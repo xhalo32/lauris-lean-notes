@@ -109,7 +109,7 @@ tag := "sec-definitional-equality-naive"
 
 In the following equation, the left and right-hand sides look different.
 -/
-example : 0 = 0 + 1 - 1 := rfl
+example : 0 = 1 - 1 := rfl
 /-
 However, Lean can reduce expressions to their normal form.
 Expressions that reduce to the same normal form are [definitionally equal][def-eq].
@@ -119,17 +119,17 @@ Above, {lean}`rfl` works as a proof since the left and right-hand sides have the
 
 We can use the meta command `#reduce` {index}[#reduce] to see how an expression is reduced.
 -/
-#reduce 0 + 1 - 1
+#reduce 1 - 1
 /-
 
 By default, `#reduce` does not reduce inside types. This affects equality, since an equality `a = a` is itself a type{margin}[We will return to this later.], namely `Eq a a`.
 -/
-#reduce 0 = 0 + 1 - 1
+#reduce 0 = 1 - 1
 /-
 
 We can force the reduction using the `types := true` option.
 -/
-#reduce (types := true) 0 = 0 + 1 - 1
+#reduce (types := true) 0 = 1 - 1
 /-
 
 The following invalid line of code produces a type mismatch error.
