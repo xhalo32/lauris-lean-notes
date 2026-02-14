@@ -48,7 +48,7 @@ Function arguments {index}[`(a : α)`] can also be introduced using parentheses.
 def plus1₂ (n : ℕ) := n + 1
 /-
 
-Yet another way is to introduce the variable in the surrounding context.
+Yet another way is to introduce the variable {index}[variable] in the surrounding context.
 -/
 variable (n : ℕ)
 def plus1₃ := n + 1
