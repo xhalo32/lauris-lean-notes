@@ -7,9 +7,10 @@ import Mathlib
 tag := "sec-expressions"
 %%%
 
-Lean is based on the [calculus of constructions][coc] with inductive types. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
+Lean is based on the [calculus of constructions][coc] with [inductive types][inductive-type]. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
 
 [coc]: https://en.wikipedia.org/wiki/Calculus_of_constructions
+[inductive-type]: https://en.wikipedia.org/wiki/Inductive_type
 
 -/
 example : ℕ := 0
