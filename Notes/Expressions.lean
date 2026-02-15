@@ -111,7 +111,7 @@ In the following equation, the left and right-hand sides look different.
 -/
 example : 0 = 1 - 1 := rfl
 /-
-However, Lean reduces expressions to their normal form.Expressions that reduce to the same normal form are [definitionally equal][def-eq]. This describes an important aspect of definitional equality, which explains most uses of {lean}`rfl`. In particular, {lean}`rfl` works as a proof since the left and right-hand sides have the same normal form.
+However, Lean reduces expressions to their normal form. Expressions that reduce to the same normal form are [definitionally equal][def-eq]. This describes an important aspect of definitional equality, which explains most uses of {lean}`rfl`. In particular, {lean}`rfl` works as a proof since the left and right-hand sides have the same normal form.
 
 [def-eq]: https://lean-lang.org/doc/reference/latest/The-Type-System/#--tech-term-definitional-equality
 
