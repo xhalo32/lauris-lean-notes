@@ -302,9 +302,9 @@ def plus1₄ :=
 /-
 
 
-# Reductions of form beta, delta, and zeta
+# Reductions of beta, delta, and zeta kind
 
-{ref "sec-definitional-equality-naive"}[Recall] that Lean reduces expressions to their normal form. This involves several kinds of reductions, three of which are related to the concepts introduced in this section.
+{ref "sec-definitional-equality-naive"}[Recall] that having the same normal form is a sufficient condition for two expressions to be definitionally equal. Computing normal forms involves several kinds of reduction, three of which are related to the concepts introduced in this section.
 
 
 ## beta-reduction
@@ -312,41 +312,50 @@ def plus1₄ :=
 β-reduction corresponds to applying a function to an argument by substitution.
 
 -/
-example : (λ n : ℕ ↦ plus1 n) 0 = plus1 0 := rfl
+variable (α β : Type) (f : α → β) (a : α)
+
+example : (λ x ↦ f x) a = f a := rfl
+
+#reduce (λ x ↦ f x) a
+#reduce f a
 /-
 
 
 ## delta-reduction
 
-δ-reduction replaces a defined name by its defining expression.
--/
-example : plus1 = (λ n : ℕ ↦ n + 1) := rfl
-/-
-
-While we have so far used `def` only to give names to functions, it should be emphasized that any expression can be named.
--/
-def one := plus1 0
-
-example : one = plus1 0 := rfl
-/-
-
-Names of expressions are referred to as constants in the Lean Language Reference, see for example [Definitions][definitions] there.
+δ-reduction replaces a defined name{margin}[Names of expressions are referred to as constants in the Lean Language Reference, see for example [Definitions][definitions] there.] by its defining expression.
 
 [definitions]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#The-Lean-Language-Reference--Definitions--Definitions
+
+While we have so far used `def` only to give names to functions, any expression can be named.
+-/
+def ℕ2 := ℕ × ℕ
+
+example : ℕ2 = (ℕ × ℕ) := rfl
+
+#reduce (types := true) ℕ2
+#reduce (types := true) ℕ × ℕ
+/-
+
+One might ask why we do not use a previously defined name such as `plus1`. The reason is that `#reduce plus1` does not demonstrate δ-reduction in isolation, as can be observed by comparing the normal form and definition of `plus1`.
+-/
+#reduce plus1
+#print plus1
+/-
+The normal form of `plus1` is related to the inductive definition of ℕ, which we explain in the next section.
 
 
 ## zeta-reduction
 
 ζ-reduction eliminates a local definition by substitution.
 
+{index}[;]
 -/
-example :
-  (
-    let t := ℕ
-    λ x : t ↦ x + 1
-  ) = λ x : ℕ ↦ x + 1
-:= rfl
+example : (let t := ℕ; t × t) = (ℕ × ℕ) := rfl
+
+#reduce (types := true) (let t := ℕ; t × t)
 /-
+The semicolon is a syntactic device that allows multiple expressions to be written on a single line. Replacing it by a line break leaves the expression intact.
 
 
 # Function eta-equivalence
@@ -356,11 +365,17 @@ tag := "sec-function-eta-equivalence"
 
 In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called η-equivalence.
 
-For functions, η-equivalence says that a function is definitionally equal to the λ-abstraction that applies it to an argument.
+For functions, η-equivalence says that a function is definitionally equal to the λ-abstraction obtained by applying the function to an argument.
 -/
-example : (λ n ↦ plus1 n) = plus1 := rfl
+example : (λ x ↦ f x) = f := rfl
 /-
-Reduction and η-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited form of extensionality.
+The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, their normal forms differ, as can be observed using `#reduce`.
+-/
+#reduce λ x ↦ f x
+#reduce f
+/-
+
+Reduction and η-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
 
 [intensional-extensional]: https://en.wikipedia.org/wiki/Extensional_and_intensional_definitions
 
