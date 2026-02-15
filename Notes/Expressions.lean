@@ -7,7 +7,7 @@ import Mathlib
 tag := "sec-expressions"
 %%%
 
-Lean is based on the [calculus of constructions][coc] with [inductive types][inductive-type]. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
+Lean is based on a _type theory_ that is a version of the [calculus of constructions][coc] with [inductive types][inductive-type]. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
 
 [coc]: https://en.wikipedia.org/wiki/Calculus_of_constructions
 [inductive-type]: https://en.wikipedia.org/wiki/Inductive_type
@@ -107,20 +107,21 @@ indexed by `u = 0, 1, ...`. Thus, `Prop` abbreviates `Sort 0`, while `Type u` ab
 tag := "sec-definitional-equality-naive"
 %%%
 
-In the following equation, the left and right-hand sides look different.
+If two expressions are [definitionally equal][def-eq], their equality can be proven using {lean}`rfl`.
+Having the same normal form is a sufficient (but not necessary) condition for definitional equality. In the following example, the left and right-hand sides have the same normal form.
 -/
 example : 0 = 1 - 1 := rfl
 /-
-However, Lean reduces expressions to their normal form. Expressions that reduce to the same normal form are [definitionally equal][def-eq]. This describes an important aspect of definitional equality, which explains most uses of {lean}`rfl`. In particular, {lean}`rfl` works as a proof since the left and right-hand sides have the same normal form.
 
 [def-eq]: https://lean-lang.org/doc/reference/latest/The-Type-System/#--tech-term-definitional-equality
 
-We can use `#reduce` {index}[#reduce] command to see how an expression is reduced.
+The `#reduce` {index}[#reduce] command displays the normal form of an expression.
 -/
 #reduce 1 - 1
 /-
+We will explain the different kinds of reduction used by `#reduce` in due course.
 
-By default, `#reduce` does not reduce inside types. This affects equality, since an equality `a = a` is itself a type{margin}[We will return to this later.], namely `Eq a a`.
+By default, `#reduce` does not reduce inside types. This affects equality, since an equality `a = a` is itself a type, namely `Eq a a`. We will return to this later.
 -/
 #reduce 0 = 1 - 1
 /-
