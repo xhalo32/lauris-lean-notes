@@ -20,7 +20,7 @@ The output shows the _type constructor_ `Nat : Type`, followed by two _construct
 * `Nat.zero : ℕ` is a constant of type ℕ,{margin}[Recall that ℕ is shorthand for {lean}`Nat`.] and
 * `Nat.succ : ℕ → ℕ` is a function from ℕ to ℕ.
 
-In Lean, `Nat.succ` is the [successor function][succ].
+`Nat.succ` corresponds to the [successor function][succ].
 
 [succ]: https://en.wikipedia.org/wiki/Successor_function
 
@@ -31,7 +31,7 @@ example : 1 = Nat.succ Nat.zero := rfl
 example : 2 = Nat.succ (Nat.succ Nat.zero) := rfl
 /-
 
-Periods separate components of hierarchical names. {index}[.] The notion of a hierarchical name is [overloaded][identifiers] in Lean, and it can mean:
+Periods separate components of hierarchical names. {index}[.] The notion of a hierarchical name is [overloaded][identifiers] in Lean, and it can mean:{margin}[This list is not exhaustive.]
 
 1. a name in a namespace,
 2. an application of a named function from the namespace of a type to an element of that type, or
@@ -51,7 +51,8 @@ and the general pattern is: if `a` has type `α`, then `a.name` may be interpret
 
 We will return to the third case below.
 
-Let's define an inductive type of the same form as `Nat`. {index}[inductive]
+Let's define an inductive type in the same way as `Nat`, with a constant constructor and a successor constructor.
+{index}[inductive]
 -/
 inductive Nat' : Type where
   | zero : Nat'
@@ -141,7 +142,7 @@ end Demo
 /-
 Observe the analogy with the Cartesian product: the type constructor `Eq` is a function, and the evaluation `Eq a a` gives a type. However, unlike `Prod α β`, where `α` and `β` are types, the parameter `a` in `Eq a a` is an expression of type `α`. Such parameters are called indices, and `Eq` is said to be an indexed family of types. The universe `α` is an implicit parameter of `Eq`.
 
-The family `Eq` has a single constructor, `refl`, that takes one argument. As a result, we can construct types of the form `Eq a a` for any expression `a`, but we can not construct types of the form `Eq a b` where `a` and `b` are distinct expressions. In this way, `Eq` encodes the equality between expressions.
+The family `Eq` has a single constructor, `refl`, that takes one argument. As a result, we can construct terms of type `Eq a a` for any expression `a`, but we cannot construct terms of type `Eq a b` when `a` and `b` are distinct. In this way, `Eq` encodes the equality between expressions.
 
 
 # Recursors
@@ -161,7 +162,7 @@ def pred (n : Nat') : Nat' :=
   | zero   => zero
   | succ m => m
 /-
-The predecessor function maps `zero` to `zero` and `n` of form `succ m` to `m`.
+The predecessor function maps `n` constructed as `zero` to `zero`, and `n` constructed as `succ m` to `m`.
 
 
 ## Pattern matching via recursors
@@ -193,7 +194,7 @@ set_option pp.all false
 Studying these expressions, we see that `pred` boils down to a rather complicated composition of λ-abstractions involving `zero`, `succ`, and `Nat'.rec`.
 
 
-# Reduction of form iota
+# Reduction of iota kind
 %%%
 tag := "sec-iota-reduction"
 %%%
