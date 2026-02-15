@@ -335,6 +335,8 @@ example
 := rfl
 
 example : (zero = zero) = Eq zero zero := rfl
+
+example : zero = zero := rfl
 /-
 
 Projections have have the expected types.
