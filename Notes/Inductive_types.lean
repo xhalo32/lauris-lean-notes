@@ -179,7 +179,7 @@ example : pred = @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m)
   funext n
   cases n <;> rfl
 /-
-The first argument of `@Nat'.rec` is called the _motive_. The motive specifies the codomain of the resulting function; since this codomain may depend on the argument of the function, the motive itself is a function. In the case of `pred`, the codomain does not depend on the argument, and we can throw away the argument of the motive.
+The first argument of `@Nat'.rec` is called the _motive_. The motive specifies the codomain of the resulting function; since this codomain may depend on the argument of the function, the motive itself is a function. In the case of `pred`, the codomain does not depend on the argument, and we can ignore the argument of the motive.
 
 The second argument of `@Nat'.rec` tells how `zero` is mapped, and the third how `succ m` is mapped. The ignored argument in `(λ m _ ↦ m)` is the codomain given by the motive.
 
