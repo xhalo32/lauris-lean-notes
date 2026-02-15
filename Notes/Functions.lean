@@ -11,13 +11,17 @@ A function can be written as follows. {index}[λ]
 -/
 example : ℕ → ℕ := λ n ↦ n + 1
 /-
-The calculus of constructions is a typed [λ-calculus][lambda]. In this context, creating a function is known as λ-abstraction. An alternative, less mathematical keyword `fun` {index}[fun] is also available
+The calculus of constructions is a typed [λ-calculus][lambda]. In this context, a function is given by a λ-abstraction. An alternative, less mathematical keyword `fun` {index}[fun] is also available
 
 [lambda]: https://en.wikipedia.org/wiki/Lambda_calculus
 
 -/
 example : ℕ → ℕ := fun n => n + 1
 /-
+The type `ℕ → ℕ` is a function type. In general, `α → β` denotes a function type, with types `α` and `β` as the [domain][domain] and [codomain][codomain], respectively.
+
+[domain]: https://en.wikipedia.org/wiki/Domain_of_a_function
+[codomain]: https://en.wikipedia.org/wiki/Codomain
 
 We can give a name to a function by replacing `example` with `def` {index}[def] and the name.
 -/
@@ -48,7 +52,7 @@ Function arguments {index}[`(a : α)`] can also be introduced using parentheses.
 def plus1₂ (n : ℕ) := n + 1
 /-
 
-Yet another way is to introduce the variable {index}[variable] in the surrounding context.
+Yet another way is to introduce a variable {index}[variable] in the surrounding context.
 -/
 variable (n : ℕ)
 def plus1₃ := n + 1
@@ -58,12 +62,13 @@ The functions `plus1₁`, `plus1₂`, and `plus1₃` coincide with `plus1`.
 
 ## Several arguments
 
-Functions of several arguments are represented as functions returning functions.
+Functions take exactly one argument in Lean. A function taking several arguments can be encoded as a function whose codomain is a function type.
 -/
 def add : ℕ → (ℕ → ℕ) := λ n ↦ (λ m ↦ n + m)
 /-
+For convenience, we refer to a function like this simply as a _function taking two arguments_.
 
-Syntactic sugar creates further illusion of functions with several arguments.
+Syntactic sugar creates the appearance of functions taking several arguments.
 -/
 def add₁ : ℕ → ℕ → ℕ := λ n m ↦ n + m
 def add₂ (n : ℕ) (m : ℕ) : ℕ := n + m
@@ -76,7 +81,7 @@ def add₄ (m : ℕ) : ℕ := n + m
 /-
 The functions `add₁, ..., add₄` coincide with `add`.
 
-[Partial application][partial-application] produces a function with fewer remaining arguments.
+[Partial application][partial-application] produces a function taking the remaining arguments.
 
 [partial-application]: https://en.wikipedia.org/wiki/Partial_application
 
@@ -84,7 +89,7 @@ The functions `add₁, ..., add₄` coincide with `add`.
 def plus1' : ℕ → ℕ := add 1
 /-
 
-Here is a function of two variables that throws away the second variable.
+The following function taking two arguments ignores the second one.
 -/
 def proj : ℕ → ℕ → ℕ := λ n ↦ λ _ ↦ n
 
@@ -112,9 +117,7 @@ universe u v
 
 example : Type u → Type v → Type (max u v) := Prod
 /-
-We will return to the least upper bound appearing in the [codomain][codomain].
-
-[codomain]: https://en.wikipedia.org/wiki/Codomain
+We will return to the least upper bound appearing in the codomain.
 
 Here are some variations
 -/
@@ -142,7 +145,7 @@ Inference of implicit arguments can be disabled using `@`. {index}[@]
 example (α : Sort u) (a : α) : a = a := @rfl α a
 example : (α : Sort u) → (a : α) → a = a := @rfl
 /-
-The explicit version `@rfl` bears some similarity with `Prod`, see in particular `Prod₁` and `Prod₂`. It is a function of two variables, taking a type `α` and then an expression `a` of that type. The codomain `a = a` of `@rfl` depends on the arguments.
+The explicit version `@rfl` bears some similarity with `Prod`, see in particular `Prod₁` and `Prod₂`. It is a function taking two arguments: first a type `α`, and then an expression `a` of that type. The codomain `a = a` of `@rfl` depends on the arguments.
 
 
 # Dependent function types
@@ -392,7 +395,7 @@ Lean's processing of source code can be divided into several [stages][processing
 
 The type theory is designed to be simple, enabling the trusted kernel to remain small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel. In addition to enforcing the rules of the type theory, the trusted kernel implements definitional equality, which accounts for η-equivalence as well as β-, δ-, and ζ-reductions, together with ι-reduction that we describe {ref "sec-iota-reduction"}[later].
 
-Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, `rfl` is simply a function with two arguments.
+Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, `rfl` is simply a function taking two arguments.
 -/
 example (α : Sort u) (a : α) : a = a := rfl
 /-
