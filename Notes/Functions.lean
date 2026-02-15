@@ -7,7 +7,7 @@ import Mathlib
 tag := "sec-functions"
 %%%
 
-A function can be written as follows. {index}[λ]
+A function can be written as follows. {index}[λ ... ↦]
 -/
 example : ℕ → ℕ := λ n ↦ n + 1
 /-
@@ -18,7 +18,7 @@ The calculus of constructions is a typed [λ-calculus][lambda]. In this context,
 -/
 example : ℕ → ℕ := fun n => n + 1
 /-
-The type `ℕ → ℕ` is a function type. In general, `α → β` denotes a function type, with types `α` and `β` as the [domain][domain] and [codomain][codomain], respectively.
+The type `ℕ → ℕ` is a function type. {index}[→] In general, `α → β` denotes a function type, with types `α` and `β` as the [domain][domain] and [codomain][codomain], respectively.
 
 [domain]: https://en.wikipedia.org/wiki/Domain_of_a_function
 [codomain]: https://en.wikipedia.org/wiki/Codomain
@@ -42,12 +42,12 @@ example : plus1 0 = 1 := rfl
 
 # Arguments
 
-The type of an argument can be included in a lambda expression. In this case, Lean can infer the type of the entire expression.
+The domain can be specified by annotating the type of the argument. Then Lean can often infer the codomain.
 -/
 def plus1₁ := λ n : ℕ ↦ n + 1
 /-
 
-Function arguments {index}[`(a : α)`] can also be introduced using parentheses.
+Syntactic sugar allows for introducing the argument using parentheses. {index}[`(a : α)`]
 -/
 def plus1₂ (n : ℕ) := n + 1
 /-
@@ -89,7 +89,7 @@ The functions `add₁, ..., add₄` coincide with `add`.
 def plus1' : ℕ → ℕ := add 1
 /-
 
-The following function taking two arguments ignores the second one.
+The following function taking two arguments ignores the second one. {index}[_]
 -/
 def proj : ℕ → ℕ → ℕ := λ n ↦ λ _ ↦ n
 
