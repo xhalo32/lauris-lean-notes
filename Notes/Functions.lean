@@ -262,7 +262,7 @@ Function extensionality is available in Lean as a theorem called {lean}`funext`.
 example : plus1 = plus1' := by
   funext n
   simp [plus1, plus1', add]
-  exact?
+  grind
 /-
 We will explain how to write proofs like this in due course. For the moment, we simply record that the principle of [functional extensionality][extensionality-principles] holds in Lean.
 
