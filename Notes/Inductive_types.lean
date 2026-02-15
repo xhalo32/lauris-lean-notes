@@ -304,11 +304,6 @@ example (x : Demo.Prod ℕ ℕ) : x = ⟨x.1, x.2⟩ := rfl
 # Further proofs and remarks
 
 -/
-example : ℕ = Nat := rfl
-example : 0 = Nat.zero := rfl
-example : 1 = Nat.succ Nat.zero := rfl
-example : 2 = Nat.succ (Nat.succ Nat.zero) := rfl
-
 example : (0, 1) = Prod.mk 0 1 := rfl
 
 example
@@ -339,7 +334,7 @@ example
   }
 := rfl
 
-example : (0 = 0) = Eq 0 0 := rfl
+example : (zero = zero) = Eq zero zero := rfl
 /-
 
 Projections have have the expected types.
