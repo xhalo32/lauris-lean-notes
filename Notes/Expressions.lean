@@ -15,12 +15,12 @@ Lean is based on the [calculus of constructions][coc] with [inductive types][ind
 -/
 example : ℕ := 0
 /-
-In this case, the expression is `0` and the type is {lean}`ℕ`. (The type precedes the expression for a reason that will become clear as we move forward.) The example asserts that the constant `0` has type ℕ, denoting the natural numbers, which are also written as {lean}`Nat`. Using programming jargon, we say that ℕ is [syntactic sugar][sugar]{margin}[In [VS Code][vscode], you can hover over ℕ and other non-ascii characters to see how they can be typed.] for {lean}`Nat`.
+In this case, the expression is `0` and the type is {lean}`ℕ`. (The type precedes the expression for a reason that will become clear as we move forward.) The example asserts that the expression `0` has type ℕ, denoting the natural numbers, which are also written as {lean}`Nat`. Using programming jargon, we say that ℕ is [syntactic sugar][sugar]{margin}[In [VS Code][vscode], you can hover over ℕ and other non-ascii characters to see how they can be typed.] for {lean}`Nat`.
 
 [vscode]: https://marketplace.visualstudio.com/items?itemName=leanprover.lean4
 [sugar]: https://en.wikipedia.org/wiki/Syntactic_sugar
 
-The meta command `#check` {index}[#check] is used to inspect{margin}[You can hover over `#check` to see its output] the type of an expression. It is useful when learning, debugging, or exploring how Lean interprets expressions.
+The command `#check` {index}[#check] is used to inspect{margin}[You can hover over `#check` to see its output] the type of an expression. It is useful when learning, debugging, or exploring how Lean interprets expressions.
 -/
 #check 0
 /-
@@ -111,13 +111,11 @@ In the following equation, the left and right-hand sides look different.
 -/
 example : 0 = 1 - 1 := rfl
 /-
-However, Lean can reduce expressions to their normal form.
-Expressions that reduce to the same normal form are [definitionally equal][def-eq].
-Above, {lean}`rfl` works as a proof since the left and right-hand sides have the same normal form.
+However, Lean reduces expressions to their normal form.Expressions that reduce to the same normal form are [definitionally equal][def-eq]. This describes an important aspect of definitional equality, which explains most uses of {lean}`rfl`. In particular, {lean}`rfl` works as a proof since the left and right-hand sides have the same normal form.
 
 [def-eq]: https://lean-lang.org/doc/reference/latest/The-Type-System/#--tech-term-definitional-equality
 
-We can use the meta command `#reduce` {index}[#reduce] to see how an expression is reduced.
+We can use `#reduce` {index}[#reduce] command to see how an expression is reduced.
 -/
 #reduce 1 - 1
 /-
