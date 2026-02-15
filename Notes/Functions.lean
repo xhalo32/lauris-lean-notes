@@ -24,7 +24,7 @@ We can give a name to a function by replacing `example` with `def` {index}[def] 
 def plus1 : ℕ → ℕ := λ n ↦ n + 1
 /-
 
-The meta command `#eval` {index}[#eval] evaluates a given expression.
+The command `#eval` {index}[#eval] evaluates a given expression.
 -/
 #eval plus1 0
 /-
@@ -60,11 +60,10 @@ The functions `plus1₁`, `plus1₂`, and `plus1₃` coincide with `plus1`.
 
 Functions of several arguments are represented as functions returning functions.
 -/
-def add : ℕ → (ℕ → ℕ) := λ n ↦ λ m ↦ n + m
+def add : ℕ → (ℕ → ℕ) := λ n ↦ (λ m ↦ n + m)
 /-
 
-Syntactic sugar is provided for iterated function types and
-nested λ-abstractions.
+Syntactic sugar creates further illusion of functions with several arguments.
 -/
 def add₁ : ℕ → ℕ → ℕ := λ n m ↦ n + m
 def add₂ (n : ℕ) (m : ℕ) : ℕ := n + m
@@ -113,6 +112,9 @@ universe u v
 
 example : Type u → Type v → Type (max u v) := Prod
 /-
+We will return to the least upper bound appearing in the [codomain][codomain].
+
+[codomain]: https://en.wikipedia.org/wiki/Codomain
 
 Here are some variations
 -/
@@ -121,7 +123,7 @@ def Prod₂ : Type → Type → Type := Prod
 def Prod₃ : Type → Type → Type := λ t ↦ λ s ↦ t × s
 def Prod₄ (t s : Type) : Type := t × s
 /-
-The functions `Prod₁, ..., Prod₄` all coincide with {lean}`Prod`, though, they are its specialization to a fixed level of the type hierarchy.
+The functions `Prod₁, ..., Prod₄` all coincide with {lean}`Prod`, though, they are instantiated with a fixed level of the type hierarchy.
 
 
 ## Implicit arguments
@@ -130,7 +132,7 @@ The functions `Prod₁, ..., Prod₄` all coincide with {lean}`Prod`, though, th
 -/
 #check rfl
 /-
-Implicit arguments {index}[`{a : α}`] are written using curly braces `{...}` instead of parentheses `(...)`. Lean infers their values automatically from context.
+Implicit arguments {index}[`{a : α}`] are written using curly braces `{...}` instead of parentheses `(...)`. Lean infers their values from context.
 -/
 example {α : Sort u} {a : α} : a = a := rfl
 /-
@@ -140,9 +142,7 @@ Inference of implicit arguments can be disabled using `@`. {index}[@]
 example (α : Sort u) (a : α) : a = a := @rfl α a
 example : (α : Sort u) → (a : α) → a = a := @rfl
 /-
-The explicit version `@rfl` bears some similarity with `Prod`, see in particular `Prod₁` and `Prod₂`. It is a function of two variables, taking a type `α` and then an expression `a` of that type. The [codomain][codomain] `a = a` of `@rfl` depends on the arguments.
-
-[codomain]: https://en.wikipedia.org/wiki/Codomain
+The explicit version `@rfl` bears some similarity with `Prod`, see in particular `Prod₁` and `Prod₂`. It is a function of two variables, taking a type `α` and then an expression `a` of that type. The codomain `a = a` of `@rfl` depends on the arguments.
 
 
 # Dependent function types
@@ -160,7 +160,7 @@ Consider the following partially applied version of `@rfl`.
 -/
 example : (i : I) → X i := @rfl I
 /-
-The type of `@rfl I` is a dependent function type, also called a [Π-type][Pi-type]. Mathematically, such a type corresponds to an [indexed product][indexed-product] of sets.
+The type of `@rfl I` is a dependent function type, also called a [Π-type][Pi-type]. Such a type can be thought of as denoting an [indexed product][indexed-product] of sets.
 
 [Pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
 [indexed-product]: https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
@@ -242,7 +242,7 @@ example : ∀ (α : Sort u) (a : α), a = a := @rfl
 
 # Function extensionality
 
-The functions `plus1` and `plus1'` are equal as mathematical functions. In Lean terminology, they are [extensionally][extensionality] equal. However, they are not definitionally equal, because their definitions use different orders of addition.
+The functions `plus1` and `plus1'` coincide in the sense that they give the same value when applied to the same argument, that is, they are [extensionally][extensionality] equal. However, they are not definitionally equal, because the two terms in the addition are in the opposite orders in their definitions.
 
 [extensionality]: https://lean-lang.org/doc/reference/latest/The-Type-System/Functions/#function-extensionality
 
@@ -302,6 +302,69 @@ def plus1₄ :=
 /-
 
 
+# Reductions of form beta, delta, and zeta
+
+{ref "sec-definitional-equality-naive"}[Recall] that Lean reduces expressions to their normal form. This involves several kinds of reductions, three of which are related to the concepts introduced in this section.
+
+
+## beta-reduction
+
+β-reduction corresponds to applying a function to an argument by substitution.
+
+-/
+example : (λ n : ℕ ↦ plus1 n) 0 = plus1 0 := rfl
+/-
+
+
+## delta-reduction
+
+δ-reduction replaces a defined name by its defining expression.
+-/
+example : plus1 = (λ n : ℕ ↦ n + 1) := rfl
+/-
+
+While we have so far used `def` only to give names to functions, it should be emphasized that any expression can be named.
+-/
+def one := plus1 0
+
+example : one = plus1 0 := rfl
+/-
+
+Names of expressions are referred to as constants in the Lean Language Reference, see for example [Definitions][definitions] there.
+
+[definitions]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#The-Lean-Language-Reference--Definitions--Definitions
+
+
+## zeta-reduction
+
+ζ-reduction eliminates a local definition by substitution.
+
+-/
+example :
+  (
+    let t := ℕ
+    λ x : t ↦ x + 1
+  ) = λ x : ℕ ↦ x + 1
+:= rfl
+/-
+
+
+# Function eta-equivalence
+%%%
+tag := "sec-function-eta-equivalence"
+%%%
+
+In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called η-equivalence.
+
+For functions, η-equivalence says that a function is definitionally equal to the λ-abstraction that applies it to an argument.
+-/
+example : (λ n ↦ plus1 n) = plus1 := rfl
+/-
+Reduction and η-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited form of extensionality.
+
+[intensional-extensional]: https://en.wikipedia.org/wiki/Extensional_and_intensional_definitions
+
+
 # Surface syntax and underlying type theory
 
 Lean's processing of source code can be divided into several [stages][processing-stages]. For our purposes, the important stages are:
@@ -312,16 +375,11 @@ Lean's processing of source code can be divided into several [stages][processing
 * _Elaboration_ that translates user-facing surface syntax into expressions of type theory.
 * _Kernel checking_ that ensures that the simplified expressions follow the rules of the type theory.
 
-The type theory is designed to be very simple, enabling the trusted kernel to remain very small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel.
+The type theory is designed to be simple, enabling the trusted kernel to remain small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel. In addition to enforcing the rules of the type theory, the trusted kernel implements definitional equality, which accounts for η-equivalence as well as β-, δ-, and ζ-reductions, together with ι-reduction that we describe {ref "sec-iota-reduction"}[later].
 
-Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, `rfl` is simply a function with two arguments
+Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, `rfl` is simply a function with two arguments.
 -/
 example (α : Sort u) (a : α) : a = a := rfl
-/-
-
-Local definitions are expanded during elaboration and do not appear in the underlying type theory. As a consequence, expressions that differ only by local definitions are definitionally equal.
--/
-example : plus1 = plus1₄ := rfl
 /-
 
 
@@ -332,6 +390,7 @@ example : plus1 = (λ n ↦ n + 1) := rfl
 example : plus1 = plus1₁ := rfl
 example : plus1 = plus1₂ := rfl
 example : plus1 = plus1₃ := rfl
+example : plus1 = plus1₄ := rfl
 
 example : (ℕ → (ℕ → ℕ)) = (ℕ → ℕ → ℕ) := rfl
 
