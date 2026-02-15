@@ -20,7 +20,38 @@ The output shows the _type constructor_ `Nat : Type`, followed by two _construct
 * `Nat.zero : ℕ` is a constant of type ℕ,{margin}[Recall that ℕ is shorthand for {lean}`Nat`.] and
 * `Nat.succ : ℕ → ℕ` is a function from ℕ to ℕ.
 
-Let's define an inductive type of the same form. {index}[inductive]
+In Lean, `Nat.succ` is the [successor function][succ].
+
+[succ]: https://en.wikipedia.org/wiki/Successor_function
+
+The numerals 0, 1, 2, ... are syntactic sugar for expressions composed from the constructors of `Nat`.
+-/
+example : 0 = Nat.zero := rfl
+example : 1 = Nat.succ Nat.zero := rfl
+example : 2 = Nat.succ (Nat.succ Nat.zero) := rfl
+/-
+
+Periods separate components of hierarchical names. {index}[.] The notion of a hierarchical name is [overloaded][identifiers] in Lean, and it can mean:
+
+1. a name in a namespace,
+2. an application of a named function from the namespace of a type to an element of that type, or
+3. a projection of a field from a structure.
+
+[identifiers]: https://lean-lang.org/doc/reference/latest/Terms/Identifiers/#identifiers-and-resolution
+
+In the first case, all but the final component of a hierarchical name constitute the [namespace][namespace], while the final component is the name itself. This case includes `Nat.zero` and `Nat.succ`, where the namespace is `Nat`, and the names are `zero` and `succ`, respectively.
+
+[namespace]: https://lean-lang.org/doc/reference/latest/Namespaces-and-Sections/#namespaces
+
+A basic example of the second case is given by
+-/
+example : 1 = Nat.zero.succ := rfl
+/-
+and the general pattern is: if `a` has type `α`, then `a.name` may be interpreted as `α.name a`.
+
+We will return to the third case below.
+
+Let's define an inductive type of the same form as `Nat`. {index}[inductive]
 -/
 inductive Nat' : Type where
   | zero : Nat'
@@ -29,7 +60,16 @@ inductive Nat' : Type where
 #print Nat'
 /-
 
-If the type signature of the type constructor is omitted, Lean will attempt to infer it automatically. The same holds for the type signature of a constructor.
+We can open {index}[open] the namespace of `Nat'`, and then write `zero` instead of `Nat'.zero`.
+-/
+open Nat'
+example : Nat' := zero
+example : Nat' := succ zero
+example : Nat' := succ (succ zero)
+/-
+The only way to construct an expression of type `Nat'` is by repeatedly applying the constructors, starting from `zero`.
+
+If the type signature of the type constructor is omitted, Lean will attempt to infer it automatically. The same holds for the type signature of a constructor. {index}[namespace]
 -/
 namespace Demo
 
@@ -41,20 +81,11 @@ end Demo
 
 #print Demo.Nat
 /-
-We introduced the namespace `Demo` {index}[namespace] to avoid a clash with the existing name `Nat`.
-
-The constant `Nat'.zero` corresponds to `0` and `Nat'.succ` is the [successor function][succ]. Type `Nat'` comes with a namespace that we can open. {index}[open] Then we can write `zero` instead of `Nat'.zero`.
-
-[succ]: https://en.wikipedia.org/wiki/Successor_function
-
+We introduced the namespace `Demo` to avoid a clash with the existing name `Nat`. We can also use it to demonstrate hierarchical names further.
 -/
-open Nat'
-example : Nat' := zero
-example : Nat' := succ zero
-example : Nat' := succ (succ zero)
+example : Demo.Nat := Demo.Nat.zero
 /-
-These expressions can be interpreted as 0, 1, and 2.
-The only way to construct an expression of type `Nat'` is by repeatedly applying the constructors, starting from `zero`.
+The hierarchical name on the right-hand side refers to the name `zero` in the namespace `Demo.Nat`.
 
 
 # Type constructors with arguments
@@ -213,7 +244,7 @@ end Demo'
 
 The structure `Prod` has two fields `fst` and `snd`. Each field in a structure corresponds to an argument of its constructor. The constructor is named `mk`, unless a name is explicitly provided. Therefore, the above structure declaration yields the same constructor as our earlier definition of `Prod`.
 
-For each field, a projection function is generated that extracts the field's value from the underlying type's constructor.
+For each field, a projection function is generated that extracts the field's value from the underlying type's constructor. This is the third use of hierarchical names that we alluded to earlier.
 -/
 example : (0, 1).fst = 0 := rfl
 example : (0, 1).snd = 1 := rfl
