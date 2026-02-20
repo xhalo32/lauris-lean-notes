@@ -1,4 +1,4 @@
-#doc (Manual) "Notes on Lean" =>
+#doc (Manual) "Notes on Lean for mathematically minded" =>
 
 %%%
 authors := ["Lauri Oksanen (lauri.oksanen@helsinki.fi)"]
