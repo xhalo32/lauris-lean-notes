@@ -1,5 +1,5 @@
 /-
-Expressions, types and propositions
+Expressions, types, propositions and universes
 -/
 import Mathlib
 /-
@@ -7,7 +7,7 @@ import Mathlib
 tag := "sec-expressions"
 %%%
 
-Lean is based on a _type theory_ that is a version of the [calculus of constructions][coc] with [inductive types][inductive-type]. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
+Lean is based on a type theory that is a version of the [calculus of constructions][coc] with [inductive types][inductive-type]. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
 
 [coc]: https://en.wikipedia.org/wiki/Calculus_of_constructions
 [inductive-type]: https://en.wikipedia.org/wiki/Inductive_type
@@ -15,12 +15,15 @@ Lean is based on a _type theory_ that is a version of the [calculus of construct
 -/
 example : ℕ := 0
 /-
-In this case, the expression is `0` and the type is {lean}`ℕ`. (The type precedes the expression for a reason that will become clear as we move forward.) The example asserts that the expression `0` has type ℕ, denoting the natural numbers, which are also written as {lean}`Nat`. Using programming jargon, we say that ℕ is [syntactic sugar][sugar]{margin}[In [VS Code][vscode], you can hover over ℕ and other non-ascii characters to see how they can be typed.] for {lean}`Nat`.
+In this case, the expression is `0` and the type is {lean}`ℕ`. The example asserts that the expression `0` has type ℕ, encoding the natural numbers.{margin}[In [VS Code][vscode], you can hover over ℕ and other non-ascii characters to see how they can be typed.]
 
 [vscode]: https://marketplace.visualstudio.com/items?itemName=leanprover.lean4
+
+Lean provides a substantial amount of [syntactic sugar][sugar]. For example, ℕ is syntactic sugar for {lean}`Nat`. Understanding the underlying type theory often requires considering expressions from which syntactic sugar has been removed.
+
 [sugar]: https://en.wikipedia.org/wiki/Syntactic_sugar
 
-The command `#check` {index}[#check] is used to inspect{margin}[You can hover over `#check` to see its output] the type of an expression. It is useful when learning, debugging, or exploring how Lean interprets expressions.
+The command `#check` {index}[#check] is used to inspect{margin}[You can hover over `#check` to see its output] the type of an expression.
 -/
 #check 0
 /-
@@ -29,7 +32,7 @@ The output `0 : ℕ` means that `0` has type `ℕ`. We will occasionally use thi
 -/
 #check (0, 1)
 /-
-The pair `(0, 1)` has type `ℕ × ℕ`, standing for the [Cartesian product][prod] of ℕ with itself. This is syntactic sugar for `Prod ℕ ℕ`.
+The pair `(0, 1)` has type `ℕ × ℕ`, encoding the [Cartesian product][prod] of ℕ with itself. This is syntactic sugar for `Prod ℕ ℕ`.
 
 [prod]: https://en.wikipedia.org/wiki/Cartesian_product
 
@@ -37,7 +40,7 @@ The pair `(0, 1)` has type `ℕ × ℕ`, standing for the [Cartesian product][pr
 example : ℕ × ℕ := (0, 1)
 /-
 
-The following invalid line of code produces a type mismatch error since the pair `(0, 0)` doesn't have type `ℕ`.
+The following invalid example produces a type mismatch error, since the pair `(0, 0)` doesn't have type `ℕ`.
 
 ```lean +error
 example : ℕ := (0, 0)
@@ -65,12 +68,12 @@ But {lean}`Type` is also a type, so what's its type?
 example : Type 1 := Type
 /-
 
-In fact, there is an infinite hierarchy of types,
+In fact, there is an infinite sequence of types,
 -/
 example : Type 2 := Type 1
 example : Type 3 := Type 2
 /-
-and so on. {lean}`Type` is an abbreviation for {lean}`Type 0`.
+and so on. {lean}`Type` is an abbreviation for {lean}`Type 0`; in fact, both are syntactic sugar, as we will explain shortly.
 
 
 # Propositions
@@ -81,25 +84,22 @@ tag := "sec-propositions"
 Propositions are expressions of type {lean}`Prop`.
 -/
 example : Prop := 0 = 0
-example : Prop := 0 = 1
+example : Prop := 1 = 0
 /-
 The first proposition is provable, while the second is not. In fact, the negation of the second is provable.
 
-Just like `ℕ`, {lean}`Prop` has type {lean}`Type`.
--/
-example : Type := Prop
-/-
+Interestingly, the proposition `0 = 0` is itself a type. In general, all expressions of type `Prop` are themselves types.
 
-Interestingly, `0 = 0` is a type. An expression of type `0 = 0` is a proof of `0 = 0`. In other words, to prove a proposition in Lean is to construct an expression having the proposition as its type.
+An expression of type `0 = 0` is viewed as a proof of `0 = 0`. In general, to prove a proposition in Lean is to construct an expression having the proposition as its type.
 -/
 example : 0 = 0 := rfl
 /-
-We will consider the precise meaning of {lean}`rfl` {index}[rfl] (and `=`) later. For the moment, let's just view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
+We will consider the precise meaning of {lean}`rfl` {index}[rfl] (and the equality `=`) later. For the moment, let's just view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
 
-The [right shift][right-shift] of the type hierarchy, with `Prop` at level `0`, is called the universe hierarchy `Sort u`,
-indexed by `u = 0, 1, ...`. Thus, `Prop` abbreviates `Sort 0`, while `Type u` abbreviates `Sort (u + 1)`. This is the full hierarchy used by Lean.
-
-[right-shift]: https://en.wikipedia.org/wiki/Shift_operator#Sequences
+Like `ℕ`, {lean}`Prop` has type {lean}`Type`.
+-/
+example : Type := Prop
+/-
 
 
 # Definitional equality
@@ -107,35 +107,64 @@ indexed by `u = 0, 1, ...`. Thus, `Prop` abbreviates `Sort 0`, while `Type u` ab
 tag := "sec-definitional-equality-naive"
 %%%
 
-If two expressions are [definitionally equal][def-eq], their equality can be proven using {lean}`rfl`.
-Having the same normal form is a sufficient (but not necessary) condition for definitional equality. In the following example, the left and right-hand sides have the same normal form.
--/
-example : 0 = 1 - 1 := rfl
-/-
+If two expressions are [definitionally equal][def-eq], then their equality can be proven using {lean}`rfl`. A sufficient (but not necessary) condition for definitional equality is that the expressions have the same normal form; the `#reduce` {index}[#reduce] command displays this normal form.{margin}[We will give more details on the reduction to normal form in due course.]
 
 [def-eq]: https://lean-lang.org/doc/reference/latest/The-Type-System/#--tech-term-definitional-equality
 
-The `#reduce` {index}[#reduce] command displays the normal form of an expression.
 -/
 #reduce 1 - 1
 /-
-We will explain the different kinds of reduction used by `#reduce` in due course.
-
-By default, `#reduce` does not reduce inside types. This affects equality, since an equality `a = a` is itself a type, namely `Eq a a`. We will return to this later.
+Since the normal form of `1 - 1` is `0`, we can use {lean}`rfl` to prove `1 - 1 = 0`.
 -/
-#reduce 0 = 1 - 1
+example : 1 - 1 = 0 := rfl
 /-
 
-We can force the reduction using the `types := true` option.
+By default, `#reduce` does not reduce inside types. This matters for equality, since an expression such as `a = a` is itself a type, namely `Eq a a`. We will return to this later.
 -/
-#reduce (types := true) 0 = 1 - 1
+#reduce 1 - 1 = 0
 /-
 
-The following invalid line of code produces a type mismatch error.
+We can force reduction inside types as follows.
+-/
+#reduce (types := true) 1 - 1 = 0
+/-
+
+The following example is invalid.
 
 ```lean +error
-example : 0 = 1 := rfl
+example : 1 = 0 := rfl
 ```
+
+
+# Universe hierarchy
+
+The infinite sequence `Prop, Type 0, Type 1, ...` is syntactic sugar for the universe hierarchy `Sort 0, Sort 1, Sort 2, ...`. {index}[Sort] Here `Sort u` is called a universe and `u` is its level.
+
+We can verify that `Prop` is indeed `Sort 0` using {lean}`rfl`.
+-/
+example : Prop = Sort 0 := rfl
+/-
+
+A general universe can be referred to using a [universe variable][universe-variable]. {index}[universe]
+
+[universe-variable]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#Lean___Parser___Command___universe-next
+
+-/
+universe u
+/-
+We can verify that `Type u` is indeed `Sort (u + 1)`.
+-/
+example : Type u = Sort (u + 1) := rfl
+/-
+
+The type of a universe is the next universe in the hierarchy.
+-/
+example : Sort (u + 1) := Sort u
+/-
+
+Each type `α` satisfies `α : Sort u` for exactly one `u = 0, 1, ...`. In particular, the universe hierarchy is [non-cumulative][non-cumulative].
+
+[non-cumulative]: https://lean-lang.org/doc/reference/latest/Elaboration-and-Compilation/?terms=non-cumulative#The-Lean-Language-Reference--Elaboration-and-Compilation--The-Kernel
 
 
 # Further proofs
@@ -148,15 +177,5 @@ example : ℕ = Nat := rfl
 example : (ℕ × ℕ) = (Prod ℕ ℕ) := rfl
 
 example : Type = Type 0 := rfl
-example : Type 0 = Sort 1 := rfl
-example : Type 1 = Sort 2 := rfl
-example : Prop = Sort 0 := rfl
 
 example : (0 = 0) = Eq 0 0 := rfl
-/-
-
-After declaring a universe variable, we can verify the relation between the type and universe hierarchies in general. We will {ref "sec-functions-of-types"}[return] to universe variables.
--/
-universe u
-
-example : Type u = Sort (u + 1) := rfl
