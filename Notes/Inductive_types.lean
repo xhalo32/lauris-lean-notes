@@ -270,54 +270,61 @@ takes a _recursive argument_, that is, an argument of the same inductive type it
 
 ## Arguments of recursors
 
-Consider the type of `@Nat.rec`.{margin}[In Lean, comments are written using `--`. {index}[--] Here they are used to label parts of the type.]
+Consider the type of `@Nat.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- ... -/`] Here they are used to label parts of the type.]
 -/
 example :
-  (motive : ℕ → Sort u) → -- motive
+  (motive : ℕ → Sort u) /- motive -/ →
 
   -- minor premises:
-  motive Nat.zero → -- zero
-  ((m : ℕ) → motive m → motive m.succ) → -- succ
+  motive Nat.zero /- zero -/ →
+  ((m : ℕ) → motive m → motive m.succ) /- succ -/ →
 
-  (n : ℕ) → -- major premise
-  motive n -- codomain
+  (n : ℕ) /- major premise -/ →
+  motive n /- codomain -/
 := @Nat.rec
+/-
 /-
 As above, the first argument of `@Nat.rec` is the motive. The last argument is called the _major premise_. In the case of `@Nat.rec`, the remaining arguments are called the _minor premises_.
 
-There is one minor premise for each constructor. The type or codomain of each minor premise is determined by the motive. A minor premise is a function if and only if the constructor is a function. In this case:
-  * If the constructor does not take recursive arguments, then the domain of the minor premise coincides with the domain of the constructor.
-  * Otherwise, the minor premise takes an additional induction-hypothesis argument for each recursive argument.
+There is one minor premise for each constructor. The type or codomain of each minor premise is determined by the motive. A minor premise is a function if the constructor is a function. In this case, it takes arguments of the same type as the constructor, excluding the parameters of the type. If the constructor takes recursive arguments, the minor premise additionally takes one induction-hypothesis argument for each such argument. In the example above, the argument `motive m` in the minor premise associated to `Nat.succ` is the only induction-hypothesis argument.
+-/
 
 Next, consider the type of `@Prod.rec`.
 -/
 example :
-  (α : Type u) → (β : Type v) → -- parameters
-  (motive : α × β → Sort w) → -- motive
+  (α : Type u) → (β : Type v) /- parameters -/ →
+  (motive : α × β → Sort w) /- motive -/ →
 
   -- minor premises:
-  ((fst : α) → (snd : β) → motive (fst, snd)) → -- mk
+  ((fst : α) → (snd : β) → motive (fst, snd)) /- mk -/ →
 
-  (pair : α × β) → -- major premise
-  motive pair -- codomain
+  (pair : α × β) /- major premise -/ →
+  motive pair /- codomain -/
 := @Prod.rec
 /-
 `Prod` is an inductive type with parameters. Its parameters precede the motive. As `Prod` has a single constructor `Prod.mk`, there is a single minor premise.
 
-Like `Nat.succ`, `Prod.mk` is a function, but unlike `Nat.succ`, it is not recursive as it does not take an argument of type `Prod`. Hence the minor premise does not have an induction hypothesis as an argument. Its domain coincides with the domain of the constructor.
+Like `Nat.succ`, `Prod.mk` is a function, but unlike `Nat.succ`, it is not recursive as it does not take an argument of type `Prod`. Hence the minor premise does not have induction-hypothesis arguments.
+
+Apart from the parameters `α : Type u` and `β : Type v`, the minor premise takes the same arguments as the constructor `@Prod.mk`:
+-/
+example :
+  (α : Type u) → (β : Type v) →
+  (fst : α) → (snd : β) → Prod α β := @Prod.mk
+/-
 
 Finally, consider the type of `@Eq.rec`.
 -/
 example :
-  (α : Sort u) → (a : α) → -- parameters
-  (motive : (x : α) → a = x → Sort v) → -- motive
+  (α : Sort u) → (a : α) /- parameters -/ →
+  (motive : (x : α) → a = x → Sort v) /- motive -/ →
 
   -- minor premises:
-  motive a (Eq.refl a) → -- refl
+  motive a (Eq.refl a) /- refl -/ →
 
-  (b : α) → -- indices
-  (h : a = b) → -- major premise
-  motive b h -- codomain
+  (b : α) /- indices -/ →
+  (h : a = b) /- major premises -/ →
+  motive b h /- codomain -/
 := @Eq.rec
 /-
 Like for `Prod`, the parameters of `Eq` precede the motive. As `Eq` has a single constructor `Eq.refl`, there is a single minor premise. Unlike `Nat` and `Prod`, `Eq` is an indexed family of types. Its index precedes the major premise.
