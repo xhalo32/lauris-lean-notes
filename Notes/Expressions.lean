@@ -40,7 +40,7 @@ The pair `(0, 1)` has type `ℕ × ℕ`, encoding the [Cartesian product][prod] 
 example : ℕ × ℕ := (0, 1)
 /-
 
-The following invalid example produces a type mismatch error, since the pair `(0, 0)` doesn't have type `ℕ`.
+The following invalid example produces a type mismatch error, since the pair `(0, 0)` does not have type `ℕ`.
 
 ```lean +error
 example : ℕ := (0, 0)
@@ -94,7 +94,7 @@ An expression of type `0 = 0` is viewed as a proof of `0 = 0`. In general, to pr
 -/
 example : 0 = 0 := rfl
 /-
-We will consider the precise meaning of {lean}`rfl` {index}[rfl] (and the equality `=`) later. For the moment, let's just view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
+We will consider the precise meaning of {lean}`rfl` {index}[rfl] (and the equality `=`) later. For the moment, let us simply view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
 
 Like `ℕ`, {lean}`Prop` has type {lean}`Type`.
 -/
@@ -140,20 +140,9 @@ example : 1 = 0 := rfl
 
 The infinite sequence `Prop, Type 0, Type 1, ...` is syntactic sugar for the universe hierarchy `Sort 0, Sort 1, Sort 2, ...`. {index}[Sort] Here `Sort u` is called a universe and `u` is its level.
 
-We can verify that `Prop` is indeed `Sort 0` using {lean}`rfl`.
+We can verify that the two sequences coincide using {lean}`rfl`.
 -/
 example : Prop = Sort 0 := rfl
-/-
-
-A general universe can be referred to using a [universe variable][universe-variable]. {index}[universe]
-
-[universe-variable]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#Lean___Parser___Command___universe-next
-
--/
-universe u
-/-
-We can verify that `Type u` is indeed `Sort (u + 1)`.
--/
 example : Type u = Sort (u + 1) := rfl
 /-
 
