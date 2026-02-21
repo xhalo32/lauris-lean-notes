@@ -482,13 +482,13 @@ Lean's processing of source code can be divided into several [stages][processing
 
 The type theory is designed to be simple, enabling the trusted kernel to remain small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel.
 
-In addition to enforcing the rules of the type theory, the trusted kernel implements definitional equality, which accounts for:
+In addition to enforcing the rules of the type theory, the trusted kernel implements definitional equality, which accounts for:{margin}[There is also quotient reduction outside the sublanguage considered here.]
 
-* proof irrelevance,
-* η-equivalence,
-* β-, δ-, and ζ-reductions,
-* ι-reduction (described {ref "sec-iota-reduction"}[later]), and
-* quotient reduction.
+1. Proof irrelevance
+2. Function η-equivalence
+3. Structure η-equivalence (described {ref "sec-structure-eta-equivalence"}[later])
+4. β-, δ-, and ζ-reductions
+5. ι-reduction (described {ref "sec-iota-reduction"}[later])
 
 Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, `rfl` is simply a function taking two arguments.
 -/
