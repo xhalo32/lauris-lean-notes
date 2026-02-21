@@ -158,9 +158,9 @@ example (α : Sort u) (a : α) : a = a := @rfl α a
 Like `Prod`, `@rfl` is a function taking two arguments: first a type `α`, and then an expression `a` of that type. Its codomain `a = a` depends on the arguments.
 
 
-# Dependent function types
+# Pi-types
 %%%
-tag := "sec-dependent-function-types"
+tag := "sec-pi-types"
 %%%
 
 To simplify the notation, we introduce the following function taking two arguments, the first of which is introduced as an implicit variable in the surrounding context.
@@ -173,9 +173,9 @@ Consider the following partially applied version of `@rfl`.
 -/
 example : (i : I) → X i := @rfl I
 /-
-The type of `@rfl I` is a dependent function type, also called a [Π-type][Pi-type]. Such a type can be thought of as encoding an [indexed product][indexed-product] of sets, with `i : I` giving the indexing. We refer to `i : I` as the _index_ of the Π-type `(i : I) → X i`.
+The type of `@rfl I` is a dependent function type, also called a [Π-type][pi-type]. Such a type can be thought of as encoding an [indexed product][indexed-product] of sets, with `i : I` giving the indexing. We refer to `i : I` as the _index_ of the Π-type `(i : I) → X i`.
 
-[Pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
+[pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
 [indexed-product]: https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
 
 
@@ -288,7 +288,7 @@ Consider an evaluation of a predicate.
 example (α : Sort u) (P : α → Prop) (a : α) : Prop := P a
 /-
 Since `P a` has type `Prop`, it is itself a type. (All expressions of type `Prop` are themselves types.)
-In particular, it can occur as the codomain of a dependent function type.
+In particular, it can occur as the codomain of a Π-type.
 -/
 example (α : Sort u) (P : α → Prop) : Prop := (a : α) → P a
 /-
