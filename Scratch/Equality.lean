@@ -1,0 +1,368 @@
+/-
+Equality and distinctness
+-/
+import Mathlib
+/-
+%%%
+tag := "sec-equality"
+%%%
+
+
+We have heavily relied on `rfl`, which is simply the constructor `Eq.refl` of `Eq`, with both the arguments implicit.
+-/
+#print rfl
+
+example : @rfl = @Eq.refl := rfl
+/-
+
+As a proof, `rfl` inherits all its power from the definitional equality implemented by the kernel. To demonstrate this, we define our own versions `Eq` and `rfl`.
+-/
+inductive Eq' : {α : Sort u} → α → α → Prop where
+  | refl : {α : Sort u} → (a : α) → Eq' a a
+
+def rfl' {α : Sort u} {a : α} := Eq'.refl a
+/-
+These behave identically to `Eq` and `rfl` as far as definitional equality is concerned:
+
+1. Proof irrelevance
+-/
+example
+  (p : Prop) (proof₁ proof₂ : p) : Eq' proof₁ proof₂
+:= rfl'
+/-
+
+2. Function η-equivalence
+-/
+example
+  (α : Sort u) (β : Sort v) (f : α → β) : Eq' (λ x ↦ f x) f
+:= rfl'
+/-
+
+3. Structure η-equivalence
+-/
+example
+  (α : Type u) (β : Type v) (x : α × β)
+  : Eq' ⟨x.1, x.2⟩  x
+:= rfl'
+/-
+
+4. β-, δ-, and ζ-reductions
+-/
+example
+  (α : Sort u) (β : Sort v) (f : α → β) (a : α)
+  : Eq' ((λ x ↦ f x) a) (f a)
+:= rfl'
+
+def ℕ_to_ℕ := ℕ → ℕ
+example : Eq' ℕ_to_ℕ (ℕ → ℕ) := rfl'
+
+example : Eq' (let t := ℕ; t → t) (ℕ → ℕ) := rfl'
+/-
+
+5. ι-reduction
+-/
+example (n : ℕ) :
+  Eq' (@Nat.rec (λ _ ↦ ℕ) 0 (λ m _ ↦ m) (Nat.succ n)) n
+:= rfl'
+/-
+
+Moreover, the kernel performs reductions of different kinds until the normal form is obtained.
+-/
+example (n : ℕ) :
+  let pred (n : ℕ) := n - 1
+  Eq' (pred (Nat.succ n)) n
+:= rfl'
+/-
+
+Of course, `Eq'` and `rfl'` also tell apart expressions that are not definitionally equal.
+```lean +error
+example : Eq' 0 1 := rfl'
+```
+
+
+# Basic properties of Eq
+
+An [equivalence relation][equivalence-relation] is a binary relation that is
+
+* reflexive: `a = a` for all `a`,
+* symmetric: if `a = b` then `b = a` for all `a` and `b`, and
+* transitive: if `a = b` and `b = c` then `a = c` for all `a`, `b`, and `c`.
+
+Reflexivity of `Eq` is proven by `rfl`, which is, in fact, named after reflexivity.
+
+[equivalence-relation]: https://en.wikipedia.org/wiki/Equivalence_relation
+
+-/
+example (α : Sort u) (a : α) : a = a := rfl
+/-
+
+
+## Symmetry
+
+{ref sec="sec-arguments-of-recursors"}[Recall] that `Eq.rec` is the recursor of `Eq`. Symmetry can be proven using this recursor and `rfl`.
+-/
+example :
+  (α : Sort u) → (a : α) /- parameters -/ →
+  (motive : (x : α) → a = x → Sort v) /- motive -/ →
+  motive a (Eq.refl a) /- minor premise -/ →
+  (b : α) /- index -/ →
+  (h : a = b) /- major premise -/ →
+  motive b h /- codomain -/
+:= @Eq.rec
+
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= @Eq.rec
+  α a /- parameters -/
+  (λ x _ ↦ x = a) /- motive -/
+  rfl /- minor premise -/
+  b /- index -/
+  h /- major premise -/
+/-
+The proof works, since the codomain `motive b h` is `b = a`,
+-/
+example (α : Sort u) (a b : α) (h : a = b) :
+  let motive := (λ x _ ↦ x = a)
+  (b = a) = motive b h := rfl
+/-
+and since `rfl` has the type of the minor premise,
+-/
+example (α : Sort u) (a : α) :
+  let motive := (λ x _ ↦ x = a)
+  motive a (Eq.refl a) := rfl
+/-
+This type is simply the proposition `a = a`,
+-/
+example (α : Sort u) (a : α) :
+  let motive := (λ x _ ↦ x = a)
+  (a = a) = motive a (Eq.refl a) := rfl
+/-
+It admits the proof `rfl`.
+
+A short proof is obtained by letting Lean infer all implicit arguments.
+-/
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= Eq.rec rfl h
+/-
+
+Proofs by pattern matching are translated to a similar use of `Eq.rec` as above.
+-/
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= match h with
+  | Eq.refl a => rfl
+
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= match h with
+  | rfl => rfl
+/-
+
+Symmetry is also available as the theorem `Eq.symm`.
+-/
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= Eq.symm h
+/-
+
+
+## Transitivity
+
+Transitivity can be proven using the recursor `Eq.rec`. We have renamed its arguments in a suggestive way.
+-/
+example :
+  (α : Sort u) → (b : α) /- parameters -/ →
+  (motive : (x : α) → b = x → Sort v) /- motive -/ →
+  motive b (Eq.refl b) /- minor premise -/ →
+  (c : α) /- index -/ →
+  (h2 : b = c) /- major premise -/ →
+  motive c h2 /- codomain -/
+:= @Eq.rec
+
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:= @Eq.rec
+  α b /- parameters -/
+  (λ x _ ↦ a = x) /- motive -/
+  h1 /- minor premise -/
+  c /- index -/
+  h2 /- major premise -/
+/-
+The motive `λ x _ ↦ a = x` is different from the one in the proof of symmetry: its body is `a = x` while for symmetry it was `x = a`. The proof works, since the codomain `motive c h2` is `a = c`,
+-/
+example (α : Sort u) (a b c : α) (h2 : b = c) :
+  let motive := (λ x _ ↦ a = x)
+  (a = c) = motive c h2 := rfl
+/-
+and since `h1 : a = b` has the type of the minor premise,
+-/
+example (α : Sort u) (a b : α) (h1 : a = b):
+  let motive := (λ x _ ↦ a = x)
+  motive b (Eq.refl b) := h1
+/-
+Indeed,
+-/
+example (α : Sort u) (a b : α):
+  let motive := (λ x _ ↦ a = x)
+  (a = b) = motive b (Eq.refl b) := rfl
+/-
+
+A short proof is obtained by letting Lean infer all implicit arguments.
+-/
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:= Eq.rec h1 h2
+/-
+
+A proof by pattern matching is translated to a similar use of `Eq.rec` as above.
+-/
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:= match h1 with
+  | rfl => h2
+/-
+
+Transitivity is also available as the theorem `Eq.trans`.
+-/
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:= Eq.trans h1 h2
+/-
+
+
+## Substitution
+
+In addition to being an equivalence relation, `=` satisfies the [substitution principle][substitution-principle], formulated and proven as follows.
+
+[substitution-principle]: https://en.wikipedia.org/wiki/Equality_(mathematics)#Basic_properties
+
+-/
+example
+  (α : Sort u) (P : α → Prop) (a b : α)
+  (h1 : a = b) (h2 : P a) : P b
+:= Eq.rec h2 h1
+/-
+
+A related substitution property under a function application is often called _congruence_ in the context of Lean.
+-/
+example
+  (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
+  (h : a = b)
+  : f a = f b
+:= Eq.rec rfl h
+/-
+
+The substitution principle and congruence are available as theorems.
+-/
+example
+  (α : Sort u) (P : α → Prop) (a b : α)
+  (h1 : a = b) (h2 : P a) : P b
+:= Eq.subst h1 h2
+
+example
+  (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
+  (h : a = b)
+  : f a = f b
+:= congrArg f h
+/-
+
+In fact, congruence is substitution for the equality-valued predicate `λ x ↦ f a = f x`. The predicate is an implicit argument of `Eq.subst` called `motive`, in line with `Eq.rec`.
+-/
+example
+  (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
+  (h : a = b)
+  : f a = f b
+:= Eq.subst (motive := λ x ↦ f a = f x) h rfl
+/-
+Named arguments allow specifying implicit parameters explicitly. {index}{`( ... := ... )`} A variation of the motive, namely `(motive := λ x _ ↦ f a = f x)`, can be used in the earlier proof by `Eq.rec` to make it more explicit.
+
+
+# Constructor distinctness
+
+Distinct constructors of an inductive type cannot be equal. This _constructor distinctness_ can be proven using the substitution principle.
+
+To illustrate this, consider an inductive type with two constructors.
+-/
+inductive S where
+  | a
+  | b
+
+open S
+/-
+
+We can show that `a = b` leads to a contradiction by applying the substitution principle to
+-/
+def f (s : S) : Prop := match s with
+  | a => True
+  | b => False
+/-
+Indeed,
+-/
+example (h : a = b) : False :=
+  let hf : f a := trivial
+  Eq.subst h hf
+/-
+
+Recall that `¬ (a = b)` is syntactic sugar. Additional syntactic sugar is provided.
+-/
+example : (¬ (a = b)) = (a = b → False) := rfl
+example : (a ≠ b) = (a = b → False) := rfl
+/-
+
+A reformulation of the above contradiction, with a proof using `S.rec` directly, can be given as follows.
+-/
+example : a ≠ b := λ h ↦
+  let f : S → Prop := S.rec True False
+  let hf : f a := trivial
+  Eq.subst h hf
+/-
+
+Proofs by pattern matching are translated to a similar use of `Eq.subst` and `S.rec` as above.
+-/
+example : a ≠ b := λ h ↦ nomatch h
+example : a ≠ b := nofun
+/-
+
+The [nomatch expression][nomatch] is a pattern match with zero cases, and `nofun` is shorthand for a function with a body that applies `nomatch` to its arguments.
+
+[nomatch]: https://lean-lang.org/doc/reference/latest/Terms/Pattern-Matching/#The-Lean-Language-Reference--Terms--Pattern-Matching--Other-Pattern-Matching-Operators
+
+
+# Constructor injectivity
+
+In addition to constructor distinctness, _constructor injectivity_ holds: if two constructor applications are equal, then their arguments are equal as well. This can be proven using congruence, transitivity, and suitable deconstruction.
+-/
+example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
+:=
+  let succ := Nat.succ
+  let pred : Nat → Nat := Nat.rec 0 (λ k _ ↦ k)
+  let hpp : pred (succ n) = pred (succ m) := congrArg pred h
+  let hnp : n = pred (succ n) := rfl
+  let hpm : pred (succ m) = m := rfl
+  Eq.trans hnp (Eq.trans hpp hpm)
+/-
+
+Lean generates an injectivity theorem for each constructor taking parameters.
+-/
+example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
+:= Nat.succ.inj h
+/-
+
+For constructors with multiple arguments, injectivity yields equalities for each argument.
+-/
+example
+  (α : Type u) (β : Type v) (pair₁ pair₂ : α × β)
+  (h : pair₁ = pair₂)
+  : pair₁.fst = pair₂.fst ∧ pair₁.snd = pair₂.snd
+:= Prod.mk.inj h
+/-
+
+
+# Further proofs
+
+-/
+example
+  (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
+  (h : a = b)
+  : f a = f b
+:= Eq.rec (motive := λ x _ ↦ f a = f x) rfl h
