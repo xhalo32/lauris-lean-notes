@@ -270,7 +270,7 @@ takes a _recursive argument_, that is, an argument of the same inductive type it
 
 ## Arguments of recursors
 
-Consider the type of `@Nat.rec`.
+Consider the type of `@Nat.rec`.{margin}[In Lean, comments are written using `--`. {index}[--] Here they are used to label parts of the type.]
 -/
 example :
   (motive : ℕ → Sort u) → -- motive
