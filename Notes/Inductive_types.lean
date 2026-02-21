@@ -269,6 +269,9 @@ takes a _recursive argument_, that is, an argument of the same inductive type it
 
 
 ## Arguments of recursors
+%%%
+tag := "sec-arguments-of-recursors"
+%%%
 
 Consider the type of `@Nat.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- ... -/`] Here they are used to label parts of the type.]
 -/
@@ -323,7 +326,7 @@ example :
   motive a (Eq.refl a) /- refl -/ →
 
   (b : α) /- indices -/ →
-  (h : a = b) /- major premises -/ →
+  (h : a = b) /- major premise -/ →
   motive b h /- codomain -/
 := @Eq.rec
 /-
