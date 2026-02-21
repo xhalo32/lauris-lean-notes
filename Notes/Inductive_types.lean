@@ -508,6 +508,9 @@ example
 
 
 # Structure eta-equivalence
+%%%
+tag := "sec-structure-eta-equivalence"
+%%%
 
 {ref "sec-function-eta-equivalence"}[Recall] that function η-equivalence identifies a function with the λ-abstraction obtained by applying it to an argument.
 
