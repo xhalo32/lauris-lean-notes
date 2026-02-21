@@ -118,13 +118,11 @@ tag := "sec-functions-of-types"
 example : Type → Type → Type := Prod
 /-
 
-In fact, {lean}`Prod` is a more general [universe-polymorphic][univ-polymorphic] function. The general version can be written with the help of universe variables.
+In fact, {lean}`Prod` is a more general [universe-polymorphic][univ-polymorphic] function.
 
 [univ-polymorphic]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#--tech-term-universe-polymorphism
 
 -/
-universe u v
-
 example : Type u → Type v → Type (max u v) := Prod
 /-
 We will {ref "sec-well-formedness"}[return] to the least upper bound appearing in the codomain.
@@ -175,10 +173,11 @@ Consider the following partially applied version of `@rfl`.
 -/
 example : (i : I) → X i := @rfl I
 /-
-The type of `@rfl I` is a dependent function type, also called a [Π-type][Pi-type]. Such a type can be thought of as encoding an [indexed product][indexed-product] of sets.
+The type of `@rfl I` is a dependent function type, also called a [Π-type][Pi-type]. Such a type can be thought of as encoding an [indexed product][indexed-product] of sets, with `i : I` giving the indexing. We refer to `i : I` as the _index_ of the Π-type `(i : I) → X i`.
 
 [Pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
 [indexed-product]: https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
+
 
 In fact, all function types are Π-types.
 -/
@@ -225,23 +224,23 @@ example
 tag := "sec-impredicative-lub-rule"
 %%%
 
-The type of a function type is governed by the _impredicative least upper bound rule_:{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity].]
+The type of a function type is governed by the _impredicative least upper bound rule_:{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity]. The [level expression][level-expression] `imax u v`, with `u, v = 0, 1, ...`, is called the impredicative least upper bound of `u` and `v`. We have named the rule accordingly.]
 
 [predicativity]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#The-Lean-Language-Reference--The-Type-System--Universes--Predicativity
+[level-expression]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/?terms=imax#level-expressions
 
 -/
 example (α : Sort u) (β : Sort v) : Sort (imax u v) := α → β
 /-
 where
 -/
-example : Sort (imax u 0) = Sort 0 := rfl
+example : Sort (imax _ 0) = Sort 0 := rfl
 example : Sort (imax u (v + 1)) = Sort (max u (v + 1))
 := rfl
 /-
 
-The [level expression][level-expression] `imax u v`, with `u, v = 0, 1, ...`, is called the impredicative least upper bound of `u` and `v`. We have named the rule accordingly. It is essential for the consistency of the type theory: certain typed lambda calculi that lack such universe-level stratification are subject to [Girard's paradox][girard].
+This rule is essential for the consistency of the type theory: certain typed lambda calculi that lack such universe-level stratification are subject to [Girard's paradox][girard].
 
-[level-expression]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/?terms=imax#level-expressions
 [girard]: https://en.wikipedia.org/wiki/System_U
 
 The special case `v = 0` is related to proof irrelevance: any two proofs of the same proposition are definitionally equal.
@@ -251,11 +250,11 @@ example (p : Prop) (proof₁ proof₂ : p) : proof₁ = proof₂
 /-
 Heuristically speaking, since proofs carry no information beyond the fact that a proposition holds, they do not enable the kind of self-referential constructions that lead to paradoxes.
 
-Let's consider logical implication and rewrite our earlier example with slightly different syntactic sugar.
+We revisit the earlier example of logical implication and emphasize again that all expressions of type `Prop` are themselves types.
 -/
 example (p : Prop) (q : Prop) : Prop := p → q
 /-
-We emphasize again that all expressions of type `Prop` are themselves types. The type `Prop` of `p → q` arises from the impredicative least upper bound rule. Indeed, since
+The type `Prop` of `p → q` arises from the impredicative least upper bound rule. Indeed, since
 -/
 example (p : Prop) : Sort 0 := p
 example (q : Prop) : Sort 0 := q
@@ -301,7 +300,7 @@ example (α : Sort u) (P : α → Prop) (a : α) : Sort 0 := P a
 /-
 the rule applies with `v = 0`, yielding the type
 -/
-example : Sort 0 = Sort (imax u 0) := rfl
+example : Sort 0 = Sort (imax _ 0) := rfl
 example : Sort 0 = Prop := rfl
 /-
 
