@@ -1,7 +1,10 @@
 #doc (Manual) "Notes on Lean for mathematically minded" =>
 
 %%%
-authors := ["Lauri Oksanen (lauri.oksanen@helsinki.fi)"]
+shortTitle := "Notes on Lean"
+shortContextTitle := "Lean"
+authors := ["Lauri Oksanen"]
+authorshipNote := "lauri.oksanen@helsinki.fi"
 %%%
 
 
