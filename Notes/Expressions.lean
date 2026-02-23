@@ -6,20 +6,25 @@ import Mathlib
 %%%
 tag := "sec-expressions"
 %%%
+```lean
+namespace Sec_Expressions
+```
 
-Lean is based on a type theory that is a version of the [calculus of constructions][coc] with [inductive types][inductive-type]. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
+Lean is based on a typed [λ-calculus][lambda], specifically a version of the [calculus of constructions][coc] with [inductive types][inductive-types]. We will refer to this formal system simply as _type theory_. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
 
+[lambda]: https://en.wikipedia.org/wiki/Lambda_calculus
 [coc]: https://en.wikipedia.org/wiki/Calculus_of_constructions
-[inductive-type]: https://en.wikipedia.org/wiki/Inductive_type
+[inductive-types]: https://en.wikipedia.org/wiki/Inductive_type
 
+{index}[`:=`]
 -/
 example : ℕ := 0
 /-
-In this case, the expression is `0` and the type is {lean}`ℕ`. The example asserts that the expression `0` has type ℕ, encoding the natural numbers.{margin}[In [VS Code][vscode], you can hover over ℕ and other non-ascii characters to see how they can be typed.]
+In this case, the expression is `0` and the type is `ℕ`. The example asserts that the expression `0` has type `ℕ`, encoding the natural numbers.{margin}[In [VS Code][vscode], you can hover over `ℕ` and other non-ascii characters to see how they can be typed.]
 
 [vscode]: https://marketplace.visualstudio.com/items?itemName=leanprover.lean4
 
-Lean provides a substantial amount of [syntactic sugar][sugar]. For example, ℕ is syntactic sugar for {lean}`Nat`. Understanding the underlying type theory often requires considering expressions from which syntactic sugar has been removed.
+Lean provides a substantial amount of [syntactic sugar][sugar]. For example, `ℕ` is syntactic sugar for {lean}`Nat`. Understanding the underlying type theory often requires considering expressions from which syntactic sugar has been removed.
 
 [sugar]: https://en.wikipedia.org/wiki/Syntactic_sugar
 
@@ -32,7 +37,7 @@ The output `0 : ℕ` means that `0` has type `ℕ`. We will occasionally use thi
 -/
 #check (0, 1)
 /-
-The pair `(0, 1)` has type `ℕ × ℕ`, encoding the [Cartesian product][prod] of ℕ with itself. This is syntactic sugar for `Prod ℕ ℕ`.
+The pair `(0, 1)` has type `ℕ × ℕ`, encoding the [Cartesian product][prod] of `ℕ` with itself. This is syntactic sugar for `Prod ℕ ℕ`.
 
 [prod]: https://en.wikipedia.org/wiki/Cartesian_product
 
@@ -73,7 +78,7 @@ In fact, there is an infinite sequence of types,
 example : Type 2 := Type 1
 example : Type 3 := Type 2
 /-
-and so on. {lean}`Type` is an abbreviation for {lean}`Type 0`; in fact, both are syntactic sugar, as we will explain shortly.
+and so on. {lean}`Type` is an abbreviation for `Type 0`; in fact, both are syntactic sugar, as we will explain shortly.
 
 
 # Propositions
@@ -88,13 +93,13 @@ example : Prop := 1 = 0
 /-
 The first proposition is provable, while the second is not. In fact, the negation of the second is provable.
 
-Interestingly, the proposition `0 = 0` is itself a type. In general, all expressions of type `Prop` are themselves types.
+Interestingly, the proposition `0 = 0` is itself a type. In general, all expressions of type {lean}`Prop` are themselves types.
 
 An expression of type `0 = 0` is viewed as a proof of `0 = 0`. In general, to prove a proposition in Lean is to construct an expression having the proposition as its type.
 -/
 example : 0 = 0 := rfl
 /-
-We will consider the precise meaning of {lean}`rfl` {index}[rfl] (and the equality `=`) later. For the moment, let us simply view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
+We will consider the precise meaning of {lean}`rfl` (and the equality `=`) later. For the moment, let us simply view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
 
 Like `ℕ`, {lean}`Prop` has type {lean}`Type`.
 -/
@@ -119,7 +124,7 @@ Since the normal form of `1 - 1` is `0`, we can use {lean}`rfl` to prove `1 - 1 
 example : 1 - 1 = 0 := rfl
 /-
 
-By default, `#reduce` does not reduce inside types. This matters for equality, since an expression such as `a = a` is itself a type, namely `Eq a a`. We will return to this later.
+By default, `#reduce` does not reduce inside types. This matters for equality, since an expression such as `a = a` is itself a type, namely `Eq a a`. We will {ref "sec-equality"}[return] to this later.
 -/
 #reduce 1 - 1 = 0
 /-
@@ -138,7 +143,7 @@ example : 1 = 0 := rfl
 
 # Universe hierarchy
 
-The infinite sequence `Prop, Type 0, Type 1, ...` is syntactic sugar for the universe hierarchy `Sort 0, Sort 1, Sort 2, ...`. {index}[Sort] Here `Sort u` is called a universe and `u` is its level.
+The infinite sequence `Prop, Type 0, Type 1, ...` is syntactic sugar for the universe hierarchy `Sort 0, Sort 1, Sort 2, ...`. Here `Sort u` is called a universe and `u` is its level.
 
 We can verify that the two sequences coincide using {lean}`rfl`.
 -/
@@ -153,7 +158,7 @@ example : Sort (u + 1) := Sort u
 
 Each type `α` satisfies `α : Sort u` for exactly one `u = 0, 1, ...`. In particular, the universe hierarchy is [non-cumulative][non-cumulative].
 
-[non-cumulative]: https://lean-lang.org/doc/reference/latest/Elaboration-and-Compilation/?terms=non-cumulative#The-Lean-Language-Reference--Elaboration-and-Compilation--The-Kernel
+[non-cumulative]: https://ncatlab.org/nlab/show/hierarchy+of+universes#cumulativity
 
 
 # Further proofs
