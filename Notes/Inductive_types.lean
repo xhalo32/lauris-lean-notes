@@ -6,7 +6,9 @@ import Mathlib
 %%%
 tag := "sec-inductive-types"
 %%%
-
+```lean
+namespace Sec_Inductive_types
+```
 
 [Inductive types][inductive-types] are the primary way to define new types in Lean. The type encoding natural numbers,  {lean}`Nat`, is an example of an inductive type. The `#print` {index}[#print] command can be used to inspect the definition of {lean}`Nat`.
 
@@ -15,30 +17,30 @@ tag := "sec-inductive-types"
 -/
 #print Nat
 /-
-The output shows the _type constructor_ and _constructors_ together with their types: the former is `Nat`, with type `Type`, while the latter are
+The output shows the _type constructor_ and _constructors_ together with their types: the former is {lean}`Nat`, with type {lean}`Type`, while the latter are
 
-* `Nat.zero`, with type `ℕ`,{margin}[Recall that ℕ is syntactic sugar for {lean}`Nat`.] and
-* `Nat.succ`, with type `ℕ → ℕ`.
+* {lean}`Nat.zero`, with type `ℕ`,{margin}[Recall that ℕ is syntactic sugar for {lean}`Nat`.] and
+* {lean}`Nat.succ`, with type `ℕ → ℕ`.
 
-The constructors define how the expressions of type `Nat` arise, while the type of the type constructor places `Nat` in the universe `Sort 1`.
+The constructors define how the expressions of type {lean}`Nat` arise, while the type of the type constructor places {lean}`Nat` in the universe `Sort 1`.
 -/
 example : Sort 1 := Nat
 example : Sort 1 = Type := rfl
 /-
 
-`Nat.succ` corresponds to the [successor function][succ].
+{lean}`Nat.succ` corresponds to the [successor function][succ].
 
 [succ]: https://en.wikipedia.org/wiki/Successor_function
 
-The numerals 0, 1, 2, ... are syntactic sugar for expressions composed from the constructors of `Nat`.
+The numerals 0, 1, 2, ... are syntactic sugar for expressions composed from the constructors of {lean}`Nat`.
 -/
 example : 0 = Nat.zero := rfl
 example : 1 = Nat.succ Nat.zero := rfl
 example : 2 = Nat.succ (Nat.succ Nat.zero) := rfl
 /-
-The only way to obtain an expression of type `Nat` is by using `Nat.succ` and `Nat.zero`.
+The only way to obtain an expression of type {lean}`Nat` is by using {lean}`Nat.succ` and {lean}`Nat.zero`.
 
-We can define an inductive type in the same way as `Nat`.
+We can define an inductive type in the same way as {lean}`Nat`.
 {index}[inductive ... where]
 -/
 inductive Nat' : Type where
@@ -73,7 +75,7 @@ inductive NextLevelNat : Sort 2 where
   | zero : NextLevelNat
   | succ : NextLevelNat → NextLevelNat
 /-
-From the mathematical point of view, `NextLevelNat` is [isomorphic][isomorphism] to `Nat`, since they both satisfy the [Peano axioms][peano]. We will show this later. However, the following is not.
+From the mathematical point of view, `NextLevelNat` is [isomorphic][isomorphism] to {lean}`Nat`, since they both satisfy the [Peano axioms][peano]. We will show this later. However, the following is not.
 
 [isomorphism]: https://en.wikipedia.org/wiki/Isomorphism
 [peano]: https://en.wikipedia.org/wiki/Peano_axioms
@@ -99,7 +101,7 @@ inductive Nat where
 
 end Demo
 /-
-We introduced the [namespace][namespace] `Demo` to avoid a clash with the existing name `Nat`.
+We introduced the [namespace][namespace] `Demo` to avoid a clash with the existing name {lean}`Nat`.
 
 [namespace]: https://lean-lang.org/doc/reference/latest/Namespaces-and-Sections/#namespaces
 
@@ -109,7 +111,7 @@ We introduced the [namespace][namespace] `Demo` to avoid a clash with the existi
 tag := "sec-hierarchical-names"
 %%%
 
-Periods separate components of hierarchical names like `Nat.zero`. {index}[.] Lean uses this notation for several related [identifiers][identifiers]:{margin}[This list is not exhaustive.]
+Periods separate components of hierarchical names like {lean}`Nat.zero`. {index}[`.`] Lean uses this notation for several related [identifiers][identifiers]:{margin}[This list is not exhaustive.]
 
 [identifiers]: https://lean-lang.org/doc/reference/latest/Terms/Identifiers/#identifiers-and-resolution
 
@@ -161,23 +163,23 @@ inductive Prod : Type u → Type v → Type (max u v) where
 end Demo
 /-
 
-We view the type constructor `Prod` as a function taking two arguments and having the codomain `Type (max u v)`.
+We view the type constructor {lean}`Prod` as a function taking two arguments and having the codomain `Type (max u v)`.
 -/
 example : Type u → Type v → Type (max u v) := Prod
 /-
-The only constructor `Prod.mk` has the type
+The only constructor {lean}`Prod.mk` has the type
 -/
 example :
   (α : Type u) → (β : Type v) →
   (fst : α) → (snd : β) → Prod α β := @Prod.mk
 /-
-In terms of the types of their arguments, `Prod` and `@Prod.mk` have the common prefix `Type u → Type v`. We can even write
+In terms of the types of their arguments, {lean}`Prod` and {lean}`@Prod.mk` have the common prefix `Type u → Type v`. We can even write
 -/
 example :
   (α : Type u) → (β : Type v) →
   Type (max u v) := Prod
 /-
-The _parameters_ of an inductive type consist of the largest prefix of arguments shared by the type constructor and all the constructors. The remaining arguments of the type constructor are called _indices_, and the remaining arguments of a constructor are called _fields_. `Prod` has the parameters `Type u` and `Type v`, but no indices. The fields of `Prod.mk` are `fst : α` and `snd : β`.
+The _parameters_ of an inductive type consist of the largest prefix of arguments shared by the type constructor and all the constructors. The remaining arguments of the type constructor are called _indices_, and the remaining arguments of a constructor are called _fields_. {lean}`Prod` has the parameters `Type u` and `Type v`, but no indices. The fields of {lean}`Prod.mk` are `fst : α` and `snd : β`.
 
 Earlier we considered the product of ℕ with itself and used the notation `(0, 1)`, which is syntactic sugar for `Prod.mk 0 1`.
 -/
@@ -197,9 +199,12 @@ inductive Prod'
 
 
 # Indexed families of types
+%%%
+tag := "sec-indexed-families"
+%%%
 
 Indices can be seen as defining a family of types: each choice of indices selects a particular member of the family.
-An example is given by `Eq`,{margin}[{ref "sec-definitional-equality-naive"}[Recall] that `a = a` is syntactic sugar for `Eq a a`.] which can be defined as follows.
+An example is given by {lean}`Eq`,{margin}[{ref "sec-definitional-equality-naive"}[Recall] that `a = a` is syntactic sugar for `Eq a a`.] which can be defined as follows.
 -/
 #print Eq
 
@@ -210,17 +215,17 @@ inductive Eq : {α : Sort u} → α → α → Prop where
 
 end Demo
 /-
-We view `@Eq` as a function taking three arguments and having the codomain `Prop`.
+We view {lean}`@Eq` as a function taking three arguments and having the codomain {lean}`Prop`.
 -/
 example : (α : Sort u) → (a : α) → α → Prop := @Eq
 /-
-The only constructor `@Eq.refl` has the type
+The only constructor {lean}`@Eq.refl` has the type
 -/
 example : (α : Sort u) → (a : α) → Eq a a := @Eq.refl
 /-
-The common prefix is `(α : Sort u) → (a : α)`. Hence, `α` and `a` are parameters, while the third argument of `@Eq` is an index. The constructor `@Eq.refl` has no fields.
+The common prefix is `(α : Sort u) → (a : α)`. Hence, `α` and `a` are parameters, while the third argument of {lean}`@Eq` is an index. The constructor {lean}`@Eq.refl` has no fields.
 
-The evaluation of the constructor `Eq.refl` at an expression `a` gives `Eq a a`, where the parameter and index of type `α` take the same value `a`. As a result, we can construct terms of type `Eq a a` for any expression `a`, but we cannot construct terms of type `Eq a b` when `a` and `b` are distinct (modulo definitional equality). In this way, `Eq` encodes the equality between expressions.
+The evaluation of the constructor {lean}`Eq.refl` at an expression `a` gives `Eq a a`, where the parameter and index of type `α` take the same value `a`. As a result, we can construct terms of type `Eq a a` for any expression `a`, but we cannot construct terms of type `Eq a b` when `a` and `b` are distinct (modulo definitional equality). In this way, `Eq` encodes the equality between expressions.
 
 
 # Recursors
@@ -273,7 +278,7 @@ takes a _recursive argument_, that is, an argument of the same inductive type it
 tag := "sec-arguments-of-recursors"
 %%%
 
-Consider the type of `@Nat.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- ... -/`] Here they are used to label parts of the type.]
+Consider the type of {lean}`@Nat.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- ... -/`] Here they are used to label parts of the type.]
 -/
 example :
   (motive : ℕ → Sort u) /- motive -/ →
@@ -286,13 +291,11 @@ example :
   motive n /- codomain -/
 := @Nat.rec
 /-
-/-
-As above, the first argument of `@Nat.rec` is the motive. The last argument is called the _major premise_. In the case of `@Nat.rec`, the remaining arguments are called the _minor premises_.
+As above, the first argument of {lean}`@Nat.rec` is the motive. The last argument is called the _major premise_. In the case of {lean}`@Nat.rec`, the remaining arguments are called the _minor premises_.
 
-There is one minor premise for each constructor. The type or codomain of each minor premise is determined by the motive. A minor premise is a function if the constructor is a function. In this case, it takes arguments of the same type as the constructor, excluding the parameters of the type. If the constructor takes recursive arguments, the minor premise additionally takes one induction-hypothesis argument for each such argument. In the example above, the argument `motive m` in the minor premise associated to `Nat.succ` is the only induction-hypothesis argument.
--/
+There is one minor premise for each constructor. The type or codomain of each minor premise is determined by the motive. A minor premise is a function if the constructor is a function. In this case, it takes arguments of the same type as the constructor, excluding the parameters of the type. If the constructor takes recursive arguments, the minor premise additionally takes one induction-hypothesis argument for each such argument. In the example above, the argument `motive m` in the minor premise associated to {lean}`Nat.succ` is the only induction-hypothesis argument.
 
-Next, consider the type of `@Prod.rec`.
+Next, consider the type of {lean}`@Prod.rec`.
 -/
 example :
   (α : Type u) → (β : Type v) /- parameters -/ →
@@ -305,18 +308,18 @@ example :
   motive pair /- codomain -/
 := @Prod.rec
 /-
-`Prod` is an inductive type with parameters. Its parameters precede the motive. As `Prod` has a single constructor `Prod.mk`, there is a single minor premise.
+{lean}`Prod` is an inductive type with parameters. Its parameters precede the motive. As {lean}`Prod` has a single constructor {lean}`Prod.mk`, there is a single minor premise.
 
-Like `Nat.succ`, `Prod.mk` is a function, but unlike `Nat.succ`, it is not recursive as it does not take an argument of type `Prod`. Hence the minor premise does not have induction-hypothesis arguments.
+Like {lean}`Nat.succ`, {lean}`Prod.mk` is a function, but unlike {lean}`Nat.succ`, it is not recursive as it does not take an argument of type {lean}`Prod`. Hence the minor premise does not have induction-hypothesis arguments.
 
-Apart from the parameters `α : Type u` and `β : Type v`, the minor premise takes the same arguments as the constructor `@Prod.mk`:
+Apart from the parameters `α : Type u` and `β : Type v`, the minor premise takes the same arguments as the constructor {lean}`@Prod.mk`:
 -/
 example :
   (α : Type u) → (β : Type v) →
   (fst : α) → (snd : β) → Prod α β := @Prod.mk
 /-
 
-Finally, consider the type of `@Eq.rec`.
+Finally, consider the type of {lean}`@Eq.rec`.
 -/
 example :
   (α : Sort u) → (a : α) /- parameters -/ →
@@ -330,15 +333,15 @@ example :
   motive b h /- codomain -/
 := @Eq.rec
 /-
-Like for `Prod`, the parameters of `Eq` precede the motive. As `Eq` has a single constructor `Eq.refl`, there is a single minor premise. Unlike `Nat` and `Prod`, `Eq` is an indexed family of types. Its index precedes the major premise.
+Like for {lean}`Prod`, the parameters of {lean}`Eq` precede the motive. As {lean}`Eq` has a single constructor {lean}`Eq.refl`, there is a single minor premise. Unlike {lean}`Nat` and {lean}`Prod`, {lean}`Eq` is an indexed family of types. Its index precedes the major premise.
 
-For `Nat` and `Prod`, the domain of the motive coincides with the type of major premise. For `Eq`, the domain of the motive is a Π-type
+For {lean}`Nat` and {lean}`Prod`, the domain of the motive coincides with the type of major premise. For {lean}`Eq`, the domain of the motive is a Π-type
 -/
 example (α : Sort u) (a : α) :
   ((x : α) → a = x) = ((x : α) → Eq a x)
 := rfl
 /-
-The index `x : α` of the Π-type is of the same type as the index of `Eq`. The codomain of the Π-type differs from the type of major premise only in the index.
+The index `x : α` of the Π-type is of the same type as the index of {lean}`Eq`. The codomain of the Π-type differs from the type of major premise only in the index.
 
 The distinction between parameters and indices is apparent in recursors. Parameters are uniform in the sense that they precede all other arguments of the recursor. By contrast, indices precede only the major premise and occur as additional arguments of the motive.
 
