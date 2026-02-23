@@ -6,19 +6,23 @@ import Mathlib
 %%%
 tag := "sec-functions"
 %%%
+```lean
+namespace Sec_Functions
+```
 
-A function can be written as follows. {index}[λ ... ↦]
--/
-example : ℕ → ℕ := λ n ↦ n + 1
-/-
-Lean's calculus of constructions is a typed [λ-calculus][lambda]. In this context, a function is given by a λ-abstraction. An alternative, less mathematical keyword `fun` {index}[fun] is also available
+We now focus on the [λ-calculus][lambda] aspect of Lean's type theory. Functions are given by λ-abstractions. {index}[`λ ... ↦`]
 
 [lambda]: https://en.wikipedia.org/wiki/Lambda_calculus
 
 -/
+example : ℕ → ℕ := λ n ↦ n + 1
+/-
+
+An alternative keyword `fun` {index}[fun] is also available.
+-/
 example : ℕ → ℕ := fun n => n + 1
 /-
-Here `ℕ → ℕ` {index}[→] is a function type. More generally, such a type is denoted by `α → β`, where `α` and `β` are types specifying the [domain][domain] and [codomain][codomain], respectively.
+Here `ℕ → ℕ` {index}[`→`] is a function type. More generally, such a type is denoted by `α → β`, where `α` and `β` are types specifying the [domain][domain] and [codomain][codomain], respectively.
 
 [domain]: https://en.wikipedia.org/wiki/Domain_of_a_function
 [codomain]: https://en.wikipedia.org/wiki/Codomain
@@ -52,7 +56,7 @@ The domain may be specified by annotating the argument with a type. Then Lean ca
 def plus1₁ := λ n : ℕ ↦ n + 1
 /-
 
-Syntactic sugar allows for introducing the argument using parentheses. {index}[`(a : α)`]
+Syntactic sugar allows for introducing the argument using parentheses. {index}[`(... : ...)`]
 -/
 def plus1₂ (n : ℕ) := n + 1
 /-
@@ -77,7 +81,7 @@ Syntactic sugar creates the appearance of functions taking several arguments.
 -/
 def add₁ : ℕ → ℕ → ℕ := λ n m ↦ n + m
 /-
-When viewing `add₁` as a function taking two arguments, we refer to the final ℕ in `ℕ → ℕ → ℕ` as the codomain.
+When viewing `add₁` as a function taking two arguments, we refer to the final `ℕ` in `ℕ → ℕ → ℕ` as the codomain.
 
 The arguments may be introduced using parentheses, and we can also make use of the variable `n` that we defined above.
 -/
@@ -144,18 +148,18 @@ if two expressions are definitionally equal, then their equality can be proven u
 -/
 #check rfl
 /-
-Implicit arguments {index}[`{a : α}`] are written using curly braces `{...}`. Lean infers their values from context.
+Implicit arguments {index}[`{... : ...}`] are written using curly braces `{...}`. Lean infers their values from context.
 -/
 example : {α : Sort u} → {a : α} → a = a := rfl
 example {α : Sort u} {a : α} : a = a := rfl
 /-
 
-Inference of implicit arguments can be disabled using `@`. {index}[@]
+Inference of implicit arguments can be disabled using `@`. {index}[`@`]
 -/
 example : (α : Sort u) → (a : α) → a = a := @rfl
 example (α : Sort u) (a : α) : a = a := @rfl α a
 /-
-Like `Prod`, `@rfl` is a function taking two arguments: first a type `α`, and then an expression `a` of that type. Its codomain `a = a` depends on the arguments.
+Like {lean}`Prod`, {lean}`@rfl` is a function taking two arguments: first a type `α`, and then an expression `a` of that type. Its codomain `a = a` depends on the arguments.
 
 
 # Pi-types
@@ -169,7 +173,7 @@ variable {I : Type}
 def X (i : I) := i = i
 /-
 
-Consider the following partially applied version of `@rfl`.
+Consider the following partially applied version of {lean}`@rfl`.
 -/
 example : (i : I) → X i := @rfl I
 /-
@@ -190,7 +194,7 @@ example
 := rfl
 /-
 
-Often codomains do not depend on arguments, as illustrated by functions such as `plus1` and `Prod`.
+Often codomains do not depend on arguments, as illustrated by functions such as `plus1` and {lean}`Prod`.
 -/
 example : (_ : ℕ) → ℕ := plus1
 example : (_ : Type) → ((_ : Type) → Type) := Prod
@@ -199,7 +203,7 @@ example : (_ : Type) → ((_ : Type) → Type) := Prod
 
 # Implication
 
-{ref "sec-propositions"}[Recall] that all expressions of type `Prop` are themselves types. Accordingly, they can occur as the domain or codomain of a function type. The case where both the domain and codomain are expressions of type `Prop` is of particular interest.
+{ref "sec-propositions"}[Recall] that all expressions of type {lean}`Prop` are themselves types. Accordingly, they can occur as the domain or codomain of a function type. The case where both the domain and codomain are expressions of type {lean}`Prop` is of particular interest.
 -/
 example (p q : Prop) : Prop := p → q
 /-
@@ -250,11 +254,11 @@ example (p : Prop) (proof₁ proof₂ : p) : proof₁ = proof₂
 /-
 Heuristically speaking, since proofs carry no information beyond the fact that a proposition holds, they do not enable the kind of self-referential constructions that lead to paradoxes.
 
-We revisit the earlier example of logical implication and emphasize again that all expressions of type `Prop` are themselves types.
+We revisit the earlier example of logical implication and emphasize again that all expressions of type {lean}`Prop` are themselves types.
 -/
 example (p : Prop) (q : Prop) : Prop := p → q
 /-
-The type `Prop` of `p → q` arises from the impredicative least upper bound rule. Indeed, since
+The type {lean}`Prop` of `p → q` arises from the impredicative least upper bound rule. Indeed, since
 -/
 example (p : Prop) : Sort 0 := p
 example (q : Prop) : Sort 0 := q
@@ -268,7 +272,7 @@ example : Sort 0 = Prop := rfl
 
 # Universal quantification
 
-For any type `α`, a function type with domain `α` and codomain `Prop` is viewed as a [predicate][predicate] on `α`.
+For any type `α`, a function type with domain `α` and codomain {lean}`Prop` is viewed as a [predicate][predicate] on `α`.
 
 [predicate]: https://en.wikipedia.org/wiki/Predicate_(logic)
 
@@ -287,14 +291,14 @@ Consider an evaluation of a predicate.
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Prop := P a
 /-
-Since `P a` has type `Prop`, it is itself a type. (All expressions of type `Prop` are themselves types.)
+Since `P a` has type {lean}`Prop`, it is itself a type. (All expressions of type {lean}`Prop` are themselves types.)
 In particular, it can occur as the codomain of a Π-type.
 -/
 example (α : Sort u) (P : α → Prop) : Prop := (a : α) → P a
 /-
 This proposition is viewed as expressing the universal quantification: `P a` holds for all `a` of type `α`.
 
-The type `Prop` of `(a : α) → P a` arises from the {ref "sec-impredicative-lub-rule"}[impredicative least upper bound rule]. Indeed, since
+The type {lean}`Prop` of `(a : α) → P a` arises from the {ref "sec-impredicative-lub-rule"}[impredicative least upper bound rule]. Indeed, since
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Sort 0 := P a
 /-
@@ -320,7 +324,7 @@ example (α : Sort u) (P Q : α → Prop)
 := λ a ↦ h1 a (h2 a)
 /-
 
-Recall that `@rfl` has the following type.
+Recall that {lean}`@rfl` has the following type.
 -/
 example : (α : Sort u) → (a : α) → a = a := @rfl
 /-
@@ -368,7 +372,7 @@ def pq (x : ℕ) : ℕ :=
   (x + 1)^2 + 3*(x + 1) + 1
 /-
 
-We can define the same function by using a local definition with `let` {index}[let].
+We can define the same function by using a local definition with `let`. {index}[let]
 -/
 def pq₁ (x : ℕ) : ℕ :=
   let y := x + 1
@@ -439,7 +443,7 @@ The normal form of `plus1` is related to the inductive definition of ℕ, which 
 
 ζ-reduction eliminates a local definition by substitution.
 
-{index}[;]
+{index}[`;`]
 -/
 example : (let t := ℕ; t × t) = (ℕ × ℕ) := rfl
 
@@ -490,7 +494,7 @@ In addition to enforcing the rules of the type theory, the trusted kernel implem
 4. β-, δ-, and ζ-reductions
 5. ι-reduction (described {ref "sec-iota-reduction"}[later])
 
-Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, `rfl` is simply a function taking two arguments.
+Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, {lean}`rfl` is simply a function taking two arguments.
 -/
 example (α : Sort u) (a : α) : a = a := rfl
 /-
