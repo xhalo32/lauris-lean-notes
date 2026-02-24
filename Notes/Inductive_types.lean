@@ -55,7 +55,7 @@ The following expressions correspond to 1 and 2.
 def one := Nat'.succ Nat'.zero
 def two := Nat'.succ (Nat'.succ Nat'.zero)
 /-
-Then
+Moreover,
 -/
 example : two = Nat'.succ one := rfl
 /-
