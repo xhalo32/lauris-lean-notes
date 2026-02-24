@@ -54,7 +54,10 @@ example : ℕ := (0, 0)
 
 # Types as expressions
 
-One way in which Lean differs from many other programming languages is that types themselves are expressions.
+One way in which Lean differs from many other programming languages is that types are [first-class citizens][1st-class].
+
+[1st-class]: https://en.wikipedia.org/wiki/First-class_citizen
+
 -/
 example : ℕ := 0
 example : Type := ℕ
@@ -64,11 +67,7 @@ That is, `0` has type `ℕ`, and `ℕ` has type {lean}`Type`. Also,
 example : Type := ℕ × ℕ
 /-
 
-Using programming jargon, it could be said that types are [first-class citizens][1st-class].
-But {lean}`Type` is also a type, so what's its type?
-
-[1st-class]: https://en.wikipedia.org/wiki/First-class_citizen
-
+Like all types, {lean}`Type` has a type.
 -/
 example : Type 1 := Type
 /-
