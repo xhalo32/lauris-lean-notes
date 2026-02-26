@@ -1,0 +1,134 @@
+/******** Header ********/
+
+.header-logo-wrapper {
+    display: none;
+}
+
+/* Align title with the burger */
+.header-title-wrapper {
+    margin-top: 0.7rem; 
+    margin-left: calc(var(--verso-burger-width) + 2rem); 
+}
+
+/* Style title similarly with toc */
+a.header-title h1 {
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 0;
+}
+a.header-title {
+    color: black;
+    text-decoration: none;
+}
+a.header-title:hover {
+    text-decoration: underline;
+}
+
+/* Make title fade under the search box for narrow screens */
+#search-wrapper::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -25px;
+    width: 25px;
+    height: var(--verso-header-height);
+    background: linear-gradient(to left, white, rgba(255, 255, 255, 0));
+    pointer-events: none;
+}
+
+/* Burger hover color */
+#toggle-toc-click:hover .line {
+    background-color: black;
+}
+body:has(#toggle-toc:checked) #toggle-toc-click:hover .line {
+    background-color: black;
+}
+
+
+/******** Toc ********/
+
+/* Current item in ToC */
+#toc .split-toc .current td:not(.num),
+#toc .split-toc .title .current {
+    text-decoration-line: none !important;
+    text-decoration-style: none !important;
+}
+#toc tr.current td.num {
+    box-shadow: -3px 0 0 0 var(--vakio-color-crust);
+}
+#toc td.num {
+    padding-left: 2px;
+}
+
+
+/******** Prev/next buttons ********/
+
+/* Hide prev/next buttons at top */
+.content-wrapper > nav.prev-next-buttons:first-of-type {
+    display: none;
+}
+
+/* Prev/next buttons at bottom */
+nav.prev-next-buttons {
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+}
+nav.prev-next-buttons a {
+    color: var(--vakio-color-subtle);
+}
+nav.prev-next-buttons a:hover {
+    color: black;
+}
+
+
+/******** Permalinks ********/
+
+.permalink-widget {
+    display: none;
+}
+
+/******** Toc in chapter intro ********/
+
+:where(:not(h2)) + ol.section-toc {
+    display: none;
+}
+
+
+/******** Title page ********/
+
+main ol.section-toc, main .section-toc ol {
+    list-style-type: none;
+}
+
+main ol.section-toc {
+    /* This is to "undo" the text-indent: -3rem on the LI elements, which indents
+       subsequent lines but not the section number. */
+    padding-left: 3rem;
+}
+
+main .section-toc > li {
+    padding-bottom: 0.25rem;
+}
+
+main .section-toc ol {
+    padding-left: 0.5rem
+}
+
+main .section-toc li {
+    font-weight: bold;
+    font-family: var(--verso-structure-font-family);
+    margin-left: 1rem;
+    /* Indent text that isn't a section number */
+    text-indent: -3rem;
+}
+
+main .section-toc a, main .section-toc a:visited {
+    color: inherit;
+    text-decoration: none;
+}
+
+main .section-toc a:hover {
+    text-decoration: underline;
+}
+

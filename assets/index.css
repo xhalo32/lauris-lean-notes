@@ -1,0 +1,83 @@
+/* Underlining clashes with some symbols, so remove it */
+.theIndex a:not(nav a) {
+    text-decoration: none !important;
+}
+
+/* Prevent horizontal scrolling on narrow screens */
+.theIndex :target {
+  scroll-margin-left: 1rem;
+}
+
+
+/******** Default styling ********/
+
+main .theIndex {
+    padding-left: 0;
+    font-family: var(--verso-text-font-family);
+}
+
+main .theIndex nav ol {
+    padding: 0;
+}
+
+main .theIndex nav ol li {
+    display: inline-block;
+}
+
+main .theIndex nav ol li a {
+    /* Padding instead of margin to have a bigger click target */
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Increase the size of the touch target on phones */
+@media screen and (max-width: 700px) {
+    main .theIndex nav ol li a {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+main .theIndex nav ol li:first-child a {
+    padding-left: 0;
+}
+
+main .theIndex nav ol li+li:before {
+    content: "|";
+}
+
+main .theIndex h1,
+main .theIndex h2,
+main .theIndex h3,
+main .theIndex h4,
+main .theIndex h5,
+main .theIndex h6 {
+    margin-top: 0;
+}
+
+main .theIndex ol {
+    list-style-type: none;
+}
+
+main .theIndex .division>ol {
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    overflow-wrap: break-word;
+}
+
+main .theIndex .division>ol>li {
+    margin-bottom: 0.5rem;
+}
+
+main .theIndex .division ol ol {
+    padding-left: 1rem;
+}
+
+main .theIndex .division {
+    break-inside: avoid;
+    counter-reset: none;
+    max-width: none;
+    width: auto;
+}

@@ -1,0 +1,104 @@
+/******** Widths ********/
+
+/* Primary width is given by lean blocks */
+.hl.lean.block{
+    width: 61ch;
+}
+
+:root{
+    --width-content: 38rem; /* Should be close to primary width */
+    --width-marginalia: 18rem;
+    --margin-sep: 4rem;
+    --padding-left: 3rem;
+}
+
+
+/******** Moving pieces ********/
+
+.marginalia .note {
+    float: right;
+    clear: right;
+    width: var(--width-marginalia);
+    margin-right: calc(-1 * (var(--width-marginalia) + var(--margin-sep)));
+    margin-top: 0.3rem;
+    margin-bottom: 0;
+}
+
+.content-wrapper {
+    padding-left: var(--padding-left);
+    width: calc(var(--width-content));
+}
+
+header {
+    display: none;
+}
+body:has(#toggle-toc:checked) header {
+    display: block;
+}
+
+
+/******** Reconfiguration ********/
+
+/* Here max-width should be slightly less than the sum
+
+    width-content + width-marginalia + margin-sep + padding-left
+
+*/
+@container body (max-width: 62.9rem) { 
+    /* Remove marginalia from margin */
+    .marginalia .note {
+        display: block;
+        float: left;
+        left: 1rem;
+        clear: both;
+        width: 90%;
+        margin: 1rem 2.5%;
+        position: relative;
+    }
+    /* Center content */
+    .content-wrapper {
+        padding-left: 0;
+        margin-inline: auto;
+    }
+}
+
+/* Here max-width should be around 
+
+    width-content + 2 * padding-left 
+
+*/
+@container body (max-width: 45rem) {
+    /* Leave small margin on left */
+    .content-wrapper {
+        padding-left: 1em;
+    }
+    /* Show header to make room for the burger */
+    header {
+        display: block;
+    }
+    main [id] {
+        /* When jumping to something, display it below the header. */
+         scroll-margin-top: calc(var(--verso-header-height) + 1rem);
+    }
+}
+
+
+/******** Containers ********/
+
+/* Body acts as the container for max-width logic */
+body {
+    margin: 0;
+    container-type: inline-size;
+    container-name: body;
+}
+
+/* Main reserves room for marginalia */
+main{
+    max-width: calc(
+        var(--width-content) 
+            + var(--width-marginalia) 
+            + var(--margin-sep) 
+            + var(--padding-left)
+        );
+    margin-inline: auto;
+}
