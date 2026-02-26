@@ -436,7 +436,7 @@ One might ask why we do not use a previously defined name such as `plus1`. The r
 #reduce plus1
 #print plus1
 /-
-The normal form of `plus1` is related to the inductive definition of ℕ, which we explain in the next section.
+The normal form of `plus1` is related to the inductive definition of `ℕ`, which we explain in the next section.
 
 
 ## zeta-reduction
