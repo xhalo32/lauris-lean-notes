@@ -28,7 +28,7 @@ Lean provides a substantial amount of [syntactic sugar][sugar]. For example, `â„
 
 [sugar]: https://en.wikipedia.org/wiki/Syntactic_sugar
 
-The command `#check` {index}[#check] is used to inspect{margin}[You can hover over `#check` to see its output] the type of an expression.
+The command `#check` {index}[#check] is used to inspect the type of an expression.{margin}[You can hover over `#check` to see its output.]
 -/
 #check 0
 /-
