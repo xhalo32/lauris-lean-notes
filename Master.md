@@ -10,23 +10,35 @@ authorshipNote := "lauri.oksanen@helsinki.fi"
 
 # Foundations
 
+In this chapter, we consider the most important expressions in Lean 4, viewed as a language for expressing [formal proofs][formal-proof]. It is remarkable that this language, namely Lean's type theory, is highly expressive while consisting of only a few kinds of expressions.{margin}[We are omitting expressions related to [quotient types][quotient-types], and effectively considering a [sublanguage][sublanguage].] All types are either 
 
-In this chapter, we consider the most important expressions in Lean 4, viewed as a language for writing [formal proofs][formal-proof].{margin}[We are omitting expressions related to [quotient types][quotient-types], and effectively considering a [sublanguage][sublanguage].] It is remarkable that this language, namely Lean's type theory, is highly expressive while consisting of only the following kinds of expressions:
+* universes in the universe hierarchy,
+* function types, or
+* given by type constructors of inductive types.
+
+The remaining expressions can be organized along two axes as follows: 
+
+```
+|                | creation      | elimination | 
+|----------------|---------------|-------------|
+| function       | λ-abstraction | evaluation  |
+| inductive type | constructor   | recursor    |
+```
+
+We begin with an introduction to expressions, types and universes. Since our primary goal is to study formal proofs using Lean, the universe of propositions at the bottom of the universe hierarchy plays a central role. The remainder of the chapter then proceeds through functions and inductive types. 
 
 [formal-proof]: https://en.wikipedia.org/wiki/Formal_proof
 [quotient-types]: https://lean-lang.org/doc/reference/latest/The-Type-System/Quotients/#quotients
 [sublanguage]: https://en.wikipedia.org/wiki/Sublanguage
 
-* universes in the universe hierarchy; 
-* functions as λ-abstractions, together with their types and evaluations; 
-* type constructors, constructors, and recursors of inductive types. 
-
-Since our primary goal is to study formal proofs using Lean, the universe of propositions at the bottom of the universe hierarchy plays a central role.
-
-
 {include 2 Generated.Expressions}
 {include 2 Generated.Functions}
 {include 2 Generated.Inductive_types}
+
+
+# Constructions
+
+{include 2 Generated.Equality}
 
 
 # Index
