@@ -1,15 +1,11 @@
 /-
-Expressions, types, propositions and universes
--/
-import Mathlib
-/-
+Types, propositions and universes
 %%%
 tag := "sec-expressions"
 %%%
-```lean
-namespace Sec_Expressions
-```
-
+-/
+import Mathlib
+/-
 Lean is based on a typed [λ-calculus][lambda], specifically a version of the [calculus of constructions][coc] with [inductive types][inductive-types]. We will refer to this formal system simply as _type theory_. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
 
 [lambda]: https://en.wikipedia.org/wiki/Lambda_calculus

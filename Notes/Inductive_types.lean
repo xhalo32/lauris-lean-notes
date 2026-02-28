@@ -1,15 +1,11 @@
 /-
 Inductive types
--/
-import Mathlib
-/-
 %%%
 tag := "sec-inductive-types"
 %%%
-```lean
-namespace Sec_Inductive_types
-```
-
+-/
+import Mathlib
+/-
 [Inductive types][inductive-types] are the primary way to define new types in Lean. The type encoding natural numbers,  {lean}`Nat`, is an example of an inductive type. The `#print` {index}[#print] command can be used to inspect the definition of {lean}`Nat`.
 
 [inductive-types]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/
@@ -19,7 +15,7 @@ namespace Sec_Inductive_types
 /-
 The output shows the _type constructor_ and _constructors_ together with their types: the former is {lean}`Nat`, with type {lean}`Type`, while the latter are
 
-* {lean}`Nat.zero`, with type `ℕ`,{margin}[Recall that ℕ is syntactic sugar for {lean}`Nat`.] and
+* {lean}`Nat.zero`, with type `ℕ`, and{margin}[Recall that `ℕ` is syntactic sugar for {lean}`Nat`.]
 * {lean}`Nat.succ`, with type `ℕ → ℕ`.
 
 The constructors define how the expressions of type {lean}`Nat` arise, while the type of the type constructor places {lean}`Nat` in the universe `Sort 1`.
@@ -32,7 +28,7 @@ example : Sort 1 = Type := rfl
 
 [succ]: https://en.wikipedia.org/wiki/Successor_function
 
-The numerals 0, 1, 2, ... are syntactic sugar for expressions composed from the constructors of {lean}`Nat`.
+The numerals `0`, `1`, `2`, ... are syntactic sugar for expressions composed from the constructors of {lean}`Nat`.
 -/
 example : 0 = Nat.zero := rfl
 example : 1 = Nat.succ Nat.zero := rfl

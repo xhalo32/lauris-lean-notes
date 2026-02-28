@@ -1,15 +1,11 @@
 /-
 Functions
--/
-import Mathlib
-/-
 %%%
 tag := "sec-functions"
 %%%
-```lean
-namespace Sec_Functions
-```
-
+-/
+import Mathlib
+/-
 We now focus on the [λ-calculus][lambda] aspect of Lean's type theory. Functions are given by λ-abstractions. {index}[`λ ... ↦`]
 
 [lambda]: https://en.wikipedia.org/wiki/Lambda_calculus
@@ -228,7 +224,7 @@ example
 tag := "sec-impredicative-lub-rule"
 %%%
 
-The type of a function type is governed by the _impredicative least upper bound rule_:{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity]. The [level expression][level-expression] `imax u v`, with `u, v = 0, 1, ...`, is called the impredicative least upper bound of `u` and `v`. We have named the rule accordingly.]
+The type of a function type is governed by the _impredicative least upper bound rule_:{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity]. The [level expression][level-expression] `imax u v` is called the impredicative least upper bound of `u` and `v`. We have named the rule accordingly.]
 
 [predicativity]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#The-Lean-Language-Reference--The-Type-System--Universes--Predicativity
 [level-expression]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/?terms=imax#level-expressions

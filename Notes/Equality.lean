@@ -1,15 +1,11 @@
 /-
 Equality
--/
-import Mathlib
-/-
 %%%
 tag := "sec-equality"
 %%%
-```lean
-namespace Sec_Equality
-```
-
+-/
+import Mathlib
+/-
 Equality has the [basic][eq-basic-properties] reflexivity, symmetry, transitivity, and substitution properties. Reflexivity is the most fundamental property, as it is an interface to definitional equality. The remaining properties are derived from the recursor of `Eq`.
 
 [eq-basic-properties]: https://en.wikipedia.org/wiki/Equality_(mathematics)#Basic_properties
