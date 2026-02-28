@@ -1,0 +1,48 @@
+.toc-title h1 {
+    font-size: 1rem;
+    font-weight: normal;
+    font-family: var(--verso-structure-font-family);
+    margin-top: 3.1rem;
+    margin-bottom: 1.3rem;
+}
+
+#toc .split-toc {
+    font-family: var(--verso-structure-font-family);
+}
+
+#toc a {
+    color: black;
+    text-decoration: none;
+}
+#toc a:hover {
+    text-decoration: underline;
+}
+
+#toc .split-toc td.num, 
+#toc .split-toc span.number {
+    color: var(--vakio-color-subtle);
+}
+#toc .split-toc td.num{
+    text-align: right;
+}
+
+#toc .first {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+#toc .split-toc .title {
+    display: flex;
+    margin-bottom: 0.5rem;
+}
+
+#toc .split-toc table {
+    border-collapse: collapse;
+}
+
+#toc .split-toc td {
+    padding: 0;
+    padding-inline-end: 0.28em;
+    padding-block-end: 0.2em;
+    vertical-align: top;
+}

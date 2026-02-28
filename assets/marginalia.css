@@ -1,0 +1,35 @@
+/* 
+Reset counter in main rather than body. KaTeX resets counters in body 
+which may cause issues depending the cascading order.  
+*/
+main {
+    counter-reset: margin-note-counter;
+}
+
+.marginalia .note {
+    font-size: 1.1rem;
+    line-height: 1.3;
+    text-align: initial;
+}
+
+.marginalia .note::before,
+.marginalia::before {
+    font-family: et-book-roman-old-style;
+    font-size: 1rem;
+    top: -0.5rem;
+    position: relative;
+    vertical-align: baseline;
+}
+
+.marginalia .note::before {
+    content: counter(margin-note-counter) " ";
+}
+
+.marginalia::before {
+    content: counter(margin-note-counter);
+    left: 0.1rem;
+}
+
+.marginalia {
+    counter-increment: margin-note-counter;
+}

@@ -1,0 +1,25 @@
+:root {
+    --vakio-color-text: #000000;
+    --vakio-color-labels: #484848;
+    --vakio-color-params: #0f5801;
+    --vakio-color-escapes: #025258;
+    --vakio-color-functions: #002dbd;
+    --vakio-color-operators: #1b5dff;
+    --vakio-color-keywords: #76017a;
+    --vakio-color-classes: #8b010c;
+    --vakio-color-subtle: #8f8f8f;
+    --vakio-color-comments: #717171;
+    --vakio-color-strings: #1d8902;
+    --vakio-color-info: #008189;
+    --vakio-color-constants: #9335df;
+    --vakio-color-cursor: #c6048e;
+    --vakio-color-errors: #d50118;
+    --vakio-color-base: #ffffff;
+    --vakio-color-mantle: #f6f5f4;
+    --vakio-color-crust: #deddda;
+    --vakio-color-surface0: #cdcdcd;
+    --vakio-color-surface1: #bdbdbd;
+    --vakio-color-surface2: #adadad;
+    --vakio-color-overlay0: #9e9e9e;
+    --vakio-color-subtext1: #161616;
+}

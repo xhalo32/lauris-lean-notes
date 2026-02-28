@@ -1,104 +1,152 @@
-/******** Widths ********/
-
-/* Primary width is given by lean blocks */
-.hl.lean.block{
+/* 
+Code lines should be no longer than 60 characters. 
+This gives the _primary width_: 61ch in monospace.
+*/    
+.hl.lean.block {
     width: 61ch;
 }
+/* 
+We use terminology from LaTeX, see e.g. Figure 1 of 
 
-:root{
-    --width-content: 38rem; /* Should be close to primary width */
-    --width-marginalia: 18rem;
-    --margin-sep: 4rem;
-    --padding-left: 3rem;
+https://mirrors.ctan.org/macros/latex/contrib/geometry/geometry.pdf
+*/
+:root {
+    /* textwidth should be slightly larger than the primary width */
+    --textwidth: 38rem;
+    --marginparwidth: 18rem;
+    --marginparsep: 4rem;
+}
+/*
+The above widths work well with Bootstrap's breakpoint widths
+
+https://getbootstrap.com/docs/5.0/layout/breakpoints/
+
+There is room for notes in the margin as long viewport width is 
+greater than Large breakpoint. Below this, notes within the body text.
+While the notes are floats in this case, on clear lanes in the sense 
+that there is no body text next to them.
+
+The main containers of the layout are as follows: 
+
+* .content-wrapper contains the body text and margin notes 
+* #toc contains the table of contents
+* .with-toc contains both .content-wrapper and #toc
+
+Margin notes have three layers of wrappers. These are from parents to 
+children: marginalia, note-wrapper, and note. Their functions are:
+
+* marginalia positions the note number in the body text
+* note-wrapper clears the lane below Large breakpoint
+* note positions the note itself
+
+Container .with-toc reserves space for the margin and centers the body 
+text and margin notes above Large breakpoint. The margin space is 
+shared by the notes and toc above Large breakpoint. When #toggle-toc 
+is checked #toc is shown, otherwise notes are shown. The burger 
+toggles the checkbox. Below Large breakpoint, #toc becomes modal in 
+the sense that the body text is shaded by .toc-backdrop when #toc is 
+shown. The notes are always shown below Large breakpoint. 
+
+Container .content-wrapper enforces fixed width of the body text. 
+Below Large breakpoint it centers the body text. The centering is 
+ajusted below Medium breakpoint. 
+
+*/
+.content-wrapper {
+    width: var(--textwidth);
 }
 
+#toc {
+    display: none;
+}
+#toc:has(#toggle-toc:checked) {
+    width: var(--marginparwidth);
+    position: fixed;
+    top: 0;
+    right: 0;
 
-/******** Moving pieces ********/
+    overflow-y: auto;
+    max-height: 100vh;
+    direction: rtl; /* scrollbar on left (if browser supports)  */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 10;
+
+    background: white;
+    border-left: 1px solid var(--vakio-color-surface0);
+}
+#toc .first {
+    direction: ltr; /* undo rtl */
+}
+
+.with-toc {
+    position: relative;
+    max-width: calc(var(--textwidth) + var(--marginparwidth) + var(--marginparsep));
+    margin-inline: auto;
+}
 
 .marginalia .note {
     float: right;
     clear: right;
-    width: var(--width-marginalia);
-    margin-right: calc(-1 * (var(--width-marginalia) + var(--margin-sep)));
+    width: var(--marginparwidth);
+    margin-right: calc(-1 * (var(--marginparwidth) + var(--marginparsep)));
     margin-top: 0.3rem;
-    margin-bottom: 0;
 }
-
-.content-wrapper {
-    padding-left: var(--padding-left);
-    width: calc(var(--width-content));
-}
-
-header {
+body:has(#toggle-toc:checked) .marginalia .note {
     display: none;
 }
-body:has(#toggle-toc:checked) header {
-    display: block;
-}
+/*
+Large breakpoint should be slightly larger than 
 
-
-/******** Reconfiguration ********/
-
-/* Here max-width should be slightly less than the sum
-
-    width-content + width-marginalia + margin-sep + padding-left
-
+textwidth + marginparwidth + marginparsep
 */
-@container body (max-width: 62.9rem) { 
-    /* Remove marginalia from margin */
-    .marginalia .note {
-        display: block;
-        float: left;
-        left: 1rem;
-        clear: both;
-        width: 90%;
-        margin: 1rem 2.5%;
-        position: relative;
+@media (max-width: 992px) {
+    .marginalia .note-wrapper {
+        width: 100%;
+        display: flow-root;
     }
-    /* Center content */
+    .marginalia .note {
+        width: initial;
+        max-width: 80%;
+        margin: 1rem;
+    }
+    body:has(#toggle-toc:checked) .marginalia .note {
+        display: initial;
+    }
+
+    /* Margins with nice ratio */
     .content-wrapper {
-        padding-left: 0;
+        margin-inline: auto;
+        transform: translateX(-5%);
+    }
+
+    #toc:has(#toggle-toc:checked) {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+    }
+
+    body:has(#toggle-toc:checked) .toc-backdrop {
+        position: fixed;
+        inset: 0;
+        background-color: #aaa4;
+        z-index: 9;
+    }
+    html:has(#toggle-toc:checked) {
+        overflow: hidden;
+    }
+}
+/*
+Medium breakpoint
+*/
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        transform: initial;
         margin-inline: auto;
     }
-}
-
-/* Here max-width should be around 
-
-    width-content + 2 * padding-left 
-
-*/
-@container body (max-width: 45rem) {
-    /* Leave small margin on left */
-    .content-wrapper {
-        padding-left: 1em;
-    }
-    /* Show header to make room for the burger */
-    header {
-        display: block;
-    }
-    main [id] {
-        /* When jumping to something, display it below the header. */
-         scroll-margin-top: calc(var(--verso-header-height) + 1rem);
-    }
-}
-
-
-/******** Containers ********/
-
-/* Body acts as the container for max-width logic */
-body {
-    margin: 0;
-    container-type: inline-size;
-    container-name: body;
-}
-
-/* Main reserves room for marginalia */
-main{
-    max-width: calc(
-        var(--width-content) 
-            + var(--width-marginalia) 
-            + var(--margin-sep) 
-            + var(--padding-left)
-        );
-    margin-inline: auto;
 }

@@ -1,0 +1,19 @@
+.permalink-widget,
+ol.section-toc,
+.titlepage + section,
+.titlepage .authors .note,
+#toc .split-toc.book .title,
+#toc .split-tocs .split-toc:not(:last-child) table,
+#toc .toggle-split-toc,
+header
+{
+    display: none;
+}
+
+#toc .split-toc label.toggle-split-toc input[type="checkbox"] {
+    display: none;
+}
+
+#toggle-toc {
+    display: none;
+}
