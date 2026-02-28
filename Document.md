@@ -2,7 +2,7 @@
 
 %%%
 shortTitle := "Notes on Lean"
-shortContextTitle := "Lean"
+shortContextTitle := "Notes"
 authors := ["Lauri Oksanen"]
 authorshipNote := "lauri.oksanen@helsinki.fi"
 %%%
@@ -31,14 +31,14 @@ We begin with an introduction to expressions, types and universes. Since our pri
 [quotient-types]: https://lean-lang.org/doc/reference/latest/The-Type-System/Quotients/#quotients
 [sublanguage]: https://en.wikipedia.org/wiki/Sublanguage
 
-{include 2 Generated.Expressions}
-{include 2 Generated.Functions}
-{include 2 Generated.Inductive_types}
+{include 2 Document.Expressions}
+{include 2 Document.Functions}
+{include 2 Document.Inductive_types}
 
 
 # Constructions
 
-{include 2 Generated.Equality}
+{include 2 Document.Equality}
 
 
 # Index
