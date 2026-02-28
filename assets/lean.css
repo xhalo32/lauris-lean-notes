@@ -678,9 +678,12 @@ root {
     --verso-code-font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
-pre,
 code {
     font-family: var(--verso-code-font-family);
+    font-size: 1rem;
+    line-height: 1.42;
+    -webkit-text-size-adjust: 100%;
+    /* Prevent adjustments of font size after orientation changes in iOS. See https://github.com/edwardtufte/tufte-css/issues/81#issuecomment-261953409 */
     font-variant-ligatures: none;
     overflow-x: auto;
     overflow-y: clip;
@@ -691,14 +694,6 @@ code {
     line-height: 1.42;
 }
 
-code,
-pre>code {
-    font-size: 1rem;
-    line-height: 1.42;
-    -webkit-text-size-adjust: 100%;
-    /* Prevent adjustments of font size after orientation changes in iOS. See https://github.com/edwardtufte/tufte-css/issues/81#issuecomment-261953409 */
-}
-
 .marginalia .note>code {
     font-size: 1rem;
 }
@@ -707,6 +702,11 @@ pre>code {
     margin-top: 1em;
     margin-bottom: 1em;
     margin-left: 0.75em;
+}
+
+pre {
+  margin: 0;
+  padding: 0;
 }
 
 .lean-output {
@@ -752,7 +752,7 @@ span[data-binding^="kw-occ-Lean.Parser.Tactic."] {
 
 /* Comments in code */
 code.lean span.inter-text {
-    color: var(--vakio-color-comment);
+    color: var(--vakio-color-comments);
 }
 
 .hover-info * {
