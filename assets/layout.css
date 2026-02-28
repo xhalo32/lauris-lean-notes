@@ -87,35 +87,37 @@ ajusted below Medium breakpoint.
     margin-inline: auto;
 }
 
-.marginalia .note {
+.marginalia .note-number {
     float: right;
     clear: right;
     width: var(--marginparwidth);
     margin-right: calc(-1 * (var(--marginparwidth) + var(--marginparsep)));
-    margin-top: 0.3rem;
+    color: var(--vakio-color-surface0);
 }
+
+body:has(#toggle-toc:checked) .marginalia .note-number {
+    cursor: pointer;
+}
+body:has(#toggle-toc:checked) .marginalia .note-number::after {
+    font-size: 1rem;
+    top: -0.4rem;
+    position: relative;
+    content: "▶";
+}
+body:has(#toggle-toc:checked) .marginalia .note-number:hover {
+    color: black;
+}
+
 body:has(#toggle-toc:checked) .marginalia .note {
     display: none;
 }
+
 /*
 Large breakpoint should be slightly larger than 
 
 textwidth + marginparwidth + marginparsep
 */
 @media (max-width: 992px) {
-    .marginalia .note-wrapper {
-        width: 100%;
-        display: flow-root;
-    }
-    .marginalia .note {
-        width: initial;
-        max-width: 80%;
-        margin: 1rem;
-    }
-    body:has(#toggle-toc:checked) .marginalia .note {
-        display: initial;
-    }
-
     /* Margins with nice ratio */
     .content-wrapper {
         margin-inline: auto;
@@ -127,6 +129,28 @@ textwidth + marginparwidth + marginparsep
         top: 0;
         right: 0;
         height: 100vh;
+    }
+
+    body:has(#toggle-toc:checked) .marginalia .note-number {
+        cursor: initial;
+    }
+    body:has(#toggle-toc:checked) .marginalia .note-number::after {
+        content: initial;
+    }
+
+    .marginalia .note-wrapper {
+        width: 100%;
+        display: flow-root;
+    }
+
+    .marginalia .note-number {
+        width: initial;
+        max-width: 80%;
+        margin: 1rem;
+    }
+
+    body:has(#toggle-toc:checked) .marginalia .note {
+        display: initial;
     }
 
     body:has(#toggle-toc:checked) .toc-backdrop {
