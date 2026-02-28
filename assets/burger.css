@@ -6,7 +6,6 @@
 #toggle-toc-click {
     --verso-burger-line-width: 0.2rem;
     --verso-burger-line-radius: 0.2rem;
-    --verso-burger-transition-time: 0.4s;
 }
 
 #toggle-toc-click {
@@ -27,9 +26,6 @@
     padding-right: 1rem;
     padding-left: 2px;
     padding-bottom: 2px;
-    transition:
-        height var(--verso-burger-transition-time) ease-in-out,
-        width var(--verso-burger-transition-time) ease-in-out;
 }
 
 #toggle-toc-click .line {
@@ -39,11 +35,6 @@
     height: var(--verso-burger-line-width);
     border-radius: var(--verso-burger-line-radius);
     background-color: var(--vakio-color-surface0);
-    transition:
-        background-color var(--verso-burger-transition-time) ease-in-out,
-        height var(--verso-burger-transition-time) ease-in-out,
-        width var(--verso-burger-transition-time) ease-in-out,
-        transform var(--verso-burger-transition-time) ease-in-out;
     z-index: 15;
 }
 #toggle-toc-click:hover .line {
