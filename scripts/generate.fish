@@ -43,6 +43,7 @@ lake exe doc || return 1
 
 cd _out/html-multi
 cp -rfv $srcdir/assets/* .
+cp -rfv $srcdir/custom/* .
 
 for file in (find . -type f -name "index.html")
     echo "Postprocessing $file"

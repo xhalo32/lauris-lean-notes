@@ -19,10 +19,16 @@ In this chapter, we consider the most important expressions in Lean 4, viewed as
 The remaining expressions can be organized along two axes as follows: 
 
 ```
-|                | creation      | elimination | 
-|----------------|---------------|-------------|
-| function       | λ-abstraction | evaluation  |
-| inductive type | constructor   | recursor    |
+<!--HTML-->
+<table class="custom-concepts-2d">
+  <thead>
+    <tr><th></th><th>creation</th><th>elimination</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>function</th><td>λ-abstraction</td><td>evaluation</td></tr>
+    <tr><th>inductive type</th><td>constructor</td><td>recursor</td></tr>
+  </tbody>
+</table>
 ```
 
 We begin with an introduction to expressions, types and universes. Since our primary goal is to study formal proofs using Lean, the universe of propositions at the bottom of the universe hierarchy plays a central role. The remainder of the chapter then proceeds through functions and inductive types. 

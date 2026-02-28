@@ -2,7 +2,10 @@ import re
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 import sys
+from html import unescape
 
+
+# html5lib is needed here, since html.parser scrambles code 
 soup = BeautifulSoup(sys.stdin.read(), "html5lib")
 
 
@@ -88,10 +91,36 @@ for note in soup.select(".marginalia span.note"):
 soup.html["lang"] = "en"
 
 
-# Add customized script for tooltips
+# Add scripts
 
 soup.head.append(soup.new_tag("script", src="tooltips.js"))
 soup.head.append(soup.new_tag("script", src="marginalia.js"))
+
+
+# Add a custom css file
+
+soup.head.append(soup.new_tag(
+    "link",
+    rel="stylesheet",
+    href="custom.css"
+))
+
+
+# Inject HTML directly
+
+MARKER = "<!--HTML-->"
+for pre in soup.find_all("pre"):
+    raw = pre.get_text() 
+    stripped = raw.lstrip()
+    if not stripped.startswith(MARKER):
+        continue
+    payload = stripped[len(MARKER):]
+    payload = unescape(payload)
+    # html.parser is needed here as payload is a fragment 
+    fragment = BeautifulSoup(payload, "html.parser")
+    for node in list(fragment.contents):
+        pre.insert_before(node)
+    pre.decompose()
 
 
 # Output
