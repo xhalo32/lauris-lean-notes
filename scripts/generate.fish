@@ -1,0 +1,53 @@
+# Load outdir and prjdir from config
+source config.fish
+
+set docdir $outdir/Document
+set doc $outdir/Document.lean
+
+set srcdir (pwd)
+
+
+if not test -e $outdir
+    echo "Init: $outdir"
+
+    mkdir -p $outdir
+    pushd $outdir
+    fish $srcdir/scripts/init.fish
+    popd
+end
+
+cp -rfv verso/* $outdir
+
+rm -f $doc
+rm -rf $docdir
+mkdir -p $docdir
+
+pushd $prjdir
+for file in *.lean
+    echo "Preprocessing $file"
+
+    set name (path basename --no-extension $file)
+    jq --arg ns "$prjdir.$name" -Rsr \
+        -f $srcdir/scripts/preprocess.jq \
+        <$file >$docdir/$file
+    echo "import Document.$name" >>$doc    
+end
+popd 
+
+echo 'import Infra.Preamble' >> $doc
+cat Document.md >> $doc
+
+cd $outdir 
+rm -rf _out 
+lake exe doc || return 1
+
+cd _out/html-multi
+cp -rfv $srcdir/assets/* .
+
+for file in (find . -type f -name "index.html")
+    echo "Postprocessing $file"
+
+    python $srcdir/scripts/postprocess.py \
+        <$file >"$file"_pp
+    mv "$file"_pp $file
+end
