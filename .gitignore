@@ -1,3 +1,4 @@
 /.lake
 .vscode/settings.json
 assets/fonts
+config.fish
