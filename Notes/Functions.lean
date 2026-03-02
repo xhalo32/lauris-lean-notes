@@ -161,7 +161,7 @@ Like {lean}`Prod`, {lean}`@rfl` is a function taking two arguments: first a type
 tag := "sec-pi-types"
 %%%
 
-To simplify the notation, we introduce the following function taking two arguments, the first of which is introduced as an implicit variable in the surrounding context.
+To simplify the notation, we define the following function taking two arguments, the first of which is introduced as an implicit variable in the surrounding context.
 -/
 variable {I : Type}
 def X (i : I) := i = i
@@ -210,7 +210,7 @@ example (p q : Prop) : Prop := p → q
 /-
 This proposition is viewed as expressing logical implication.
 
-{ref "sec-propositions"}[Recall] that a proof of a proposition is an expression having the proposition as its type. [Modus ponens][modus-ponens] admits a natural proof by composition. We give two formulations.
+{ref "sec-propositions"}[Recall] that a proof of a proposition is an expression having the proposition as its type. Function application encodes [Modus ponens][modus-ponens]. We give two formulations.
 
 [modus-ponens]: https://en.wikipedia.org/wiki/Modus_ponens
 
@@ -272,6 +272,9 @@ example : Sort 0 = Prop := rfl
 
 
 # Universal quantification
+%%%
+tag := "sec-universal-quantification"
+%%%
 
 For any type `α`, a function type with domain `α` and codomain {lean}`Prop` is viewed as a [predicate][predicate] on `α`.
 
@@ -317,13 +320,16 @@ example
 := rfl
 /-
 
-Here is a natural proof of "pointwise" modus ponens using function application and composition.
+Here is a proof encoding [universal instantiation][universal-instantiation] followed by Modus ponens.
+
+[universal-instantiation]: https://en.wikipedia.org/wiki/Universal_instantiation
 -/
 example (α : Sort u) (P Q : α → Prop)
   (h1 : ∀ a : α, P a → Q a) (h2 : ∀ a : α, P a)
   : ∀ a : α, Q a
 := λ a ↦ h1 a (h2 a)
 /-
+In fact, the proof uses universal instantiation twice: first in the application _`h2 a`_ and then in the partial application _`h1 a`_.
 
 Recall that {lean}`@rfl` has the following type.
 -/
@@ -336,35 +342,6 @@ example : ∀ (α : Sort u) (a : α), a = a := @rfl
 /-
 
 
-# Function extensionality
-
-The functions `plus1` and `plus1'` coincide in the sense that they give the same value when applied to the same argument, that is, they are [extensionally][extensionality] equal. However, they are not definitionally equal, because the two terms in the addition are in the opposite orders in their definitions.
-
-[extensionality]: https://lean-lang.org/doc/reference/latest/The-Type-System/Functions/#function-extensionality
-
--/
-example : plus1 =  (λ n ↦ n + 1) := rfl
-example : plus1' = (λ n ↦ 1 + n) := rfl
-/-
-
-The following example is invalid.
-
-```lean +error
-example : plus1 = plus1' := rfl
-```
-
-Function extensionality is available in Lean as a theorem called {lean}`funext`. We can show that `plus1` and `plus1` are indeed equal.
--/
-example : plus1 = plus1' := by
-  funext n
-  simp [plus1, plus1', add]
-  grind
-/-
-We will explain how to write proofs like this in due course. For the moment, we simply record that the principle of [functional extensionality][extensionality-principles] holds in Lean.
-
-[extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
-
-
 # Local definitions
 
 Consider the following function.
@@ -373,20 +350,79 @@ def pq (x : ℕ) : ℕ :=
   (x + 1)^2 + 3*(x + 1) + 1
 /-
 
-We can define the same function by using a local definition with `let`. {index}[let]
+We can avoid repeating the expression `x + 1` by composing two functions.
 -/
-def pq₁ (x : ℕ) : ℕ :=
+def q (x : ℕ) : ℕ := x + 1
+def p (y : ℕ) : ℕ := y^2 + 3*y + 1
+def pq₁ (x : ℕ) := p (q x)
+/-
+
+This introduces two names `p` and `q`. Such auxiliary definitions can be avoided as follows. {index}[have].
+-/
+def pq₂ (x : ℕ) :=
+  have y := x + 1
+  y^2 + 3*y + 1
+/-
+Here `have` is syntactic sugar for $`\lambda` abstraction and application.
+-/
+example (α : Sort u) (β : Sort v) (a : α) (b : β) :
+  (
+    have x : α := a
+    b
+  ) = (λ (x : α) ↦ b) a := rfl
+/-
+We see that `pq₂` is, in fact,
+-/
+def pq₃ (x : ℕ) :=
+  (λ (y : ℕ) ↦ y^2 + 3*y + 1) (x + 1)
+/-
+
+
+## Steps in proofs
+
+A typical use of `have` is to isolate steps in proofs. Let us {ref "sec-universal-quantification"}[return] to our earlier example on universal instantiation followed by Modus ponens, and isolate the universal instantiation.
+-/
+example (α : Sort u) (P Q : α → Prop)
+  (h1 : ∀ a : α, P a → Q a) (h2 : ∀ a : α, P a)
+  : ∀ a : α, Q a
+:=
+  λ a : α ↦
+  have Pa := h2 a
+  h1 a Pa
+/-
+The proof has the natural reading:
+
+1. Let `a : α`.
+2. We have `P a` by hypothesis `h2`, applied to `a`.
+3. We conclude by hypothesis `h1`, applied to `a` and the fact `P a`.
+
+If a name in `have` is omitted, then the name `this` is used.
+-/
+example (α : Sort u) (P Q : α → Prop)
+  (h1 : ∀ a : α, P a → Q a) (h2 : ∀ a : α, P a)
+  : ∀ a : α, Q a
+:=
+  λ a : α ↦
+  have : P a := h2 a
+  h1 a this
+/-
+Let us reiterate the reading:
+
+1. Let `a : α`.
+2. We have `P a` by hypothesis `h2`, applied to `a`.
+3. We conclude by hypothesis `h1`, applied to `a` and this fact.
+
+
+## Syntactic abbreviation
+
+A more general form of local definition is given by `let`. {index}[let]
+-/
+def pq₄ (x : ℕ) : ℕ :=
   let y := x + 1
   y^2 + 3*y + 1
 /-
 
-Another alternative is to introduce two auxiliary functions and compose them.
--/
-def q (x : ℕ) : ℕ := x + 1
-def p (y : ℕ) : ℕ := y^2 + 3*y + 1
-def pq₂ (x : ℕ) := p (q x)
-/-
-A local definition is a [syntactic abbreviation][local-def]. There are cases where it is applicable but composition is not.
+There are cases where [syntactic abbreviation][local-def] using `let` is applicable but composition is not.
 
 [local-def]: https://lean-lang.org/theorem_proving_in_lean4/dependent_type_theory.html#local-definitions
 
@@ -475,6 +511,35 @@ Reduction and $`\eta` equivalence differ in a fundamental way: the former has an
 [intensional-extensional]: https://en.wikipedia.org/wiki/Extensional_and_intensional_definitions
 
 
+# Function extensionality
+
+The functions `plus1` and `plus1'` coincide in the sense that they give the same value when applied to the same argument, that is, they are [extensionally][extensionality] equal. However, they are not definitionally equal, because the two terms in the addition are in the opposite orders in their definitions.
+
+[extensionality]: https://lean-lang.org/doc/reference/latest/The-Type-System/Functions/#function-extensionality
+
+-/
+example : plus1  = (λ n ↦ n + 1) := rfl
+example : plus1' = (λ n ↦ 1 + n) := rfl
+/-
+
+The following example is invalid.
+
+```lean +error
+example : plus1 = plus1' := rfl
+```
+
+Function extensionality is available in Lean as a theorem called {lean}`funext`. We can show that `plus1` and `plus1` are indeed equal.
+-/
+example : plus1 = plus1' := by
+  funext n
+  simp [plus1, plus1', add]
+  grind
+/-
+We will explain how to write proofs like this in due course. For the moment, we simply record that the principle of [functional extensionality][extensionality-principles] holds in Lean.
+
+[extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
+
+
 # Surface syntax and underlying type theory
 
 Lean's processing of source code can be divided into several [stages][processing-stages]. For our purposes, the important stages are:
@@ -538,3 +603,5 @@ example :
 
 example : pq = pq₁ := rfl
 example : pq = pq₂ := rfl
+example : pq = pq₃ := rfl
+example : pq = pq₄ := rfl
