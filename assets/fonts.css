@@ -1,0 +1,68 @@
+/* Latin Modern Roman */
+@font-face{
+  font-family: "Latin Modern";
+  src: url("/fonts/lm-roman-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Latin Modern";
+  src: url("/fonts/lm-roman-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Latin Modern";
+  src: url("/fonts/lm-roman-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Latin Modern";
+  src: url("/fonts/lm-roman-bolditalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Latin Modern Sans */
+@font-face{
+  font-family: "Latin Modern Sans";
+  src: url("/fonts/lm-sans-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Latin Modern Sans";
+  src: url("/fonts/lm-sans-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* JuliaMono */
+@font-face{
+  font-family: "JuliaMono";
+  src: url("/fonts/JuliaMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: "JuliaMono";
+  src: url("/fonts/JuliaMono-RegularItalic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face{
+  font-family: "JuliaMono";
+  src: url("/fonts/JuliaMono-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

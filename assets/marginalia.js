@@ -13,15 +13,13 @@
         const toggle = document.getElementById('toggle-toc');
         if (!toggle || !toggle.checked) return;
 
-        // Uncheck and notify listeners
         toggle.checked = false;
         toggle.dispatchEvent(new Event('change', { bubbles: true }));
       },
-      true // capture to survive stopPropagation inside notes
+      true 
     );
   }
 
-  // Safe init whether script is in <head> or <body>
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

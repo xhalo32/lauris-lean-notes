@@ -11,8 +11,7 @@ main {
 }
 
 .marginalia .note {
-    font-size: 1.1rem;
-    color: black;
+    font-size: 1rem;
 }
 
 .marginalia .note-number {
@@ -22,16 +21,15 @@ main {
 
 .marginalia .note-number::before,
 .marginalia::before {
-    font-family: et-book-roman-old-style;
+    font-variant-numeric: oldstyle-nums;
     font-size: 1rem;
-    top: -0.5rem;
+    top: -0.45rem;
     position: relative;
     vertical-align: baseline;
 }
 
 .marginalia .note-number::before {
     padding-right: 0.3em;
-    color: black;
     content: counter(margin-note-counter);
 }
 

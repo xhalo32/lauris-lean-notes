@@ -1,0 +1,25 @@
+.custom-concepts-2d {
+    border-collapse: collapse;   
+    font-size: var(--body-text-font-size);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.custom-concepts-2d td,
+.custom-concepts-2d th {
+    padding-top: 0.6rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-weight: normal;
+}
+
+.custom-concepts-2d thead th:not(:first-child) {
+    padding-top: 0;
+    border-bottom: 1.6px dotted var(--vakio-color-comments);
+}
+
+.custom-concepts-2d tbody th:first-child {
+    border-right: 1.6px dotted var(--vakio-color-comments);
+    padding-left: 0;
+    text-align: right;
+}

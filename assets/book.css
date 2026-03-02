@@ -16,10 +16,11 @@
 @import "title-page.css";
 /* Typography of index page */
 @import "index.css";
-/* Appearance of burger icon toggling toc */
-@import "burger.css";
 /* Color palette */
 @import "vakio-colors.css";
+/* Fonts */
+@import "fonts.css";
+
 
 /*
 TODO Fix search bar

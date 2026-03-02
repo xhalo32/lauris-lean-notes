@@ -42,6 +42,6 @@ nav.prev-next-buttons a:hover {
 }
 
 .prev-next-buttons .arrow {
-    font-family: var(--verso-code-font-family);
+    display: none;
 }
 

@@ -130,6 +130,8 @@ window.onload = () => {
       }
     };
 
+    tippy.setDefaultProps({ arrow: false });
+
     const clickTippySelectors = [
       '.hl.lean .literal.token',
       '.hl.lean .option.token',
@@ -176,5 +178,6 @@ window.onload = () => {
     });
     
     hoverTippys = tippy('.hl.lean .has-info, .hl.lean .tactic', hoverTippyProps);
+
   });
 }

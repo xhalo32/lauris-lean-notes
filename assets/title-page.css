@@ -1,4 +1,8 @@
-main .authors {
+.titlepage h1 {
+    font-size: 2.6rem;
+}
+
+.titlepage .authors {
     font-style: italic;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -7,14 +11,18 @@ main .authors {
     line-height: 1;
 }
 
-main .authors .author:only-of-type::after {
+main:has(.titlepage) .prev-next-buttons .where::before {
+    content: "Next "
+}
+
+.titlepage .authors .author:only-of-type::after {
     content: "";
 }
 
-main .authors .author:not(:last-of-type)::after {
+.titlepage .authors .author:not(:last-of-type)::after {
     content: ", ";
 }
 
-main .authors .author:nth-last-of-type(2)::after {
+.titlepage .authors .author:nth-last-of-type(2)::after {
     content: " and ";
 }
