@@ -6,9 +6,7 @@ tag := "sec-functions"
 -/
 import Mathlib
 /-
-We now focus on the [λ-calculus][lambda] aspect of Lean's type theory. Functions are given by λ-abstractions. {index}[`λ ... ↦`]
-
-[lambda]: https://en.wikipedia.org/wiki/Lambda_calculus
+We now focus on the $`\lambda` calculus aspect of Lean's type theory. Functions are given by $`\lambda` abstractions. {index}[`λ ... ↦`]
 
 -/
 example : ℕ → ℕ := λ n ↦ n + 1
@@ -173,13 +171,20 @@ Consider the following partially applied version of {lean}`@rfl`.
 -/
 example : (i : I) → X i := @rfl I
 /-
-The type of `@rfl I` is a dependent function type, also called a [Π-type][pi-type]. Such a type can be thought of as encoding an [indexed product][indexed-product] of sets, with `i : I` giving the indexing. We refer to `i : I` as the _index_ of the Π-type `(i : I) → X i`.
+The type of `@rfl I` is a $`\Pi` [type][pi-type].{margin}[$`\Pi` types are also called dependent function types.] Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
+$$`
+\prod_{i \in I} X_i
+=
+\left\{\left. f: I \to \bigcup_{i \in I} X_i\ \right|
+\ f(i) \in X_i,\ i \in I \right\}.
+`
+We refer to `i : I` as the _index_ of the $`\Pi` type `(i : I) → X i`.
 
 [pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
 [indexed-product]: https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
 
 
-In fact, all function types are Π-types.
+In fact, all function types are $`\Pi` types.
 -/
 example
   (α : Sort u) (β : Sort v) : (α → β) = ((a : α) → β)
@@ -239,7 +244,7 @@ example : Sort (imax u (v + 1)) = Sort (max u (v + 1))
 := rfl
 /-
 
-This rule is essential for the consistency of the type theory: certain typed lambda calculi that lack such universe-level stratification are subject to [Girard's paradox][girard].
+This rule is essential for the consistency of the type theory: certain typed $`\lambda` calculi that lack such universe-level stratification are subject to [Girard's paradox][girard].
 
 [girard]: https://en.wikipedia.org/wiki/System_U
 
@@ -287,14 +292,14 @@ Consider an evaluation of a predicate.
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Prop := P a
 /-
-Since `P a` has type {lean}`Prop`, it is itself a type. (All expressions of type {lean}`Prop` are themselves types.)
-In particular, it can occur as the codomain of a Π-type.
+Since _`P a`_ has type {lean}`Prop`, it is itself a type.{margin}[Once again, all expressions of type {lean}`Prop` are themselves types.]
+In particular, it can occur as the codomain of a $`\Pi` type.
 -/
 example (α : Sort u) (P : α → Prop) : Prop := (a : α) → P a
 /-
-This proposition is viewed as expressing the universal quantification: `P a` holds for all `a` of type `α`.
+This proposition is viewed as expressing the universal quantification: _`P a`_ holds for all _`a`_ of type _`α`_.
 
-The type {lean}`Prop` of `(a : α) → P a` arises from the {ref "sec-impredicative-lub-rule"}[impredicative least upper bound rule]. Indeed, since
+The type {lean}`Prop` of `(`_`a `_` : α) → `_` P a`_ arises from the {ref "sec-impredicative-lub-rule"}[impredicative least upper bound rule]. Indeed, since
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Sort 0 := P a
 /-
@@ -399,7 +404,7 @@ def plus1₄ :=
 
 ## beta-reduction
 
-β-reduction corresponds to applying a function to an argument by substitution.
+Reduction of $`\beta` kind corresponds to applying a function to an argument by substitution.
 
 -/
 variable (α : Sort u) (β : Sort v) (f : α → β) (a : α)
@@ -413,7 +418,7 @@ example : (λ x ↦ f x) a = f a := rfl
 
 ## delta-reduction
 
-δ-reduction replaces a defined name{margin}[Names of expressions are referred to as constants in the Lean Language Reference, see [Definitions][definitions].] by its defining expression.
+Reduction of $`\delta` kind replaces a defined name by its defining expression.{margin}[Names are referred to as constants in the Lean Language Reference, see [Definitions][definitions].]
 
 [definitions]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#The-Lean-Language-Reference--Definitions--Definitions
 
@@ -427,7 +432,7 @@ example : ℕ2 = (ℕ × ℕ) := rfl
 #reduce (types := true) ℕ × ℕ
 /-
 
-One might ask why we do not use a previously defined name such as `plus1`. The reason is that `#reduce plus1` does not demonstrate δ-reduction in isolation, as can be observed by comparing the normal form and definition of `plus1`.
+One might ask why we do not use a previously defined name such as `plus1`. The reason is that `#reduce plus1` does not demonstrate $`\delta` reduction in isolation, as can be observed by comparing the normal form and definition of `plus1`.
 -/
 #reduce plus1
 #print plus1
@@ -437,7 +442,7 @@ The normal form of `plus1` is related to the inductive definition of `ℕ`, whic
 
 ## zeta-reduction
 
-ζ-reduction eliminates a local definition by substitution.
+Reduction of $`\zeta` kind eliminates a local definition by substitution.
 
 {index}[`;`]
 -/
@@ -453,9 +458,9 @@ The semicolon is a syntactic device that allows multiple expressions to be writt
 tag := "sec-function-eta-equivalence"
 %%%
 
-In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called η-equivalence.
+In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called $`\eta` equivalence.
 
-For functions, η-equivalence says that a function is definitionally equal to the λ-abstraction obtained by applying the function to an argument.
+For functions, $`\eta` equivalence says that a function is definitionally equal to the $`\lambda` abstraction obtained by applying the function to an argument.
 -/
 example : (λ x ↦ f x) = f := rfl
 /-
@@ -465,7 +470,7 @@ The definitional equality of the left and right-hand sides is not based on them 
 #reduce f
 /-
 
-Reduction and η-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
+Reduction and $`\eta` equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
 
 [intensional-extensional]: https://en.wikipedia.org/wiki/Extensional_and_intensional_definitions
 
@@ -485,10 +490,10 @@ The type theory is designed to be simple, enabling the trusted kernel to remain 
 In addition to enforcing the rules of the type theory, the trusted kernel implements definitional equality, which accounts for:{margin}[There is also quotient reduction outside the sublanguage considered here.]
 
 1. Proof irrelevance
-2. Function η-equivalence
-3. Structure η-equivalence (described {ref "sec-structure-eta-equivalence"}[later])
-4. β-, δ-, and ζ-reductions
-5. ι-reduction (described {ref "sec-iota-reduction"}[later])
+2. Function $`\eta` equivalence
+3. Structure $`\eta` equivalence (described {ref "sec-structure-eta-equivalence"}[later])
+4. $`\beta`, $`\delta`, and $`\zeta` reductions
+5. $`\iota` reduction (described {ref "sec-iota-reduction"}[later])
 
 Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, {lean}`rfl` is simply a function taking two arguments.
 -/

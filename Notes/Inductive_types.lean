@@ -514,11 +514,11 @@ example
 tag := "sec-structure-eta-equivalence"
 %%%
 
-{ref "sec-function-eta-equivalence"}[Recall] that function η-equivalence identifies a function with the λ-abstraction obtained by applying it to an argument.
+{ref "sec-function-eta-equivalence"}[Recall] that function η-equivalence identifies a function with the $`\lambda` abstraction obtained by applying it to an argument.
 
-There is an analogous η-equivalence for structures. If the type of an expression `x` is a structure with two fields, then `x` is definitionally equal to the expression obtained by reconstructing it from its projections, namely `⟨x.1, x.2⟩`.
+There is an analogous $`\eta` equivalence for structures. If the type of an expression `x` is a structure with two fields, then `x` is definitionally equal to the expression obtained by reconstructing it from its projections, namely `⟨x.1, x.2⟩`.
 
-More generally, structure η-equivalence applies to structures with any number of fields. It also applies to any inductive type that could be defined as a structure, regardless of whether the surface-syntax keyword `structure` was used in its definition.
+More generally, structure $`\eta` equivalence applies to structures with any number of fields. It also applies to any inductive type that could be defined as a structure, regardless of whether the surface-syntax keyword `structure` was used in its definition.
 
 -/
 variable (x : Demo.Prod ℕ ℕ)

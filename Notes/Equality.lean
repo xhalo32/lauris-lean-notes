@@ -47,14 +47,14 @@ example
 := rfl'
 /-
 
-2. Function η-equivalence
+2. Function $`\eta` equivalence
 -/
 example
   (α : Sort u) (β : Sort v) (f : α → β) : Eq' (λ x ↦ f x) f
 := rfl'
 /-
 
-3. Structure η-equivalence
+3. Structure $`\eta` equivalence
 -/
 example
   (α : Type u) (β : Type v) (x : α × β)
@@ -62,7 +62,7 @@ example
 := rfl'
 /-
 
-4. β-, δ-, and ζ-reductions
+4. $`\beta`, $`\delta`, and $`\zeta` reductions
 -/
 example
   (α : Sort u) (β : Sort v) (f : α → β) (a : α)
@@ -75,7 +75,7 @@ example : Eq' ℕ_to_ℕ (ℕ → ℕ) := rfl'
 example : Eq' (let t := ℕ; t → t) (ℕ → ℕ) := rfl'
 /-
 
-5. ι-reduction
+5. $`\iota` reduction
 -/
 example (n : ℕ) :
   Eq' (@Nat.rec (λ _ ↦ ℕ) 0 (λ m _ ↦ m) (Nat.succ n)) n
@@ -344,7 +344,7 @@ The [nomatch expression][nomatch] is a pattern match with zero cases, and `nofun
 [nomatch]: https://lean-lang.org/doc/reference/latest/Terms/Pattern-Matching/#The-Lean-Language-Reference--Terms--Pattern-Matching--Other-Pattern-Matching-Operators
 
 
-## Constructor injectivity
+# Constructor injectivity
 
 Applications of a constructor at distinct arguments are not equal. Equivalently, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using congruence, transitivity, and suitable deconstruction.
 -/
