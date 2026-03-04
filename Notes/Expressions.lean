@@ -6,7 +6,7 @@ tag := "sec-expressions"
 -/
 import Mathlib
 /-
-Lean is based on a typed $`\lambda` [calculus][lambda], specifically a version of the [calculus of constructions][coc] with [inductive types][inductive-types]. We will refer to this formal system simply as _type theory_. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
+Lean is based on a typed [$`\lambda`-calculus][lambda], specifically a version of the [calculus of constructions][coc] with [inductive types][inductive-types]. We will refer to this formal system simply as _type theory_. In particular, every expression has a type. The `example` {index}[example] command checks that a given expression has the specified type.
 
 [lambda]: https://en.wikipedia.org/wiki/Lambda_calculus
 [coc]: https://en.wikipedia.org/wiki/Calculus_of_constructions
