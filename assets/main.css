@@ -56,13 +56,15 @@ main p {
     hyphens: auto;
 }
 
-main section a {
+main section a, main section a * {
     color: inherit;
     text-underline-offset: 0.1em;
     text-decoration-thickness: 0.05em;
     text-decoration-color: var(--vakio-color-subtle);
+    text-decoration-style: solid;
+    text-decoration-line: underline;
 }
-main section a:hover {
+main section a:hover, main section a:hover * {
     text-decoration-color: black;
 }
 
@@ -71,10 +73,5 @@ main section a:not([href^="https://"]) {
     text-decoration-style: dotted;
 }
 main section a:not([href^="https://"]):hover {
-    text-decoration-style: solid;
-}
-
-/* Absolute links */
-main section a[href^="https://"] {
     text-decoration-style: solid;
 }
