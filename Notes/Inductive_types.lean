@@ -175,7 +175,7 @@ example :
   (α : Type u) → (β : Type v) →
   Type (max u v) := Prod
 /-
-The _parameters_ of an inductive type consist of the largest prefix of arguments shared by the type constructor and all the constructors. The remaining arguments of the type constructor are called _indices_, and the remaining arguments of a constructor are called _fields_. {lean}`Prod` has the parameters `Type u` and `Type v`, but no indices. The fields of {lean}`Prod.mk` are `fst : α` and `snd : β`.
+The _parameters_ of an inductive type consist of the largest prefix of arguments shared by the type constructor and all the constructors. The remaining arguments of the type constructor are called _indices_, and the remaining arguments of a constructor are called _fields_.{margin}[{ref "sec-surface-syntax"}[Recall] that implicit and explicit arguments do not differ at the level of the type theory. When considering the prefix of arguments, we can use the explicit versions of the type constructor and constructors.] {lean}`Prod` has the parameters `Type u` and `Type v`, but no indices. The fields of {lean}`Prod.mk` are `fst : α` and `snd : β`.
 
 Earlier we considered the product of ℕ with itself and used the notation `(0, 1)`, which is syntactic sugar for `Prod.mk 0 1`.
 -/
@@ -245,6 +245,9 @@ The predecessor function maps `n` constructed as `zero` to `zero`, and `n` const
 
 
 ## Pattern matching via recursors
+%%%
+tag := "sec-pattern-matching"
+%%%
 
 The recursor of `Nat'` is `Nat'.rec`. Like all recursors, it has a function type.
 -/
@@ -471,13 +474,14 @@ example : (0, 1).fst = 0 := rfl
 example : (0, 1).snd = 1 := rfl
 /-
 
-Projections of a structure are just syntactic sugar for deconstruction via pattern matching.
+Projections of a structure are just syntactic sugar for deconstruction via pattern matching.{margin}[We will call all functions of form this projections, as long as they are associated to an inductive type that could be defined as a structure, regardless of whether the surface-syntax keyword `structure` was used in its definition.]
 -/
 example
   (α : Type u) (β : Type v) (p : Prod α β)
   : p.fst = match p with | Prod.mk fst _ => fst
 := rfl
 /-
+
 
 The fields of a structure can be accessed by indices.
 -/
@@ -514,11 +518,11 @@ example
 tag := "sec-structure-eta-equivalence"
 %%%
 
-{ref "sec-function-eta-equivalence"}[Recall] that function η-equivalence identifies a function with the $`\lambda` abstraction obtained by applying it to an argument.
+{ref "sec-function-eta-equivalence"}[Recall] that function η-equivalence identifies a function with the $`\lambda`-abstraction obtained by applying it to an argument.
 
-There is an analogous $`\eta` equivalence for structures. If the type of an expression `x` is a structure with two fields, then `x` is definitionally equal to the expression obtained by reconstructing it from its projections, namely `⟨x.1, x.2⟩`.
+There is an analogous $`\eta`-equivalence for structures. If the type of an expression `x` is a structure with two fields, then `x` is definitionally equal to the expression obtained by reconstructing it from its projections, namely `⟨x.1, x.2⟩`.
 
-More generally, structure $`\eta` equivalence applies to structures with any number of fields. It also applies to any inductive type that could be defined as a structure, regardless of whether the surface-syntax keyword `structure` was used in its definition.
+More generally, structure $`\eta`-equivalence applies to structures with any number of fields. It also applies to any inductive type that could be defined as a structure, regardless of whether the surface-syntax keyword `structure` was used in its definition.
 
 -/
 variable (x : Demo.Prod ℕ ℕ)
