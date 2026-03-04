@@ -6,7 +6,7 @@ tag := "sec-functions"
 -/
 import Mathlib
 /-
-We now focus on the $`\lambda` calculus aspect of Lean's type theory. Functions are given by $`\lambda` abstractions. {index}[`λ ... ↦`]
+We now focus on the $`\lambda`-calculus aspect of Lean's type theory. Functions are given by $`\lambda`-abstractions. {index}[`λ ... ↦`]
 
 -/
 example : ℕ → ℕ := λ n ↦ n + 1
@@ -83,7 +83,7 @@ def add₂ (n : ℕ) (m : ℕ) : ℕ := n + m
 def add₃ (n m : ℕ) : ℕ := n + m
 def add₄ (m : ℕ) : ℕ := n + m
 /-
-All this is syntactic sugar. The functions `add₁, ..., add₄` coincide with `add`.
+All this is syntactic sugar. The functions `add₁`, ..., `add₄` coincide with `add`.
 
 [Partial application][partial-application] produces a function taking the remaining arguments.
 
@@ -132,7 +132,7 @@ def Prod₂ : Type → Type → Type := Prod
 def Prod₃ : Type → Type → Type := λ t ↦ λ s ↦ t × s
 def Prod₄ (t s : Type) : Type := t × s
 /-
-The functions `Prod₁, ..., Prod₄` all coincide with {lean}`Prod`, though, they are instantiated with a fixed level of the universe hierarchy.
+The functions `Prod₁`, ..., `Prod₄` all coincide with {lean}`Prod`, though, they are instantiated with a fixed level of the universe hierarchy.
 
 
 ## Implicit arguments
@@ -171,20 +171,20 @@ Consider the following partially applied version of {lean}`@rfl`.
 -/
 example : (i : I) → X i := @rfl I
 /-
-The type of `@rfl I` is a $`\Pi` [type][pi-type].{margin}[$`\Pi` types are also called dependent function types.] Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
+The type of `@rfl I` is a [$`\Pi`-type][pi-type].{margin}[$`\Pi`-types are also called dependent function types.] Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
 $$`
 \prod_{i \in I} X_i
 =
 \left\{\left. f: I \to \bigcup_{i \in I} X_i\ \right|
 \ f(i) \in X_i,\ i \in I \right\}.
 `
-We refer to `i : I` as the _index_ of the $`\Pi` type `(i : I) → X i`.
+We refer to `i : I` as the _index_ of the $`\Pi`-type `(i : I) → X i`.
 
 [pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
 [indexed-product]: https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
 
 
-In fact, all function types are $`\Pi` types.
+In fact, all function types are $`\Pi`-types.
 -/
 example
   (α : Sort u) (β : Sort v) : (α → β) = ((a : α) → β)
@@ -203,12 +203,18 @@ example : (_ : Type) → ((_ : Type) → Type) := Prod
 
 
 # Implication
+%%%
+tag := "sec-implication"
+%%%
+
 
 {ref "sec-propositions"}[Recall] that all expressions of type {lean}`Prop` are themselves types. Accordingly, they can occur as the domain or codomain of a function type. The case where both the domain and codomain are expressions of type {lean}`Prop` is of particular interest.
 -/
 example (p q : Prop) : Prop := p → q
 /-
-This proposition is viewed as expressing logical implication.
+This proposition is viewed as expressing logical [implication][implication].
+
+[implication]: https://en.wikipedia.org/wiki/Logical_implication
 
 {ref "sec-propositions"}[Recall] that a proof of a proposition is an expression having the proposition as its type. Function application encodes [Modus ponens][modus-ponens]. We give two formulations.
 
@@ -244,7 +250,7 @@ example : Sort (imax u (v + 1)) = Sort (max u (v + 1))
 := rfl
 /-
 
-This rule is essential for the consistency of the type theory: certain typed $`\lambda` calculi that lack such universe-level stratification are subject to [Girard's paradox][girard].
+This rule is essential for the consistency of the type theory: certain typed $`\lambda`-calculi that lack such universe-level stratification are subject to [Girard's paradox][girard].
 
 [girard]: https://en.wikipedia.org/wiki/System_U
 
@@ -296,7 +302,7 @@ Consider an evaluation of a predicate.
 example (α : Sort u) (P : α → Prop) (a : α) : Prop := P a
 /-
 Since _`P a`_ has type {lean}`Prop`, it is itself a type.{margin}[Once again, all expressions of type {lean}`Prop` are themselves types.]
-In particular, it can occur as the codomain of a $`\Pi` type.
+In particular, it can occur as the codomain of a $`\Pi`-type.
 -/
 example (α : Sort u) (P : α → Prop) : Prop := (a : α) → P a
 /-
@@ -357,13 +363,13 @@ def p (y : ℕ) : ℕ := y^2 + 3*y + 1
 def pq₁ (x : ℕ) := p (q x)
 /-
 
-This introduces two names `p` and `q`. Such auxiliary definitions can be avoided as follows. {index}[have].
+This introduces two names `p` and `q`. Such auxiliary definitions can be avoided as follows. {index}[have]
 -/
 def pq₂ (x : ℕ) :=
   have y := x + 1
   y^2 + 3*y + 1
 /-
-Here `have` is syntactic sugar for $`\lambda` abstraction and application.
+Here `have` is syntactic sugar for $`\lambda`-abstraction and application.
 -/
 example (α : Sort u) (β : Sort v) (a : α) (b : β) :
   (
@@ -371,7 +377,14 @@ example (α : Sort u) (β : Sort v) (a : α) (b : β) :
     b
   ) = (λ (x : α) ↦ b) a := rfl
 /-
-We see that `pq₂` is, in fact,
+The parentheses around the `have` syntax can be omitted.
+-/
+example (α : Sort u) (β : Sort v) (a : α) (b : β) :
+  have x : α := a
+  b = (λ (x : α) ↦ b) a := rfl
+/-
+
+We see, in particular, that `pq₂` is, in fact,
 -/
 def pq₃ (x : ℕ) :=
   (λ (y : ℕ) ↦ y^2 + 3*y + 1) (x + 1)
@@ -379,6 +392,9 @@ def pq₃ (x : ℕ) :=
 
 
 ## Steps in proofs
+%%%
+tag := "sec-proof-steps"
+%%%
 
 A typical use of `have` is to isolate steps in proofs. Let us {ref "sec-universal-quantification"}[return] to our earlier example on universal instantiation followed by Modus ponens, and isolate the universal instantiation.
 -/
@@ -392,9 +408,9 @@ example (α : Sort u) (P Q : α → Prop)
 /-
 The proof has the natural reading:
 
-1. Let `a : α`.
-2. We have `P a` by hypothesis `h2`, applied to `a`.
-3. We conclude by hypothesis `h1`, applied to `a` and the fact `P a`.
+1. Let _`a`_ `:` _`α`_.
+2. We have _`P a`_ by hypothesis _`h2`_, applied to _`a`_.
+3. We conclude by hypothesis _`h1`_, applied to _`a`_ and the fact _`P a`_.
 
 If a name in `have` is omitted, then the name `this` is used.
 -/
@@ -406,11 +422,19 @@ example (α : Sort u) (P Q : α → Prop)
   have : P a := h2 a
   h1 a this
 /-
-Let us reiterate the reading:
+We can read the first line of the example as introducing the symbols involved in the statement, which itself consists of the second and third lines. The statement is:
 
-1. Let `a : α`.
-2. We have `P a` by hypothesis `h2`, applied to `a`.
-3. We conclude by hypothesis `h1`, applied to `a` and this fact.
+* Suppose _`h1`_ `: …` and _`h2`_ `: …`.
+* Then `∀` _`a`_ `:` _`α`_`,` _`Q a`_.
+
+The leading `:` on the third line reads as "Then" and `:=` on the fourth line as "Proof:".{margin}[It is due to this reading that we prefer the indentation in the example over the one in [Mathlib's style guidelines][style-guide]. When not proving a proposition, we adopt the usual indentation style.] Let us reiterate the reading of the proof as well:
+
+[style-guide]: https://leanprover-community.github.io/contribute/style.html#structuring-definitions-and-theorems
+
+
+1. Let _`a`_ `:` _`α`_.
+2. We have _`P a`_ by hypothesis _`h2`_, applied to _`a`_.
+3. We conclude by hypothesis _`h1`_, applied to _`a`_ and _this_ fact.
 
 
 ## Syntactic abbreviation
@@ -468,7 +492,7 @@ example : ℕ2 = (ℕ × ℕ) := rfl
 #reduce (types := true) ℕ × ℕ
 /-
 
-One might ask why we do not use a previously defined name such as `plus1`. The reason is that `#reduce plus1` does not demonstrate $`\delta` reduction in isolation, as can be observed by comparing the normal form and definition of `plus1`.
+One might ask why we do not use a previously defined name such as `plus1`. The reason is that `#reduce plus1` does not demonstrate $`\delta`-reduction in isolation, as can be observed by comparing the normal form and definition of `plus1`.
 -/
 #reduce plus1
 #print plus1
@@ -494,9 +518,9 @@ The semicolon is a syntactic device that allows multiple expressions to be writt
 tag := "sec-function-eta-equivalence"
 %%%
 
-In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called $`\eta` equivalence.
+In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called $`\eta`-equivalence.
 
-For functions, $`\eta` equivalence says that a function is definitionally equal to the $`\lambda` abstraction obtained by applying the function to an argument.
+For functions, $`\eta`-equivalence says that a function is definitionally equal to the $`\lambda`-abstraction obtained by applying the function to an argument.
 -/
 example : (λ x ↦ f x) = f := rfl
 /-
@@ -506,7 +530,7 @@ The definitional equality of the left and right-hand sides is not based on them 
 #reduce f
 /-
 
-Reduction and $`\eta` equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
+Reduction and $`\eta`-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
 
 [intensional-extensional]: https://en.wikipedia.org/wiki/Extensional_and_intensional_definitions
 
@@ -541,6 +565,10 @@ We will explain how to write proofs like this in due course. For the moment, we 
 
 
 # Surface syntax and underlying type theory
+%%%
+tag := "sec-surface-syntax"
+%%%
+
 
 Lean's processing of source code can be divided into several [stages][processing-stages]. For our purposes, the important stages are:
 
@@ -555,10 +583,10 @@ The type theory is designed to be simple, enabling the trusted kernel to remain 
 In addition to enforcing the rules of the type theory, the trusted kernel implements definitional equality, which accounts for:{margin}[There is also quotient reduction outside the sublanguage considered here.]
 
 1. Proof irrelevance
-2. Function $`\eta` equivalence
-3. Structure $`\eta` equivalence (described {ref "sec-structure-eta-equivalence"}[later])
-4. $`\beta`, $`\delta`, and $`\zeta` reductions
-5. $`\iota` reduction (described {ref "sec-iota-reduction"}[later])
+2. Function $`\eta`-equivalence
+3. Structure $`\eta`-equivalence (described {ref "sec-structure-eta-equivalence"}[later])
+4. $`\beta`-, $`\delta`-, and $`\zeta`-reductions
+5. $`\iota`-reduction (described {ref "sec-iota-reduction"}[later])
 
 Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, {lean}`rfl` is simply a function taking two arguments.
 -/
