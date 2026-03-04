@@ -87,6 +87,11 @@ window.onload = () => {
           }
         }
       }
+      // If there's no meaningful content return null
+      const text = (content.textContent || '').trim();
+      if (!text && content.children.length === 0) {
+        return null;
+      }
       return content;
     }
 
@@ -97,19 +102,22 @@ window.onload = () => {
       content: tippyContent,
       interactive: true,
 
-      onShow() {
+      onShow(inst) {
+        const c = inst.props.content;
+        const node = (typeof c === 'function') ? c(instance.reference) : c;
+        if (!node) return false;
         hoverTippys?.forEach(inst => inst.disable());
       },
       onHide() {
         hoverTippys?.forEach(inst => inst.enable());
       },
-      onCreate(instance) {
-        const ref = instance.reference;
+      onCreate(inst) {
+        const ref = inst.reference;
         const stopLabelToggle = (e) => {
           e.preventDefault();
         };
         ref.addEventListener("click", stopLabelToggle, true);
-        instance._stopLabelToggle = stopLabelToggle;
+        inst._stopLabelToggle = stopLabelToggle;
       },
     }
 
@@ -121,6 +129,9 @@ window.onload = () => {
       //interactive: true,
 
       onShow(inst) {
+        const c = inst.props.content;
+        const node = (typeof c === 'function') ? c(instance.reference) : c;
+        if (!node) return false;
         if (inst.reference.className == 'tactic') {
           const toggle = inst.reference.querySelector("input.tactic-toggle");
           if (toggle && toggle.checked) {
@@ -140,15 +151,19 @@ window.onload = () => {
       '.hl.lean .level-var',
       '.hl.lean .level-const', 
       '.hl.lean .level-op',
-      '.hl.lean .sort'
+      '.hl.lean .sort',
     ];
     clickTippySelectors.push('.hl.lean .const.token:not(a *)');
 
+    // These don't have an actual tooltip
+    // Moreover, lemma doesn't have a tooltip but it also doesn't 
+    // have any binding that we could use for selection 
     const excluded_kw_data_bindings = [
       "kw-occ-Lean.Parser.Command.example-",
       "kw-occ-Lean.Parser.Command.definition-",
       "kw-occ-Lean.Parser.Term.fun-",
       "kw-occ-Lean.Parser.Command.check-",
+      "kw-occ-Lean.Parser.Command.theorem-",
     ];
     clickTippySelectors.push('.hl.lean .keyword.token' + 
       excluded_kw_data_bindings.map(
