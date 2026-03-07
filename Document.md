@@ -1,4 +1,4 @@
-#doc (Manual) "Notes on Lean for mathematically minded" =>
+#doc (Manual) "Notes on Lean" =>
 
 %%%
 shortTitle := "Notes on Lean"
@@ -21,7 +21,7 @@ Every type is either a universe in the universe hierarchy, a function type, or a
     <tr><th></th><th>creation</th><th>elimination</th></tr>
   </thead>
   <tbody>
-    <tr><th>function</th><td><code class="math inline">\lambda</code> abstraction</td><td>evaluation</td></tr>
+    <tr><th>function</th><td><code class="math inline">\lambda</code>-abstraction</td><td>evaluation</td></tr>
     <tr><th>inductive type</th><td>constructor</td><td>recursor</td></tr>
   </tbody>
 </table>
@@ -40,7 +40,19 @@ We begin with an introduction to types and universes. Since our primary goal is 
 
 # Constructions
 
+We have now seen all the primitive notions in Lean's type theory. To reiterate, they are universes, function types, and inductive types,{margin}[We view `→` and `inductive … where` as primitive notions. This does not include concrete function types or inductive types.] together with creation and elimination of expressions of the latter two types. In addition, we have considered the concrete inductive types `Eq` and `Nat`, as well as the product and sum types `Prod` and `Sum`.
+
+We begin with an encoding of first-order logic using inductive types. This involves [product][product-type] and [sum][sum-type] types similar to `Prod` and `Sum`, a [dependent sum type][dep-sum-type], a [unit type][unit-type] `⊤`, and an [empty type][empty-type] `⊥`. The remainder of the chapter then takes a deeper look at `Eq` and `Nat`.
+
+[product-type]: https://en.wikipedia.org/wiki/Product_type
+[sum-type]: https://en.wikipedia.org/wiki/Sum_type
+[dep-sum-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A3_type
+[unit-type]: https://en.wikipedia.org/wiki/Unit_type
+[empty-type]: https://en.wikipedia.org/wiki/Empty_type
+
+{include 2 Document.Logic}
 {include 2 Document.Equality}
+{include 2 Document.Peano}
 
 
 # Index
