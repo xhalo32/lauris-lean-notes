@@ -60,6 +60,9 @@ We will explain {ref "sec-hierarchical-names"}[below] the hierarchical name appe
 
 
 # Universes
+%%%
+tag := "sec-universe-placement"
+%%%
 
 The universe of an inductive type is specifed by its type constructor.
 -/
@@ -67,7 +70,7 @@ inductive NextLevelNat : Sort 2 where
   | zero : NextLevelNat
   | succ : NextLevelNat → NextLevelNat
 /-
-From the mathematical point of view, `NextLevelNat` is [isomorphic][isomorphism] to {lean}`Nat`, since they both satisfy the second order [Peano axioms][peano]. We will show this later.
+From the mathematical point of view, `NextLevelNat` is [isomorphic][isomorphism] to {lean}`Nat`, since they both satisfy the second order [Peano axioms][peano]. We will show this {ref "sec-peano"}[later].
 
 The following is not isomorphic to {lean}`Nat`.
 
@@ -245,7 +248,10 @@ tag := "sec-indexed-families"
 
 The type constructor of an inductive types can take arguments that are not shared with the constructors of the type. Such arguments are called _indices_. Indices can be seen as defining a family of types: each choice of indices selects a particular member of the family.
 
-An example is given by {lean}`Eq` that encodes equality. We define our version as follows.{margin}[Our `Eq'` is not quite the same as the standard `Eq`. The constructor of the latter takes the second parameter explicitly rather than implicitly. We take the view that `Eq` abuses auto-promotion of indices and that `Eq'` is a more natural way to define equality. {ref "sec-surface-syntax"}[Recall] also that implicit and explicit arguments do not differ at the level of the type theory.]
+An example is given by {lean}`Eq` that encodes equality. We define our version as follows.{margin}[Our `Eq'` is not quite the same as the standard `Eq`. The constructor of the latter takes the second parameter explicitly rather than implicitly. We take the view that `Eq` abuses auto-promotion of indices and that `Eq'` is a more natural way to define equality. Counterarguments to this view are [welcome][refute]. {ref "sec-surface-syntax"}[Recall] also that implicit and explicit arguments do not differ at the level of the type theory.]
+
+[refute]: https://leanprover.zulipchat.com/#narrow/channel/113489-new-members/topic/Why.20the.20constructor.20of.20Eq.20doesn't.20take.20implicit.20parameters.3F/with/577656843
+
 -/
 #print Eq
 
@@ -315,7 +321,7 @@ The constructor
 -/
 example : Nat' → Nat' := Nat'.succ
 /-
-takes a _recursive argument_, that is, an argument of the same inductive type it constructs. The ignored argument in `λ m _ ↦ m` is the _induction hypothesis_ associated to this recursive argument. While ignored here, induction hypotheses will be useful later: as their name indicates, recursors are not used only for pattern matching.
+takes a _recursive argument_, that is, an argument of the same inductive type it constructs. The ignored argument in `λ m _ ↦ m` is the _induction hypothesis_ associated to this recursive argument. While ignored here, induction hypotheses will be useful {ref "sec-induction"}[later]: as their name indicates, recursors are not used only for pattern matching.
 
 
 ## Arguments of recursors
@@ -326,13 +332,13 @@ tag := "sec-arguments-of-recursors"
 Consider the type of {lean}`@Nat.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- … -/`] Here they are used to label parts of the type.]
 -/
 example :
-  (motive : ℕ → Sort u) /- motive -/ →
+  (motive : Nat → Sort u) /- motive -/ →
 
   -- minor premises:
   motive Nat.zero /- zero -/ →
-  ((m : ℕ) → motive m → motive m.succ) /- succ -/ →
+  ((m : Nat) → motive m → motive m.succ) /- succ -/ →
 
-  (n : ℕ) /- major premise -/ →
+  (n : Nat) /- major premise -/ →
   motive n /- codomain -/
 := @Nat.rec
 /-
