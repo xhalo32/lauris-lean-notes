@@ -149,23 +149,23 @@ example : False' → False := nofun
 We can give a name to a proven proposition in several ways.
 {index}[lemma] {index}[theorem]
 -/
-def explosion : False' → False := nofun
-def explosion₁ (h : False') : False := nomatch h
-lemma explosion₂ (h : False') : False := nomatch h
-theorem explosion₃ (h : False') : False := nomatch h
+def explosion : False → False' := nofun
+def explosion₁ (h : False) : False' := nomatch h
+lemma explosion₂ (h : False) : False' := nomatch h
+theorem explosion₃ (h : False) : False' := nomatch h
 /-
 Despite the syntactic differences, all these define the same function. The following indentation suggest reading `h : False'` as a hypothesis and `False` as the conclusion.{margin}[{ref "sec-proof-steps"}[Recall] that `:` before the conclusion `False` can be read as "Then" and `:=` as "Proof:".]
 -/
 lemma explosion₄
-  (h : False')
-  : False
+  (h : False)
+  : False'
 :=
   nomatch h
 /-
 
 Lemmas can be used in subsequent proofs.
 -/
-example : ¬False' := explosion
+example : Not' False := explosion
 /-
 
 
@@ -222,7 +222,15 @@ example (h : And' p q) : p
 /-
 This is just the projection function associated to the first field of `And'`.{margin}[{ref "sec-structures"}[Recall] that projection functions are generated for structures in this manner. While we could have defined `And'` as a structure, its definition as an inductive type illustrates the fact that structures are merely a convenience.]
 
-Here is a proof that bypasses the user-facing pattern matching syntax and employs the recursor `And'.rec` directly.
+An alternative proof uses the shorthand related to the {ref "sec-anon-const-syntax"}[anonymous constructor syntax].
+-/
+example (h : And' p q) : p
+:=
+  let ⟨hp, _⟩ := h
+  hp
+/-
+
+Here is a proof that bypasses the user-facing surface syntax and employs the recursor `And'.rec` directly.
 -/
 example (p q : Prop) (h : And' p q) : p
 := And'.rec (λ hp _ ↦ hp) h
@@ -411,6 +419,10 @@ The definition is based on [existential generalization][existential-generalizati
 example (α : Sort u) (P : α → Prop) (a : α)
   (h : P a) : Exists' P
 := Exists'.intro a h
+
+example (α : Sort u) (P : α → Prop) (a : α)
+  (h : P a) : Exists' P
+:= ⟨a, h⟩
 /-
 
 Deconstruction enables [existential instantiation][existential-instantiation].
@@ -418,6 +430,12 @@ Deconstruction enables [existential instantiation][existential-instantiation].
 [existential-instantiation]: https://en.wikipedia.org/wiki/Existential_instantiation
 
 -/
+example (α : Sort u) (P : α → Prop)
+  (h1 : Exists' P) (h2 : ∀ a : α, P a → q) : q
+:=
+  let ⟨a, h⟩ := h1
+  h2 a h
+
 example (α : Sort u) (P : α → Prop)
   (h1 : Exists' P) (h2 : ∀ a : α, P a → q) : q
 :=
@@ -440,6 +458,127 @@ Syntactic sugar is provided for the standard version.
 -/
 example (α : Sort u) (P : α → Prop) :
   (∃ a : α, P a) = Exists P := rfl
+/-
+
+
+# Axioms
+
+Axioms postulate principles that cannot be established otherwise. There are seven [standard axioms][standard-axioms], three of which are important for our present purposes. These three are propositional extensionality, the axiom of choice, and the quotient axiom. We call them the _three mathematical axioms_.
+
+[standard-axioms]: https://lean-lang.org/doc/reference/4.28.0-rc1/Axioms/#standard-axioms
+
+-/
+#print propext
+#print Classical.choice
+#print Quot.sound
+/-
+
+The law of excluded middle
+-/
+example : Prop := p ∨ ¬p
+/-
+holds in [classical logic][classical-logic] but not in [intuitionistic logic][intuitionistic-logic]. The _three mathematical axioms_ enable encoding of classical logic.
+
+[classical-logic]: https://en.wikipedia.org/wiki/Classical_logic
+[intuitionistic-logic]: https://en.wikipedia.org/wiki/Intuitionistic_logic
+
+-/
+lemma excluded_middle : p ∨ ¬p := by grind
+/-
+
+Lean tracks the axioms that each proof depends on.
+-/
+#print axioms excluded_middle
+/-
+
+For instance, our earlier proof of conjunction elimination is constructive and does not depend on any axiom.
+-/
+lemma and_elim (h : p ∧ q) : p := h.left
+#print axioms and_elim
+/-
+
+Proofs based on function extensionality depend on all three mathematical axioms.
+-/
+def plus1  (n : ℕ) := n + 1
+def plus1' (n : ℕ) := 1 + n
+
+lemma plus1s_coincide : plus1 = plus1'
+:= by
+  funext n
+  simp [plus1, plus1']
+  grind
+
+#print axioms plus1s_coincide
+/-
+
+Proving the law of excluded middle from
+propositional extensionality, functional extensionality, and the axiom of choice is called [Diaconescu's theorem][diaconescu]. We can adapt this proof for our `Or'` and `Not'`.
+
+[diaconescu]: https://en.wikipedia.org/wiki/Diaconescu%27s_theorem
+
+-/
+lemma excluded_middle' : Or' p (Not' p) :=
+  /-
+  The following three definitions are reproduced from the
+  namespace Classical. They are specialized to the universe
+  of propositions, since universes cannot be introduced in
+  local definitons. We have also removed some syntactic
+  sugar and made all arguments explicit.
+  -/
+  let indefiniteDescription (q : Prop → Prop)
+    (h : ∃ x, q x) :
+    Subtype (λ x ↦ q x) := Classical.choice (
+      let ⟨x, qx⟩ := h
+      Nonempty.intro (Subtype.mk x qx)
+    )
+  let choose (q : Prop → Prop)
+    (h : ∃ x, q x) :
+    Prop := (indefiniteDescription q h).val
+  have choose_spec (q : Prop → Prop)
+    (h : ∃ x, q x)
+    : q (choose q h)
+  :=
+    (indefiniteDescription q h).property
+
+  -- We follow the proof of Classical.em.
+  let U (x : Prop) : Prop := x = True ∨ p
+  let V (x : Prop) : Prop := x = False ∨ p
+  have exU : ∃ x, U x := ⟨True, Or.inl rfl⟩
+  have exV : ∃ x, V x := ⟨False, Or.inl rfl⟩
+  let u : Prop := choose U exU
+  let v : Prop := choose V exV
+  have u_def : U u := choose_spec U exU
+  have v_def : V v := choose_spec V exV
+  have not_uv_or_p : u ≠ v ∨ p :=
+    match u_def, v_def with
+    | Or.inr h, _ => Or.inr h
+    | _, Or.inr h => Or.inr h
+    | Or.inl hut, Or.inl hvf =>
+      have hne : u ≠ v := by simp [hvf, hut]
+      Or.inl hne
+  have p_implies_uv : p → u = v :=
+    λ hp ↦
+    have hpred : U = V :=
+      funext λ x ↦
+        have hl : (x = True ∨ p) → (x = False ∨ p) :=
+          λ _ ↦ Or.inr hp
+        have hr : (x = False ∨ p) → (x = True ∨ p) :=
+          λ _ ↦ Or.inr hp
+        propext (Iff.intro hl hr)
+    have h₀ : ∀ exU exV, choose U exU = choose V exV :=
+      by simp [hpred]
+    h₀ exU exV
+
+  -- The remaining is adapted for Or' and Not'.
+  have mt' {a b : Prop} (h₁ : a → b) (h₂ : ¬b) : Not' a :=
+    λ ha ↦
+      have : False := h₂ (h₁ ha)
+      explosion this
+  match not_uv_or_p with
+  | Or.inl hne => Or'.inr (mt' p_implies_uv hne)
+  | Or.inr h   => Or'.inl h
+
+#print axioms excluded_middle'
 /-
 
 
