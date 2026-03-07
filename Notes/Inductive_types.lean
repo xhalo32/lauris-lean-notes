@@ -571,6 +571,13 @@ example
 := rfl
 /-
 
+The following shorthand is also available.
+-/
+example (α : Type u) (β : Type v) (pair : Prod α β) : α :=
+  let ⟨a, _⟩ := pair
+  a
+/-
+
 
 # Structure eta-equivalence
 %%%
@@ -631,6 +638,10 @@ example
     fst := a
   }
 := rfl
+
+example (α : Type u) (β : Type v) (pair : Prod α β) : β :=
+  let ⟨_, b⟩ := pair
+  b
 /-
 
 Projections have the expected types.
