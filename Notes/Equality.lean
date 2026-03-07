@@ -18,6 +18,10 @@ The proofs of constructor distinctness and injectivity use the recursor of the i
 
 
 # Definitional equality and reflexivity
+%%%
+tag := "sec-definitional-equality"
+%%%
+
 
 We have made extensive use of {lean}`rfl`, which is simply the constructor {lean}`Eq.refl` of {lean}`Eq`, with both the arguments implicit.
 -/
@@ -33,10 +37,10 @@ example (α : Sort u) (a : α) : a = a := rfl
 
 The applicability of `rfl` as a proof is entirely determined by the definitional equality implemented by the kernel. To demonstrate this, we define our own versions {lean}`Eq` and {lean}`rfl`.
 -/
-inductive Eq' : {α : Sort u} → α → α → Prop where
-  | refl : {α : Sort u} → (a : α) → Eq' a a
+inductive Eq' {α : Sort u} (a : α) : α → Prop where
+  | refl : Eq' a a
 
-def rfl' {α : Sort u} {a : α} := Eq'.refl a
+def rfl' {α : Sort u} {a : α} := @Eq'.refl α a
 /-
 These behave identically to {lean}`Eq` and {lean}`rfl` as far as definitional equality is concerned:
 
@@ -47,14 +51,14 @@ example
 := rfl'
 /-
 
-2. Function $`\eta` equivalence
+2. Function $`\eta`-equivalence
 -/
 example
   (α : Sort u) (β : Sort v) (f : α → β) : Eq' (λ x ↦ f x) f
 := rfl'
 /-
 
-3. Structure $`\eta` equivalence
+3. Structure $`\eta`-equivalence
 -/
 example
   (α : Type u) (β : Type v) (x : α × β)
@@ -62,7 +66,7 @@ example
 := rfl'
 /-
 
-4. $`\beta`, $`\delta`, and $`\zeta` reductions
+4. $`\beta`-, $`\delta`-, and $`\zeta`-reductions
 -/
 example
   (α : Sort u) (β : Sort v) (f : α → β) (a : α)
@@ -75,7 +79,7 @@ example : Eq' ℕ_to_ℕ (ℕ → ℕ) := rfl'
 example : Eq' (let t := ℕ; t → t) (ℕ → ℕ) := rfl'
 /-
 
-5. $`\iota` reduction
+5. $`\iota`-reduction
 -/
 example (n : ℕ) :
   Eq' (@Nat.rec (λ _ ↦ ℕ) 0 (λ m _ ↦ m) (Nat.succ n)) n
@@ -158,12 +162,8 @@ example (α : Sort u) (a b : α) (h : a = b) : b = a
 := Eq.rec rfl h
 /-
 
-Proofs by pattern matching are translated to a similar use of `Eq.rec` as above.
+Proofs by pattern matching are translated to a similar use of `Eq.rec` as above.{margin}[We could replace `rfl` on the left of `=>` with `Eq.refl _`. Using `rfl` avoids having to ignore the explicit parameter of `Eq.refl`.]
 -/
-example (α : Sort u) (a b : α) (h : a = b) : b = a
-:= match h with
-  | Eq.refl a => rfl
-
 example (α : Sort u) (a b : α) (h : a = b) : b = a
 := match h with
   | rfl => rfl
@@ -231,8 +231,8 @@ A proof by pattern matching is translated to a similar use of `Eq.rec` as above.
 example
   (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
   : a = c
-:= match h1 with
-  | rfl => h2
+:= match h2 with
+  | rfl => h1
 /-
 
 Transitivity is also available as the theorem {lean}`Eq.trans`.
@@ -290,7 +290,7 @@ example
   : f a = f b
 := Eq.subst (motive := λ x ↦ f a = f x) h rfl
 /-
-Named arguments allow specifying implicit parameters explicitly. {index}[`(... := ...)`] A variation of the motive, namely `(motive := λ x _ ↦ f a = f x)`, can be used in the earlier proof by `Eq.rec` to make it more explicit.
+Named arguments allow specifying implicit parameters explicitly. {index}[`(… := …)`] A variation of the motive, namely `(motive := λ x _ ↦ f a = f x)`, can be used in the earlier proof by `Eq.rec` to make it more explicit.
 
 
 # Constructor distinctness
@@ -333,28 +333,24 @@ example : a ≠ b := λ h ↦
   Eq.subst h this
 /-
 
-Proofs by pattern matching are translated to a similar use of {lean}`Eq.subst` and `S.rec` as above. {index}[nomatch] {index}[nofun]
+Proofs by pattern matching are translated to a similar use of {lean}`Eq.subst` and `S.rec` as above.
 -/
 example : a ≠ b := λ h ↦ nomatch h
 example : a ≠ b := nofun
 /-
 
-The [nomatch expression][nomatch] is a pattern match with zero cases, and `nofun` is shorthand for a function with a body that applies `nomatch` to its arguments.
-
-[nomatch]: https://lean-lang.org/doc/reference/latest/Terms/Pattern-Matching/#The-Lean-Language-Reference--Terms--Pattern-Matching--Other-Pattern-Matching-Operators
-
 
 # Constructor injectivity
 
-Applications of a constructor at distinct arguments are not equal. Equivalently, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using congruence, transitivity, and suitable deconstruction.
+Applications of a constructor at distinct arguments are not equal. Equivalently, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using deconstruction together with congruence and transitivity.
 -/
 example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
 :=
-  let succ := Nat.succ
   let pred : Nat → Nat := Nat.rec 0 (λ k _ ↦ k)
-  let hpp : pred (succ n) = pred (succ m) := congrArg pred h
-  let hnp : n = pred (succ n) := rfl
-  let hpm : pred (succ m) = m := rfl
+  have hpp : pred (Nat.succ n) = pred (Nat.succ m)
+    := congrArg pred h
+  have hnp : n = pred (Nat.succ n) := rfl
+  have hpm : pred (Nat.succ m) = m := rfl
   Eq.trans hnp (Eq.trans hpp hpm)
 /-
 
