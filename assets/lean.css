@@ -732,6 +732,7 @@ code {
     font-variant-ligatures: none;
     overflow-x: auto;
     overflow-y: clip;
+    white-space: nowrap;
 }
 
 .hl.lean {
