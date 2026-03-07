@@ -16,19 +16,18 @@ Lean is based on a typed [$`\lambda`-calculus][lambda], specifically a version o
 -/
 example : ℕ := 0
 /-
-In this case, the expression is `0` and the type is `ℕ`. The example asserts that the expression `0` has type `ℕ`, encoding the natural numbers.{margin}[In [VS Code][vscode], you can hover over `ℕ` and other non-ascii characters to see how they can be typed.]
-
-[vscode]: https://marketplace.visualstudio.com/items?itemName=leanprover.lean4
+The example asserts that `ℕ` is the type of `0`. The type `ℕ` encodes the natural numbers.{margin}[Hovering over `ℕ` in [VS Code][vscode] shows that it can be entered using `\N`.]
 
 Lean provides a substantial amount of [syntactic sugar][sugar]. For example, `ℕ` is syntactic sugar for {lean}`Nat`. Understanding the underlying type theory often requires considering expressions from which syntactic sugar has been removed.
 
+[vscode]: https://lean-lang.org/install/
 [sugar]: https://en.wikipedia.org/wiki/Syntactic_sugar
 
-The command `#check` {index}[#check] is used to inspect the type of an expression.{margin}[You can hover over `#check` to see its output.]
+The command `#check` {index}[#check] is used to inspect the type of an expression.{margin}[Hovering over `#check` shows its output.]
 -/
 #check 0
 /-
-The output `0 : ℕ` means that `0` has type `ℕ`. We will occasionally use this notation in our explanations.
+The output `0 : ℕ` means that `0` has type `ℕ`. Another way to say this is that `0` inhabits `ℕ`.
 
 -/
 #check (0, 1)
@@ -94,7 +93,7 @@ An expression of type `0 = 0` is viewed as a proof of `0 = 0`. In general, to pr
 -/
 example : 0 = 0 := rfl
 /-
-We will consider the precise meaning of {lean}`rfl` (and the equality `=`) later. For the moment, let us simply view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
+We will consider the precise meaning of {lean}`rfl` (and the equality `=`) {ref "sec-equality"}[later]. For the moment, let us simply view {lean}`rfl` as a canonical proof of `a = a` for any expression `a`.
 
 Like `ℕ`, {lean}`Prop` has type {lean}`Type`.
 -/
@@ -107,7 +106,7 @@ example : Type := Prop
 tag := "sec-definitional-equality-naive"
 %%%
 
-If two expressions are [definitionally equal][def-eq], then their equality can be proven using {lean}`rfl`. A sufficient (but not necessary) condition for definitional equality is that the expressions have the same normal form; the `#reduce` {index}[#reduce] command displays this normal form.{margin}[We will give more details on the reduction to normal form in due course.]
+If two expressions are [definitionally equal][def-eq], then their equality can be proven using {lean}`rfl`. A sufficient (but not necessary) condition for definitional equality is that the expressions have the same normal form; the `#reduce` {index}[#reduce] command displays this normal form.{margin}[Further details of the reduction to normal form will be provided in due course. A {ref "sec-definitional-equality"}[summary] covering all aspects of definitional equality is also available.]
 
 [def-eq]: https://lean-lang.org/doc/reference/latest/The-Type-System/#--tech-term-definitional-equality
 
@@ -138,7 +137,7 @@ example : 1 = 0 := rfl
 
 # Universe hierarchy
 
-The infinite sequence `Prop, Type 0, Type 1, ...` is syntactic sugar for the universe hierarchy `Sort 0, Sort 1, Sort 2, ...`. Here `Sort u` is called a universe and `u` is its level.
+The infinite sequence `Prop, Type 0, Type 1, …` is syntactic sugar for the universe hierarchy `Sort 0, Sort 1, Sort 2, …`. Here `Sort u` is called a universe and `u` is its level.
 
 We can verify that the two sequences coincide using {lean}`rfl`.
 -/
@@ -151,9 +150,7 @@ The type of a universe is the next universe in the hierarchy.
 example : Sort (u + 1) := Sort u
 /-
 
-Each type `α` satisfies `α : Sort u` for exactly one `u = 0, 1, ...`. In particular, the universe hierarchy is [non-cumulative][non-cumulative].
-
-[non-cumulative]: https://ncatlab.org/nlab/show/hierarchy+of+universes#cumulativity
+Each type `α` satisfies `α : Sort u` for exactly one `u = 0, 1, …`. We say that `Sort u` is the universe of `α` or that `α` inhabits `Sort u`.
 
 
 # Further proofs
