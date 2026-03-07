@@ -6,7 +6,7 @@ tag := "sec-equality"
 -/
 import Mathlib
 /-
-Equality has the [basic][eq-basic-properties] reflexivity, symmetry, transitivity, and substitution properties. Reflexivity is the most fundamental property, as it is an interface to definitional equality. The remaining properties are derived from the recursor of `Eq`.
+Equality has the [basic][eq-basic-properties] reflexivity, symmetry, transitivity, and substitution properties. In Lean, reflexivity is the most fundamental property, as it is an interface to definitional equality. The remaining properties are derived from the recursor of `Eq`.
 
 [eq-basic-properties]: https://en.wikipedia.org/wiki/Equality_(mathematics)#Basic_properties
 
@@ -342,7 +342,7 @@ example : a ≠ b := nofun
 
 # Constructor injectivity
 
-Applications of a constructor at distinct arguments are not equal. Equivalently, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using deconstruction together with congruence and transitivity.
+Applications of a constructor at distinct arguments are not equal. That is, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using deconstruction together with congruence and transitivity.
 -/
 example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
 :=

@@ -254,7 +254,7 @@ This rule is essential for the consistency of the type theory: certain typed $`\
 
 [girard]: https://en.wikipedia.org/wiki/System_U
 
-The special case `v = 0` is related to proof irrelevance: any two proofs of the same proposition are definitionally equal.
+The special case `v = 0` is related to _proof irrelevance_: any two proofs of the same proposition are definitionally equal.
 -/
 example (p : Prop) (proof₁ proof₂ : p) : proof₁ = proof₂
 := rfl
@@ -552,7 +552,11 @@ The following example is invalid.
 example : plus1 = plus1' := rfl
 ```
 
-Function extensionality is available in Lean as a theorem called {lean}`funext`. We can show that `plus1` and `plus1'` are indeed equal.
+The principle of [functional extensionality][extensionality-principles] holds in Lean. It can be used to show that `plus1` and `plus1'` are indeed equal.{margin}[[Theorem Proving in Lean][TPIL] is the canonical reference for writing proofs like this in Lean.]
+
+[TPIL]: https://lean-lang.org/theorem_proving_in_lean4/Axioms-and-Computation/#function-extensionality
+[extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
+
 -/
 example : plus1 = plus1'
 := by
@@ -560,10 +564,6 @@ example : plus1 = plus1'
   simp [plus1, plus1', add]
   grind
 /-
-We plan to explain how to write proofs like this in due course.{margin}[The current version of the notes does not cover this. [Theorem Proving in Lean][TPIL] is the canonical reference for writing proofs in Lean.] For the moment, we simply record that the principle of [functional extensionality][extensionality-principles] holds in Lean.
-
-[TPIL]: https://lean-lang.org/theorem_proving_in_lean4/Axioms-and-Computation/#function-extensionality
-[extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
 
 
 # Surface syntax and underlying type theory
