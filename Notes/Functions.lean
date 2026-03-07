@@ -6,7 +6,7 @@ tag := "sec-functions"
 -/
 import Mathlib
 /-
-We now focus on the $`\lambda`-calculus aspect of Lean's type theory. Functions are given by $`\lambda`-abstractions. {index}[`λ ... ↦`]
+We now focus on the $`\lambda`-calculus aspect of Lean's type theory. Functions are given by $`\lambda`-abstractions. {index}[`λ … ↦`]
 
 -/
 example : ℕ → ℕ := λ n ↦ n + 1
@@ -16,7 +16,7 @@ An alternative keyword `fun` {index}[fun] is also available.
 -/
 example : ℕ → ℕ := fun n => n + 1
 /-
-Here `ℕ → ℕ` {index}[`→`] is a function type. More generally, such a type is denoted by `α → β`, where `α` and `β` are types specifying the [domain][domain] and [codomain][codomain], respectively.
+Here `ℕ → ℕ` {index}[`→`] is a function type. More generally, a function type is denoted by `α → β`, where `α` and `β` are types specifying the [domain][domain] and [codomain][codomain], respectively.
 
 [domain]: https://en.wikipedia.org/wiki/Domain_of_a_function
 [codomain]: https://en.wikipedia.org/wiki/Codomain
@@ -50,7 +50,7 @@ The domain may be specified by annotating the argument with a type. Then Lean ca
 def plus1₁ := λ n : ℕ ↦ n + 1
 /-
 
-Syntactic sugar allows for introducing the argument using parentheses. {index}[`(... : ...)`]
+Syntactic sugar allows for introducing the argument using parentheses. {index}[`(… : …)`]
 -/
 def plus1₂ (n : ℕ) := n + 1
 /-
@@ -83,7 +83,7 @@ def add₂ (n : ℕ) (m : ℕ) : ℕ := n + m
 def add₃ (n m : ℕ) : ℕ := n + m
 def add₄ (m : ℕ) : ℕ := n + m
 /-
-All this is syntactic sugar. The functions `add₁`, ..., `add₄` coincide with `add`.
+All this is syntactic sugar. The functions `add₁`, …, `add₄` coincide with `add`.
 
 [Partial application][partial-application] produces a function taking the remaining arguments.
 
@@ -100,7 +100,7 @@ example : ℕ := add 1 0
 
 The following function taking two arguments ignores the second one. {index}[`_`]
 -/
-def proj : ℕ → ℕ → ℕ := λ n ↦ λ _ ↦ n
+def proj : ℕ → ℕ → ℕ := λ n _ ↦ n
 
 example : proj 0 1 = 0 := rfl
 /-
@@ -111,7 +111,7 @@ example : proj 0 1 = 0 := rfl
 tag := "sec-functions-of-types"
 %%%
 
-{ref "sec-expressions"}[Recall] that `Prod ℕ ℕ` gives the Cartesian product. {lean}`Prod` is a function taking types as arguments.
+{ref "sec-expressions"}[Recall] that `Prod ℕ ℕ` encodes the Cartesian product. {lean}`Prod` is a function taking types as arguments.
 -/
 example : Type → Type → Type := Prod
 /-
@@ -123,7 +123,7 @@ In fact, {lean}`Prod` is a more general [universe-polymorphic][univ-polymorphic]
 -/
 example : Type u → Type v → Type (max u v) := Prod
 /-
-We will {ref "sec-well-formedness"}[return] to the least upper bound appearing in the codomain.
+We will {ref "sec-well-formedness"}[return] to the maximum appearing in the codomain.
 
 Here are some variations
 -/
@@ -132,7 +132,7 @@ def Prod₂ : Type → Type → Type := Prod
 def Prod₃ : Type → Type → Type := λ t ↦ λ s ↦ t × s
 def Prod₄ (t s : Type) : Type := t × s
 /-
-The functions `Prod₁`, ..., `Prod₄` all coincide with {lean}`Prod`, though, they are instantiated with a fixed level of the universe hierarchy.
+The functions `Prod₁`, …, `Prod₄` all coincide with {lean}`Prod`, though, they are instantiated with a fixed level of the universe hierarchy.
 
 
 ## Implicit arguments
@@ -142,7 +142,7 @@ if two expressions are definitionally equal, then their equality can be proven u
 -/
 #check rfl
 /-
-Implicit arguments {index}[`{... : ...}`] are written using curly braces `{...}`. Lean infers their values from context.
+Implicit arguments {index}[`{… : …}`] are written using curly braces `{…}`. Lean infers their values from context.
 -/
 example : {α : Sort u} → {a : α} → a = a := rfl
 example {α : Sort u} {a : α} : a = a := rfl
@@ -212,7 +212,7 @@ tag := "sec-implication"
 -/
 example (p q : Prop) : Prop := p → q
 /-
-This proposition is viewed as expressing logical [implication][implication].
+This encodes [logical implication][implication].
 
 [implication]: https://en.wikipedia.org/wiki/Logical_implication
 
@@ -230,12 +230,12 @@ example
 /-
 
 
-# Impredicative least upper bound rule
+# Impredicative maximum rule
 %%%
 tag := "sec-impredicative-lub-rule"
 %%%
 
-The type of a function type is governed by the _impredicative least upper bound rule_:{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity]. The [level expression][level-expression] `imax u v` is called the impredicative least upper bound of `u` and `v`. We have named the rule accordingly.]
+The type of a function type is governed by the _impredicative maximum rule_:{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity]. The [level expression][level-expression] `imax u v` is called the impredicative maximum (or least upper bound) of `u` and `v`. We have named the rule accordingly.]
 
 [predicativity]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#The-Lean-Language-Reference--The-Type-System--Universes--Predicativity
 [level-expression]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/?terms=imax#level-expressions
@@ -265,7 +265,7 @@ We revisit the earlier example of logical implication and emphasize again that a
 -/
 example (p : Prop) (q : Prop) : Prop := p → q
 /-
-The type {lean}`Prop` of `p → q` arises from the impredicative least upper bound rule. Indeed, since
+The type {lean}`Prop` of `p → q` arises from the impredicative maximum rule. Indeed, since
 -/
 example (p : Prop) : Sort 0 := p
 example (q : Prop) : Sort 0 := q
@@ -282,16 +282,15 @@ example : Sort 0 = Prop := rfl
 tag := "sec-universal-quantification"
 %%%
 
-For any type `α`, a function type with domain `α` and codomain {lean}`Prop` is viewed as a [predicate][predicate] on `α`.
+For any type `α`, the function type with domain `α` and codomain {lean}`Prop` encodes the [predicates][predicate] on `α`.
 
 [predicate]: https://en.wikipedia.org/wiki/Predicate_(logic)
 
 -/
 example (α : Sort u) : Sort (max u 1) := α → Prop
 /-
-We will simply call such function types _predicates_.
 
-The type `Sort (max u 1)` of `α → Prop` arises from the {ref "sec-impredicative-lub-rule"}[impredicative least upper bound rule]. Indeed, since
+The type `Sort (max u 1)` of `α → Prop` arises from the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule]. Indeed, since
 -/
 example : Sort 1 := Prop
 /-
@@ -306,9 +305,9 @@ In particular, it can occur as the codomain of a $`\Pi`-type.
 -/
 example (α : Sort u) (P : α → Prop) : Prop := (a : α) → P a
 /-
-This proposition is viewed as expressing the universal quantification: _`P a`_ holds for all _`a`_ of type _`α`_.
+This encodes the universal quantification: _`P a`_ holds for all _`a`_ of type _`α`_.
 
-The type {lean}`Prop` of `(`_`a `_` : α) → `_` P a`_ arises from the {ref "sec-impredicative-lub-rule"}[impredicative least upper bound rule]. Indeed, since
+The type {lean}`Prop` of `(`_`a `_` : α) → `_` P a`_ arises from the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule]. Indeed, since
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Sort 0 := P a
 /-
@@ -375,19 +374,19 @@ example (α : Sort u) (β : Sort v) (a : α) (b : β) :
   (
     have x : α := a
     b
-  ) = (λ (x : α) ↦ b) a := rfl
+  ) = (λ x : α ↦ b) a := rfl
 /-
 The parentheses around the `have` syntax can be omitted.
 -/
 example (α : Sort u) (β : Sort v) (a : α) (b : β) :
   have x : α := a
-  b = (λ (x : α) ↦ b) a := rfl
+  b = (λ x : α ↦ b) a := rfl
 /-
 
-We see, in particular, that `pq₂` is, in fact,
+We see, in particular, that `pq₂` is
 -/
 def pq₃ (x : ℕ) :=
-  (λ (y : ℕ) ↦ y^2 + 3*y + 1) (x + 1)
+  (λ y : ℕ ↦ y^2 + 3*y + 1) (x + 1)
 /-
 
 
@@ -439,16 +438,17 @@ The leading `:` on the third line reads as "Then" and `:=` on the fourth line as
 
 ## Syntactic abbreviation
 
-A more general form of local definition is given by `let`. {index}[let]
+A more general [abbreviation][local-def] is given by `let`. {index}[let]
+
+[local-def]: https://lean-lang.org/theorem_proving_in_lean4/dependent_type_theory.html#local-definitions
+
 -/
 def pq₄ (x : ℕ) : ℕ :=
   let y := x + 1
   y^2 + 3*y + 1
 /-
 
-There are cases where [syntactic abbreviation][local-def] using `let` is applicable but composition is not.
-
-[local-def]: https://lean-lang.org/theorem_proving_in_lean4/dependent_type_theory.html#local-definitions
+There are cases where `let` is applicable but `have` is not.
 
 -/
 def plus1₄ :=
@@ -497,12 +497,12 @@ One might ask why we do not use a previously defined name such as `plus1`. The r
 #reduce plus1
 #print plus1
 /-
-The normal form of `plus1` is related to the inductive definition of `ℕ`, which we explain in the next section.
+The normal form of `plus1` is related to the inductive definition of `ℕ`, described {ref "sec-inductive-types"}[later].
 
 
 ## zeta-reduction
 
-Reduction of $`\zeta` kind eliminates a local definition by substitution.
+Reduction of $`\zeta` kind eliminates a `let`-definition by substitution.
 
 {index}[`;`]
 -/
@@ -552,15 +552,17 @@ The following example is invalid.
 example : plus1 = plus1' := rfl
 ```
 
-Function extensionality is available in Lean as a theorem called {lean}`funext`. We can show that `plus1` and `plus1` are indeed equal.
+Function extensionality is available in Lean as a theorem called {lean}`funext`. We can show that `plus1` and `plus1'` are indeed equal.
 -/
-example : plus1 = plus1' := by
+example : plus1 = plus1'
+:= by
   funext n
   simp [plus1, plus1', add]
   grind
 /-
-We will explain how to write proofs like this in due course. For the moment, we simply record that the principle of [functional extensionality][extensionality-principles] holds in Lean.
+We plan to explain how to write proofs like this in due course.{margin}[The current version of the notes does not cover this. [Theorem Proving in Lean][TPIL] is the canonical reference for writing proofs in Lean.] For the moment, we simply record that the principle of [functional extensionality][extensionality-principles] holds in Lean.
 
+[TPIL]: https://lean-lang.org/theorem_proving_in_lean4/Axioms-and-Computation/#function-extensionality
 [extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
 
 
@@ -588,7 +590,7 @@ In addition to enforcing the rules of the type theory, the trusted kernel implem
 4. $`\beta`-, $`\delta`-, and $`\zeta`-reductions
 5. $`\iota`-reduction (described {ref "sec-iota-reduction"}[later])
 
-Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For example, at the level of the type theory, {lean}`rfl` is simply a function taking two arguments.
+Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For instance, from the kernel's perspective, {lean}`rfl` is simply a function taking two arguments.
 -/
 example (α : Sort u) (a : α) : a = a := rfl
 /-
