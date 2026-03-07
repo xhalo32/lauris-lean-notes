@@ -145,6 +145,9 @@ example : three = zero.succ.succ.succ := rfl
 
 
 # Parameters and fields
+%%%
+tag := "sec-params"
+%%%
 
 Recall that `Prod` encodes Cartesian product. It is an inductive type with parameters. We can define our version as follows.
 -/
@@ -544,6 +547,12 @@ example
     snd := b
   }
 /-
+
+
+## Anonymous constructor syntax
+%%%
+tag := "sec-anon-const-syntax"
+%%%
 
 If an inductive type has a single constructor, then this constructor is eligible for the [anonymous constructor syntax][anon-const-syntax] `⟨…⟩`. {index}[`⟨…⟩`] This syntax can be used, in particular, with structures.
 
