@@ -12,27 +12,22 @@ Proving a proposition in Lean amounts to constructing an expression whose type i
 * proof: an expression of type `p`
 * formula is true: there is an expression of type `p`
 * formula is false: there is no expression of type `p`
-* truth `⊤`: an inductive type with a single constant constructor ([unit type][unit-type])
-* falsehood `⊥`: an inductive type with no constructors ([empty type][empty-type])
+* truth `⊤`: an inductive type with a single constant constructor
+* falsehood `⊥`: an inductive type with no constructors
 * [implication][implication] `→`: function type (as {ref "sec-implication"}[explained] already)
-* [conjunction][conjunction] `∧`: an inductive type like {lean}`Prod` but in the universe `Prop` ([product type][product-type])
-* [disjunction][disjunction] `∨`: an inductive type like {lean}`Sum` but in the universe `Prop` ([sum type][sum-type])
+* [conjunction][conjunction] `∧`: like {lean}`Prod` but in the universe `Prop`
+* [disjunction][disjunction] `∨`: like {lean}`Sum` but in the universe `Prop`
 * [universal quantification][universal-quantification]: $`\Pi`-type (as {ref "sec-universal-quantification"}[explained] already)
-* [existential quantification][existential-quantification]: an inductive type with a predicate as a parameter ([dependent sum type][dep-sum-type])
+* [existential quantification][existential-quantification]: an inductive type with a predicate as a parameter
 
 [Curry-Howard]: https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence
 [1st-order-logic]: https://en.wikipedia.org/wiki/First-order_logic
 [formula]: https://en.wikipedia.org/wiki/Well-formed_formula
-[unit-type]: https://en.wikipedia.org/wiki/Unit_type
-[empty-type]: https://en.wikipedia.org/wiki/Empty_type
 [implication]: https://en.wikipedia.org/wiki/Logical_implication
 [conjunction]: https://en.wikipedia.org/wiki/Logical_conjunction
-[product-type]: https://en.wikipedia.org/wiki/Product_type
 [disjunction]: https://en.wikipedia.org/wiki/Logical_disjunction
-[sum-type]: https://en.wikipedia.org/wiki/Sum_type
 [universal-quantification]: https://en.wikipedia.org/wiki/Universal_quantification
 [existential-quantification]: https://en.wikipedia.org/wiki/Existential_quantification
-[dep-sum-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A3_type
 
 
 # Truth, falsehood and negation
@@ -227,13 +222,13 @@ example (h : And' p q) : p
 /-
 This is just the projection function associated to the first field of `And'`.{margin}[{ref "sec-structures"}[Recall] that projection functions are generated for structures in this manner. While we could have defined `And'` as a structure, its definition as an inductive type illustrates the fact that structures are merely a convenience.]
 
-Here is a proof that bypasses the user-facing pattern matching layer and employs the recursor `And'.rec` directly.
+Here is a proof that bypasses the user-facing pattern matching syntax and employs the recursor `And'.rec` directly.
 -/
 example (p q : Prop) (h : And' p q) : p
 := And'.rec (λ hp _ ↦ hp) h
 /-
 
-Let us write this proof more explicitly. The recursor of `And` has the type{margin}[The recursor layer is not fully exposed for all types. This example verifying the type does not work for the recursor of `And'`. The actual proof works, though, and the type is shown by `#print And'.rec`. To see the fully expanded type, set the option `pp.proofs` to `true` before the `#print` command.]
+Let us write this proof more explicitly. The recursor of `And` has the type{margin}[Recursors are not fully exposed for all types. This example checking the type of `@And.rec` does not work for the recursor of `@And'.rec`. The actual proof works, though, and the type is shown by `#print And'.rec`. To see the fully expanded type, set the option `pp.proofs` to `true` before the `#print` command.]
 -/
 example :
   (p q : Prop) /- parameters -/ →
