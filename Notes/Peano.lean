@@ -119,9 +119,9 @@ example (P : ℕ → Prop) :
 /-
 
 
-# Structural recursion
+# Recursion
 
-Axiom 9 can be proven using pattern matching together with [structural recursion][structural-recursion].
+Axiom of induction can be proven using pattern matching together with [structural recursion][structural-recursion].
 
 [structural-recursion]: https://lean-lang.org/doc/reference/latest/Definitions/Recursive-Definitions/#structural-recursion
 
@@ -136,43 +136,75 @@ lemma axiom9
   | Nat.succ m => h2 m (axiom9 P h1 h2 m)
 /-
 
-Structural recursion is translated to a use an associated recursor. Here are two [primitive recursive][primitive-recursive] functions, defined with the help of structural recursion.
+Structural recursion is translated to a use of an associated recursor. Here are is a [primitive recursive][primitive-recursive] function, defined with and without pattern matching.
 
 [primitive-recursive]: https://en.wikipedia.org/wiki/Primitive_recursive_function
 
 -/
 def add (x y : ℕ) :=
-  match x with
-  | 0 => y
-  | Nat.succ z => Nat.succ (add z y)
+  match y with
+  | 0 => x
+  | Nat.succ z => Nat.succ (add x z)
 
-def sub (y x : ℕ) :=
-  let pred n :=
-    match n with
-    | 0 => 0
-    | Nat.succ m => m
-  match x with
-  | 0 => y
-  | Nat.succ z => pred (sub y z)
+def add₁ (x y : ℕ) : ℕ := Nat.rec x (λ _ hi ↦ Nat.succ hi) y
 /-
 
-They can be shown to coincide with the standard `+` and `-` on `ℕ`.
+Both versions coincide with `+` on `ℕ`.
 -/
-example (x y : ℕ) : add x y = x + y
-:= by
-  induction x with
-  | zero => simp [add]
-  | succ z ih =>
-      simp [add]
-      grind
+lemma add_coincides (x y : Nat) : add x y = x + y
+:=
+  match y with
+  | 0 => rfl
+  | Nat.succ z => congrArg Nat.succ (add_coincides x z)
 
-example (x y : ℕ) : sub y x = y - x
-:= by
-  induction x with
-  | zero => simp [sub]
-  | succ z ih =>
-      simp [sub]
-      grind
+example (x y : Nat) : add₁ x y = x + y
+:= Nat.rec rfl (λ _ hi ↦ congrArg Nat.succ hi) y
+/-
+
+The expressive power of `Nat.rec` goes well beyond primitive recursive functions. Here is the [Ackermann function][ackermann].
+
+[ackermann]: https://en.wikipedia.org/wiki/Ackermann_function
+
+-/
+def ackermann : Nat → Nat → Nat := Nat.rec
+  (λ n ↦ n + 1)
+  (λ _ hi1 ↦ Nat.rec
+    (hi1 1)
+    (λ _ hi2 ↦ hi1 hi2)
+  )
+/-
+
+It can be defined in a natural way using pattern matching.
+-/
+def ackermann' (m n : ℕ) :=
+  match m, n with
+  | 0, n => n + 1
+  | m + 1, 0 => ackermann' m 1
+  | m + 1, n + 1 => ackermann' m (ackermann' (m + 1) n)
+/-
+However, this version is not translated to a nested use of `Nat.rec` as above. Instead, it uses [well-founded recursion][well-founded-recursion].
+
+[well-founded-recursion]: https://lean-lang.org/doc/reference/latest/Definitions/Recursive-Definitions/#well-founded-recursion
+-/
+#print ackermann'
+#print ackermann'._unary
+/-
+
+Mathlib's {lean}`ack` is defined in the same way as `ackermann'`. Both our versions coincide with {lean}`ack`.
+-/
+example : ack = ackermann := by
+  funext m
+  induction m with
+  | zero =>
+      funext n
+      simp [ackermann]
+  | succ m ih =>
+      funext n
+      induction n with
+      | zero =>
+          simp [ackermann, ih]
+      | succ n ihn =>
+          simp [ackermann, ih, ihn]
 /-
 
 
@@ -212,6 +244,23 @@ example
 
 
 # Further proofs and remarks
+
+Our two versions of the Ackermann function coincide.
+-/
+example : ackermann' = ackermann := by
+  funext m
+  induction m with
+  | zero =>
+      funext n
+      simp [ackermann', ackermann]
+  | succ m ih =>
+      funext n
+      induction n with
+      | zero =>
+          simp [ackermann', ackermann, ih]
+      | succ n ihn =>
+          simp [ackermann', ackermann, ih, ihn]
+/-
 
 Here is a variant of `proxy` with the two first arguments implicit.
 -/
