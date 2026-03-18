@@ -219,8 +219,10 @@ body:has(#toggle-toc:checked) #toggle-toc-click {
     content: "[";
 }
 #toggle-toc-click .line2::before {
-    content: "...";
+    position: relative;
+    right: 0.03em;
     letter-spacing: 0.02em;
+    content: "...";
 }
 #toggle-toc-click .line3::before {
     content: "]";
@@ -236,9 +238,9 @@ body:has(#toggle-toc:checked) #toggle-toc-click {
 }
 
 body:has(#toggle-toc:checked) #toggle-toc-click .line2::before {
-    right: 0.05em;
-    position: relative;
-    content: "contents";
+    letter-spacing: initial;
+    word-spacing: -0.2em;
+    content: " contents ";
     color: var(--vakio-color-subtle);
 }
 

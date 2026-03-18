@@ -1,12 +1,12 @@
 .titlepage h1 {
-    font-size: 2.6rem;
+    font-size: 3.5rem;
 }
 
 .titlepage .authors {
     font-style: italic;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    font-size: 1.8rem;
+    font-size: 1.7rem;
     display: block;
     line-height: 1;
 }
