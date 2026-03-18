@@ -57,7 +57,7 @@ main p {
 }
 
 code:not(.block) {
-    word-spacing: -0.18em;
+    word-spacing: -0.2em;
 }
 
 main section a, main section a * {
