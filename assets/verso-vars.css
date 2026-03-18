@@ -1,9 +1,9 @@
 :root {
     /** Typography **/
     /* The font family used for headers, ToC entries, etc */
-    --verso-structure-font-family: "Latin Modern Sans", sans-serif;
+    --verso-structure-font-family: "Jost", sans-serif;
     /* The font family used for body text */
-    --verso-text-font-family: "Latin Modern", serif;
+    --verso-text-font-family: "Libertinus Serif", serif;
     /* The font family used for code */
     --verso-code-font-family: "JuliaMono", monospace;
 

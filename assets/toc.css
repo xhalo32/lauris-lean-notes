@@ -23,15 +23,20 @@
     text-decoration: underline;
 }
 
+#toc tr.numbered > td {
+  vertical-align: baseline;
+}
+#toc .title {
+  display: flex;
+  align-items: baseline;
+}
+
 #toc .split-toc td.num,
 #toc .split-toc span.number {
     font-variant-numeric: lining-nums tabular-nums;
-    font-weight: 400;
     font-size: 0.75rem;
-    letter-spacing: 0.02em;
     line-height: 1;
-    position: relative;
-    top: 0.25rem;
+    letter-spacing: 0.02em;
 }
 #toc .split-toc td.num{
     text-align: right;
@@ -56,5 +61,4 @@
     padding: 0;
     padding-inline-end: 0.28em;
     padding-block-end: 0.2em;
-    vertical-align: top;
 }
