@@ -258,7 +258,7 @@ Here is a reformulation of the above contradiction, with a proof that uses `Nat.
 -/
 example (n : ℕ) : 0 ≠ n + 1
 :=
-  λ h ↦
+  λ h : 0 = n + 1 ↦
   let P : ℕ → Prop := Nat.rec True (λ _ _ ↦ False)
   have : P 0 := trivial
   Eq.subst h this
@@ -282,6 +282,19 @@ example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
   have hnp : n = pred (Nat.succ n) := rfl
   have hpm : pred (Nat.succ m) = m := rfl
   Eq.trans hnp (Eq.trans hpp hpm)
+/-
+
+The keyword `calc` provides surface syntax for step-wise reasoning over transitive relations.{margin}[We use also a shorthand notation for pattern matching.]
+-/
+example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
+:=
+  let pred
+  | 0 => 0
+  | x + 1 => x
+  calc
+    n = pred (Nat.succ n) := rfl
+    _ = pred (Nat.succ m) := congrArg pred h
+    _ = m := rfl
 /-
 
 Lean generates an injectivity theorem for each constructor taking fields, unless those fields appear in constructor's codomain.
