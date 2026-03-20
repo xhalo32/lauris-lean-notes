@@ -11,17 +11,15 @@ We now focus on the $`\lambda`-calculus aspect of Lean's type theory. Functions 
 -/
 example : ℕ → ℕ := λ n ↦ n + 1
 /-
-
-An alternative keyword `fun` {index}[fun] is also available.
+This is syntactic sugar for {index}[fun]
 -/
 example : ℕ → ℕ := fun n => n + 1
 /-
-Here `ℕ → ℕ` {index}[`→`] is a function type. More generally, a function type is denoted by `α → β`, where `α` and `β` are types specifying the [domain][domain] and [codomain][codomain], respectively.
+Here `ℕ → ℕ` {index}[`→`] is a function type. More generally, a function type is denoted by `α → β`, where `α` and `β` are types specifying the [domain][domain] and [codomain][codomain], respectively. As any other expression, `ℕ → ℕ` has a type.
 
 [domain]: https://en.wikipedia.org/wiki/Domain_of_a_function
 [codomain]: https://en.wikipedia.org/wiki/Codomain
 
-As any other expression, `ℕ → ℕ` has a type.
 -/
 example : Type := ℕ → ℕ
 /-
@@ -31,12 +29,10 @@ We can give a name to a function by replacing `example` with `def` {index}[def] 
 def plus1 : ℕ → ℕ := λ n ↦ n + 1
 /-
 
-The command `#eval` {index}[#eval] evaluates a given expression.
+The command `#eval` {index}[#eval] evaluates a given expression.{margin}[Parentheses are not needed in function evaluation syntax.]
 -/
 #eval plus1 0
 /-
-Parentheses are not needed in the function evaluation syntax.
-
 Lean is a proof assistant and a functional programming language. One may think of `#check` and `#eval` as reflecting these two sides. We will focus on the proof assistant features and favor a proof over `#eval`.
 -/
 example : plus1 0 = 1 := rfl
@@ -45,7 +41,7 @@ example : plus1 0 = 1 := rfl
 
 # Arguments
 
-The domain may be specified by annotating the argument with a type. Then Lean can often infer the codomain.
+The domain of a function may be specified by annotating its argument with a type. Then Lean can often infer the codomain.
 -/
 def plus1₁ := λ n : ℕ ↦ n + 1
 /-
@@ -69,15 +65,11 @@ Functions take exactly one argument in Lean. A function taking several arguments
 -/
 def add : ℕ → (ℕ → ℕ) := λ n ↦ (λ m ↦ n + m)
 /-
-We refer to a function like this simply as a _function taking two arguments_.
-
-Syntactic sugar creates the appearance of functions taking several arguments.
+We refer to a function like this simply as a _function taking two arguments_. Syntactic sugar creates the appearance of functions taking several arguments.
 -/
 def add₁ : ℕ → ℕ → ℕ := λ n m ↦ n + m
 /-
-When viewing `add₁` as a function taking two arguments, we refer to the final `ℕ` in `ℕ → ℕ → ℕ` as the codomain.
-
-The arguments may be introduced using parentheses, and we can also make use of the variable `n` that we defined above.
+When viewing `add₁` as a function taking two arguments, we refer to the final `ℕ` in `ℕ → ℕ → ℕ` as the codomain. The arguments may be introduced using parentheses, and we can also make use of the variable `n` that we defined above.
 -/
 def add₂ (n : ℕ) (m : ℕ) : ℕ := n + m
 def add₃ (n m : ℕ) : ℕ := n + m
@@ -111,21 +103,20 @@ example : proj 0 1 = 0 := rfl
 tag := "sec-functions-of-types"
 %%%
 
-{ref "sec-expressions"}[Recall] that `Prod ℕ ℕ` encodes the Cartesian product. {lean}`Prod` is a function taking types as arguments.
+{ref "sec-expressions"}[Recall] that {lean}`Prod` encodes the Cartesian product. It is a function taking types as arguments.
 -/
 example : Type → Type → Type := Prod
 /-
 
-In fact, {lean}`Prod` is a more general [universe-polymorphic][univ-polymorphic] function.
+In fact, {lean}`Prod` is a more general [universe-polymorphic][univ-polymorphic] function.{margin}[We will {ref "sec-well-formedness"}[return] to the maximum appearing in the codomain.]
 
 [univ-polymorphic]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#--tech-term-universe-polymorphism
 
 -/
 example : Type u → Type v → Type (max u v) := Prod
 /-
-We will {ref "sec-well-formedness"}[return] to the maximum appearing in the codomain.
 
-Here are some variations
+Here are some variations.
 -/
 def Prod₁ (t : Type) (s : Type) : Type := Prod t s
 def Prod₂ : Type → Type → Type := Prod
@@ -167,24 +158,22 @@ variable {I : Type}
 def X (i : I) := i = i
 /-
 
-Consider the following partially applied version of {lean}`@rfl`.
+Consider the following partial application of {lean}`@rfl`.
 -/
 example : (i : I) → X i := @rfl I
 /-
-The type of `@rfl I` is a [$`\Pi`-type][pi-type].{margin}[$`\Pi`-types are also called dependent function types.] Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
+We refer to `(i : I) → X i` as a [$`\Pi`-type][pi-type] and `i : I` as the _index_ of the $`\Pi`-type.{margin}[$`\Pi`-types are also called dependent function types.]  Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
 $$`
 \prod_{i \in I} X_i
 =
 \left\{\left. f: I \to \bigcup_{i \in I} X_i\ \right|
 \ f(i) \in X_i,\ i \in I \right\}.
 `
-We refer to `i : I` as the _index_ of the $`\Pi`-type `(i : I) → X i`.
 
 [pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
 [indexed-product]: https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
 
-
-In fact, all function types are $`\Pi`-types.
+All function types are $`\Pi`-types.
 -/
 example
   (α : Sort u) (β : Sort v) : (α → β) = ((a : α) → β)
@@ -208,15 +197,15 @@ tag := "sec-implication"
 %%%
 
 
-{ref "sec-propositions"}[Recall] that all expressions of type {lean}`Prop` are themselves types. Accordingly, they can occur as the domain or codomain of a function type. The case where both the domain and codomain are expressions of type {lean}`Prop` is of particular interest.
--/
-example (p q : Prop) : Prop := p → q
-/-
-This encodes [logical implication][implication].
+{ref "sec-propositions"}[Recall] that all expressions of type {lean}`Prop` are themselves types. Accordingly, they can occur as the domain or codomain of a function type. The case where both the domain and codomain are expressions of type {lean}`Prop` encodes [logical implication][implication].
 
 [implication]: https://en.wikipedia.org/wiki/Logical_implication
 
-{ref "sec-propositions"}[Recall] that a proof of a proposition is an expression having the proposition as its type. Function application encodes [Modus ponens][modus-ponens]. We give two formulations.
+-/
+example (p q : Prop) : Prop := p → q
+/-
+
+{ref "sec-propositions"}[Recall] that a proof of a proposition is an expression having the proposition as its type. Function application encodes [modus ponens][modus-ponens]. We give two formulations.
 
 [modus-ponens]: https://en.wikipedia.org/wiki/Modus_ponens
 
@@ -241,7 +230,8 @@ The type of a function type is governed by the _impredicative maximum rule_:{mar
 [level-expression]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/?terms=imax#level-expressions
 
 -/
-example (α : Sort u) (β : Sort v) : Sort (imax u v) := α → β
+example (α : Sort u) (β : α → Sort v) :
+  Sort (imax u v) := (a : α) → β a
 /-
 where
 -/
@@ -250,11 +240,10 @@ example : Sort (imax u (v + 1)) = Sort (max u (v + 1))
 := rfl
 /-
 
-This rule is essential for the consistency of the type theory: certain typed $`\lambda`-calculi that lack such universe-level stratification are subject to [Girard's paradox][girard].
+This rule is essential for the consistency of the type theory: certain typed $`\lambda`-calculi that lack such universe-level stratification are subject to [Girard's paradox][girard]. The special case `v = 0` is related to _proof irrelevance_: any two proofs of the same proposition are definitionally equal.
 
 [girard]: https://en.wikipedia.org/wiki/System_U
 
-The special case `v = 0` is related to _proof irrelevance_: any two proofs of the same proposition are definitionally equal.
 -/
 example (p : Prop) (proof₁ proof₂ : p) : proof₁ = proof₂
 := rfl
@@ -294,18 +283,20 @@ The type `Sort (max u 1)` of `α → Prop` arises from the {ref "sec-impredicati
 -/
 example : Sort 1 := Prop
 /-
-the rule applies with `v = 1`, yielding the type `Sort (max u 1)`.
+the rule applies with `v = 1`, yielding `Sort (max u 1)`.
 
 Consider an evaluation of a predicate.
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Prop := P a
 /-
 Since _`P a`_ has type {lean}`Prop`, it is itself a type.{margin}[Once again, all expressions of type {lean}`Prop` are themselves types.]
-In particular, it can occur as the codomain of a $`\Pi`-type.
+In particular, it can occur as the codomain of a $`\Pi`-type. Such types encode [universal quantification][universal-quantification].
+
+[universal-quantification]: https://en.wikipedia.org/wiki/Universal_quantification
+
 -/
 example (α : Sort u) (P : α → Prop) : Prop := (a : α) → P a
 /-
-This encodes the universal quantification: _`P a`_ holds for all _`a`_ of type _`α`_.
 
 The type {lean}`Prop` of `(`_`a `_` : α) → `_` P a`_ arises from the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule]. Indeed, since
 -/
@@ -325,7 +316,7 @@ example
 := rfl
 /-
 
-Here is a proof encoding [universal instantiation][universal-instantiation] followed by Modus ponens.
+Here is a proof encoding [universal instantiation][universal-instantiation] followed by modus ponens.
 
 [universal-instantiation]: https://en.wikipedia.org/wiki/Universal_instantiation
 -/
@@ -383,10 +374,10 @@ example (α : Sort u) (β : Sort v) (a : α) (b : β) :
   b = (λ x : α ↦ b) a := rfl
 /-
 
-We see, in particular, that `pq₂` is
+In particular, the following coincides with `pq₂`.
 -/
 def pq₃ (x : ℕ) :=
-  (λ y : ℕ ↦ y^2 + 3*y + 1) (x + 1)
+  (λ y ↦ y^2 + 3*y + 1) (x + 1)
 /-
 
 
@@ -395,7 +386,7 @@ def pq₃ (x : ℕ) :=
 tag := "sec-proof-steps"
 %%%
 
-A typical use of `have` is to isolate steps in proofs. Let us {ref "sec-universal-quantification"}[return] to our earlier example on universal instantiation followed by Modus ponens, and isolate the universal instantiation.
+A typical use of `have` is to isolate steps in proofs. Let us {ref "sec-universal-quantification"}[return] to our earlier example on universal instantiation followed by modus ponens, and isolate the universal instantiation.
 -/
 example (α : Sort u) (P Q : α → Prop)
   (h1 : ∀ a : α, P a → Q a) (h2 : ∀ a : α, P a)
@@ -405,13 +396,20 @@ example (α : Sort u) (P Q : α → Prop)
   have Pa := h2 a
   h1 a Pa
 /-
-The proof has the natural reading:
+We can read the first line of the example as introducing the symbols involved in the statement, which itself consists of the second and third lines. The statement is:
+
+* Suppose _`h1`_ `: …` and _`h2`_ `: …`.
+* Then `∀` _`a`_ `:` _`α`_`,` _`Q a`_.
+
+The leading `:` on the third line reads as "Then" and `:=` on the fourth line as "Proof:".{margin}[It is due to this reading that we prefer the indentation in the example over the one in [Mathlib's style guidelines][style-guide]. When not proving a proposition, we adopt the usual indentation style.] The proof has the reading:
+
+[style-guide]: https://leanprover-community.github.io/contribute/style.html#structuring-definitions-and-theorems
 
 1. Let _`a`_ `:` _`α`_.
 2. We have _`P a`_ by hypothesis _`h2`_, applied to _`a`_.
 3. We conclude by hypothesis _`h1`_, applied to _`a`_ and the fact _`P a`_.
 
-If a name in `have` is omitted, then the name `this` is used.
+Naming every intermediate step can become cumbersome. Omitting the name after `have` makes the step accessible as `this`.
 -/
 example (α : Sort u) (P Q : α → Prop)
   (h1 : ∀ a : α, P a → Q a) (h2 : ∀ a : α, P a)
@@ -421,19 +419,16 @@ example (α : Sort u) (P Q : α → Prop)
   have : P a := h2 a
   h1 a this
 /-
-We can read the first line of the example as introducing the symbols involved in the statement, which itself consists of the second and third lines. The statement is:
-
-* Suppose _`h1`_ `: …` and _`h2`_ `: …`.
-* Then `∀` _`a`_ `:` _`α`_`,` _`Q a`_.
-
-The leading `:` on the third line reads as "Then" and `:=` on the fourth line as "Proof:".{margin}[It is due to this reading that we prefer the indentation in the example over the one in [Mathlib's style guidelines][style-guide]. When not proving a proposition, we adopt the usual indentation style.] Let us reiterate the reading of the proof as well:
-
-[style-guide]: https://leanprover-community.github.io/contribute/style.html#structuring-definitions-and-theorems
-
-
-1. Let _`a`_ `:` _`α`_.
-2. We have _`P a`_ by hypothesis _`h2`_, applied to _`a`_.
-3. We conclude by hypothesis _`h1`_, applied to _`a`_ and _this_ fact.
+A proof can also be referenced by its type using `‹…›` notation.{margin}[This introduces no ambiguity, since any two proofs of the same proposition are equal.] {index}[`‹…›`]
+-/
+example (α : Sort u) (P Q : α → Prop)
+  (h1 : ∀ a : α, P a → Q a) (h2 : ∀ a : α, P a)
+  : ∀ a : α, Q a
+:=
+  λ a : α ↦
+  have : P a := h2 a
+  h1 a ‹P a›
+/-
 
 
 ## Syntactic abbreviation
@@ -464,7 +459,7 @@ def plus1₄ :=
 
 ## beta-reduction
 
-Reduction of $`\beta` kind corresponds to applying a function to an argument by substitution.
+$`\beta`-reduction corresponds to applying a function to an argument by substitution.
 
 -/
 variable (α : Sort u) (β : Sort v) (f : α → β) (a : α)
@@ -478,7 +473,7 @@ example : (λ x ↦ f x) a = f a := rfl
 
 ## delta-reduction
 
-Reduction of $`\delta` kind replaces a defined name by its defining expression.{margin}[Names are referred to as constants in the Lean Language Reference, see [Definitions][definitions].]
+$`\delta`-reduction replaces a defined name by its defining expression.{margin}[Names are referred to as constants in the Lean Language Reference, see [Definitions][definitions].]
 
 [definitions]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#The-Lean-Language-Reference--Definitions--Definitions
 
@@ -492,7 +487,7 @@ example : ℕ2 = (ℕ × ℕ) := rfl
 #reduce (types := true) ℕ × ℕ
 /-
 
-One might ask why we do not use a previously defined name such as `plus1`. The reason is that `#reduce plus1` does not demonstrate $`\delta`-reduction in isolation, as can be observed by comparing the normal form and definition of `plus1`.
+A function such as `plus1` cannot be employed to demonstrate $`\delta`-reduction in isolation. Indeed, the normal form of `plus1` differs from its defition.{margin}[The `#print` command queries information about definitions.] {index}[#print]
 -/
 #reduce plus1
 #print plus1
@@ -502,7 +497,7 @@ The normal form of `plus1` is related to the inductive definition of `ℕ`, desc
 
 ## zeta-reduction
 
-Reduction of $`\zeta` kind eliminates a `let`-definition by substitution.
+$`\zeta`-reduction expands a `let`-abbreviation.
 
 {index}[`;`]
 -/
@@ -518,13 +513,11 @@ The semicolon is a syntactic device that allows multiple expressions to be writt
 tag := "sec-function-eta-equivalence"
 %%%
 
-In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called $`\eta`-equivalence.
-
-For functions, $`\eta`-equivalence says that a function is definitionally equal to the $`\lambda`-abstraction obtained by applying the function to an argument.
+In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called $`\eta`-equivalence. For functions, $`\eta`-equivalence says that a function is definitionally equal to the $`\lambda`-abstraction obtained by applying the function to an argument.
 -/
 example : (λ x ↦ f x) = f := rfl
 /-
-The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, their normal forms differ, as can be observed using `#reduce`.
+The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, their normal forms differ.
 -/
 #reduce λ x ↦ f x
 #reduce f
@@ -576,24 +569,146 @@ Lean's processing of source code can be divided into several [stages][processing
 
 [processing-stages]: https://lean-lang.org/doc/reference/latest/Elaboration-and-Compilation/
 
-* _Macro expansion_ that replaces syntactic sugar with more basic syntax.
-* _Elaboration_ that translates user-facing surface syntax into expressions of type theory.
-* _Kernel checking_ that ensures that the simplified expressions follow the rules of the type theory.
+* _Macro expansion_ that removes syntactic sugar.
+* _Elaboration_ that translates the remaining user-facing surface syntax into an underlying basic form.
+* _Kernel checking_ that ensures that the translated expressions follow the rules of the type theory.
 
-The type theory is designed to be simple, enabling the trusted kernel to remain small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel.
-
-In addition to enforcing the rules of the type theory, the trusted kernel implements definitional equality, which accounts for:{margin}[There is also quotient reduction outside the sublanguage considered here.]
-
-1. Proof irrelevance
-2. Function $`\eta`-equivalence
-3. Structure $`\eta`-equivalence (described {ref "sec-structure-eta-equivalence"}[later])
-4. $`\beta`-, $`\delta`-, and $`\zeta`-reductions
-5. $`\iota`-reduction (described {ref "sec-iota-reduction"}[later])
-
-Implicit and explicit arguments do not differ at the level of the type theory, only during elaboration. For instance, from the kernel's perspective, {lean}`rfl` is simply a function taking two arguments.
+For instance, implicit arguments are a part of the surface syntax. They are translated into explicit arguments during elaboration. Recall that {lean}`rfl` takes two implicit arguments. From the kernel's perspective, it is simply a function taking two arguments.
 -/
 example (α : Sort u) (a : α) : a = a := rfl
 /-
+
+In addition to enforcing the rules of the type theory, the kernel implements definitional equality. We have encounted the following aspects of definitional equality.
+
+* Proof irrelevance
+* Function $`\eta`-equivalence
+* $`\beta`-, $`\delta`-, and $`\zeta`-reductions
+
+The type theory is designed to be simple, enabling the kernel to remain small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel.
+
+
+## Rules of the type theory
+
+The following rules govern the concepts introduced so far. They constitute a [pure type system][pure-type-system]. For each rule, we first present an example and then its abstract formulation. In the abstract formulations, we write $`\operatorname{Sort}_{u}` for `Sort u`, $`\Pi x : \alpha.\; \beta` for `(x : α) → β x`, and $`\equiv` for definitional equality. Moreover, $`\Gamma` denotes an arbitrary [typing context][typing-context] and $`\beta[x := a]` denotes [substitution][substitution].{margin}[The substitution replaces all free occurrences of $`x` in the expression $`\beta` with the expression $`a`.] We use the [standard notation][typing-rule] for typing rules.
+
+[pure-type-system]: https://en.wikipedia.org/wiki/Pure_type_system
+[substitution]: https://en.wikipedia.org/wiki/Lambda_calculus_definition#Substitution
+[typing-context]: https://en.wikipedia.org/wiki/Typing_environment
+[typing-rule]: https://en.wikipedia.org/wiki/Typing_rule
+
+1. Axioms
+
+-/
+example : Sort (u + 1) := Sort u
+/-
+$$`
+\frac{
+}{
+\vdash
+\operatorname{Sort}_{u} : \operatorname{Sort}_{u + 1}
+}
+`
+
+2. Start
+
+-/
+example (α : Sort u) (a : α) : α := a
+/-
+$$`
+\frac{
+\Gamma \vdash  \alpha : \operatorname{Sort}_{u}
+}{
+\Gamma, a : \alpha \vdash  a : \alpha
+}
+`
+
+3. [Weakening][weakening]
+
+[weakening]: https://en.wikipedia.org/wiki/Monotonicity_of_entailment
+
+-/
+example (α : Sort u) (a : α) (β : Sort v) (b : β) : α := a
+/-
+$$`
+\frac{
+\Gamma \vdash  a : \alpha
+\quad
+\Gamma \vdash  \beta : \operatorname{Sort}_v
+}{
+\Gamma, b : \beta \vdash  a : \alpha
+}
+`
+
+4. Product{margin}[This is the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule].]
+
+-/
+example (α : Sort u) (β : α → Sort v) :
+  Sort (imax u v) := (x : α) → β x
+/-
+$$`
+\frac{
+\Gamma \vdash  \alpha : \operatorname{Sort}_{u}
+\quad
+\Gamma, x : \alpha \vdash  \beta : \operatorname{Sort}_{v}
+}{
+\Gamma \vdash  \Pi x : \alpha.\; \beta
+: \operatorname{Sort}_{\operatorname{imax} u \; v}
+}
+`
+
+5. Application
+
+-/
+example (α : Sort u) (β : α → Sort v)
+  (f : (x : α) → β x) (a : α) :
+  β a := f a
+/-
+$$`
+\frac{
+\Gamma \vdash  f : \Pi x : \alpha.\; \beta
+\quad
+\Gamma \vdash  a : \alpha
+}{
+\Gamma \vdash  f\; a : \beta[x := a]
+}
+`
+
+6. Abstraction
+
+-/
+example (α : Sort u) (β : α → Sort v)
+  (f : (a : α) → β a) :
+  (a : α) → β a := λ x ↦ f x
+/-
+$$`
+\frac{
+\Gamma, x : \alpha \vdash  e : \beta
+\quad
+\Gamma \vdash  \Pi x : \alpha.\; \beta
+: \operatorname{Sort}_{v}
+}{
+\Gamma \vdash
+\lambda x : \alpha \mapsto e
+: \Pi x : \alpha.\; \beta
+}
+`
+
+7. Conversion
+
+-/
+example (α : Sort u) (a : α) :
+  let β := α
+  β := a
+/-
+$$`
+\frac{
+\Gamma \vdash  a : \alpha
+\quad
+\Gamma \vdash  \alpha\equiv\beta
+}{
+\Gamma \vdash  a : \beta
+}
+`
 
 
 # Further proofs
