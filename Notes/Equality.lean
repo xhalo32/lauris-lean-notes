@@ -6,8 +6,9 @@ tag := "sec-equality"
 -/
 import Mathlib
 /-
-Equality has the [basic][eq-basic-properties] reflexivity, symmetry, transitivity, and substitution properties. In Lean, reflexivity is the most fundamental property, as it is an interface to definitional equality. The remaining properties are derived from the recursor of `Eq`.
+[First-order logic with equality][first-order-logic-with-eq] impose two axioms, reflexivity and substitution principle, on equality.{margin}[Substitution principle is also called Leibniz's law.] These two axioms imply its remaining [basic properties][eq-basic-properties], including symmetry and transitivity. In Lean, reflexivity is the most fundamental property, as it is an interface to definitional equality.
 
+[first-order-logic-with-eq]: https://en.wikipedia.org/wiki/First-order_logic#Equality_and_its_axioms
 [eq-basic-properties]: https://en.wikipedia.org/wiki/Equality_(mathematics)#Basic_properties
 
 The basic properties alone do not guarantee that equality is non-vacuous. When equality is considered on a fixed type, the basic properties may hold simply because all pairs of expressions of that type are equal. In Lean, equality is non-vacuous on most types.{margin}[`Prop` is a type on which equality is vacuous. This is stating the proof irrelevance.]
@@ -97,6 +98,89 @@ example : Eq' 0 1 := rfl'
 ```
 
 
+# Substitution principle
+
+Substitution principle is formulated as follows: if `a = b` and `P a` holds for a predicate `P`, then `P b` holds. We can prove it using the recursor
+-/
+example :
+  (α : Sort u) → (a : α) /- parameters -/ →
+  (motive : (x : α) → a = x → Sort v) /- motive -/ →
+  motive a (Eq.refl a) /- minor premise -/ →
+  (b : α) /- index -/ →
+  (h1 : a = b) /- major premise -/ →
+  motive b h1 /- codomain -/
+:= @Eq.rec
+
+example
+  (α : Sort u) (P : α → Prop) (a b : α)
+  (h1 : a = b) (h2 : P a)
+  : P b
+:= @Eq.rec
+  α a /- parameters -/
+  (λ x _ ↦ P x) /- motive -/
+  h2 /- minor premise -/
+  b /- index -/
+  h1 /- major premise -/
+/-
+
+The proof works, since the codomain `motive b h1` is `P b`,
+-/
+example (α : Sort u) (P : α → Prop) (a b : α) (h1 : a = b) :
+  let motive := (λ x _ ↦ P x)
+  P b = motive b h1 := rfl
+/-
+and since `h2` has the type of the minor premise,
+-/
+example (α : Sort u) (P : α → Prop) (a b : α) (h2 : P a) :
+  let motive := (λ x _ ↦ P x)
+  motive a (Eq.refl a) := h2
+/-
+This type is simply the proposition `P a`,
+-/
+example (α : Sort u) (P : α → Prop) (a b : α) (h2 : P a) :
+  let motive := (λ x _ ↦ P x)
+  motive a (Eq.refl a) = P a := rfl
+/-
+
+A short proof is obtained by letting Lean infer all implicit arguments.
+-/
+example
+  (α : Sort u) (P : α → Prop) (a b : α)
+  (h1 : a = b) (h2 : P a)
+  : P b
+:= Eq.rec h2 h1
+/-
+
+Proofs by pattern matching are translated to a similar use of `Eq.rec` as above.{margin}[We could replace `rfl` on the left of `=>` with `Eq.refl _`. Using `rfl` avoids having to ignore the explicit parameter of `Eq.refl`.]
+-/
+example
+  (α : Sort u) (P : α → Prop) (a b : α)
+  (h1 : a = b) (h2 : P a)
+  : P b
+:=
+  match h1 with
+  | rfl => h2
+/-
+
+Substitution principle is available as a theorem, with the predicate as an implicit parameter called `motive`, in line with `Eq.rec`.
+-/
+example
+  (α : Sort u) (P : α → Prop) (a b : α)
+  (h1 : a = b) (h2 : P a)
+  : P b
+:= Eq.subst h1 h2
+/-
+
+Named arguments allow specifying implicit parameters explicitly. {index}[`(… := …)`]
+-/
+example
+  (α : Sort u) (P : α → Prop) (a b : α)
+  (h1 : a = b) (h2 : P a)
+  : P b
+:= Eq.subst (motive := P) h1 h2
+/-
+
+
 # Basic properties of equality
 
 Equality is an [equivalence relation][equivalence-relation], namely it is
@@ -108,180 +192,16 @@ Equality is an [equivalence relation][equivalence-relation], namely it is
 [equivalence-relation]: https://en.wikipedia.org/wiki/Equivalence_relation
 
 With reflexivity already established, it remains to prove symmetry and transitivity.
-
-We will also consider the substitution property, which says informally that equal terms may be interchanged in any context.
-
-
-## Symmetry
-
-{ref "sec-arguments-of-recursors"}[Recall] that `Eq.rec` is the recursor of {lean}`Eq`. Symmetry can be proven using this recursor and {lean}`rfl`.
--/
-example :
-  (α : Sort u) → (a : α) /- parameters -/ →
-  (motive : (x : α) → a = x → Sort v) /- motive -/ →
-  motive a (Eq.refl a) /- minor premise -/ →
-  (b : α) /- index -/ →
-  (h : a = b) /- major premise -/ →
-  motive b h /- codomain -/
-:= @Eq.rec
-
-example (α : Sort u) (a b : α) (h : a = b) : b = a
-:= @Eq.rec
-  α a /- parameters -/
-  (λ x _ ↦ x = a) /- motive -/
-  rfl /- minor premise -/
-  b /- index -/
-  h /- major premise -/
-/-
-The proof works, since the codomain `motive b h` is `b = a`,
--/
-example (α : Sort u) (a b : α) (h : a = b) :
-  let motive := (λ x _ ↦ x = a)
-  (b = a) = motive b h := rfl
-/-
-and since {lean}`rfl` has the type of the minor premise,
--/
-example (α : Sort u) (a : α) :
-  let motive := (λ x _ ↦ x = a)
-  motive a (Eq.refl a) := rfl
-/-
-This type is simply the proposition `a = a`,
--/
-example (α : Sort u) (a : α) :
-  let motive := (λ x _ ↦ x = a)
-  (a = a) = motive a (Eq.refl a) := rfl
-/-
-It admits the proof {lean}`rfl`.
-
-A short proof is obtained by letting Lean infer all implicit arguments.
 -/
 example (α : Sort u) (a b : α) (h : a = b) : b = a
-:= Eq.rec rfl h
-/-
+:= Eq.subst (motive := λ x ↦ x = a) h rfl
 
-Proofs by pattern matching are translated to a similar use of `Eq.rec` as above.{margin}[We could replace `rfl` on the left of `=>` with `Eq.refl _`. Using `rfl` avoids having to ignore the explicit parameter of `Eq.refl`.]
--/
-example (α : Sort u) (a b : α) (h : a = b) : b = a
-:=
-  match h with
-  | rfl => rfl
-/-
-
-Symmetry is also available as the theorem {lean}`Eq.symm`.
--/
-example (α : Sort u) (a b : α) (h : a = b) : b = a
-:= Eq.symm h
-/-
-
-
-## Transitivity
-
-Transitivity can be proven using the recursor `Eq.rec`. We have renamed its arguments in a suggestive way.
--/
-example :
-  (α : Sort u) → (b : α) /- parameters -/ →
-  (motive : (x : α) → b = x → Sort v) /- motive -/ →
-  motive b (Eq.refl b) /- minor premise -/ →
-  (c : α) /- index -/ →
-  (h2 : b = c) /- major premise -/ →
-  motive c h2 /- codomain -/
-:= @Eq.rec
-
-example
-  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+example (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
   : a = c
-:= @Eq.rec
-  α b /- parameters -/
-  (λ x _ ↦ a = x) /- motive -/
-  h1 /- minor premise -/
-  c /- index -/
-  h2 /- major premise -/
-/-
-The motive `λ x _ ↦ a = x` is different from the one in the proof of symmetry: its body is `a = x` while for symmetry it was `x = a`. The proof works, since the codomain `motive c h2` is `a = c`,
--/
-example (α : Sort u) (a b c : α) (h2 : b = c) :
-  let motive := (λ x _ ↦ a = x)
-  (a = c) = motive c h2 := rfl
-/-
-and since `h1 : a = b` has the type of the minor premise,
--/
-example (α : Sort u) (a b : α) (h1 : a = b):
-  let motive := (λ x _ ↦ a = x)
-  motive b (Eq.refl b) := h1
-/-
-Indeed,
--/
-example (α : Sort u) (a b : α):
-  let motive := (λ x _ ↦ a = x)
-  (a = b) = motive b (Eq.refl b) := rfl
+:= Eq.subst h2 h1
 /-
 
-A short proof is obtained by letting Lean infer all implicit arguments.
--/
-example
-  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
-  : a = c
-:= Eq.rec h1 h2
-/-
-
-A proof by pattern matching is translated to a similar use of `Eq.rec` as above.
--/
-example
-  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
-  : a = c
-:=
-  match h2 with
-  | rfl => h1
-/-
-
-Transitivity is also available as the theorem {lean}`Eq.trans`.
--/
-example
-  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
-  : a = c
-:= Eq.trans h1 h2
-/-
-
-
-## Substitution
-
-We prove the following two variants of the substitution property:
-
-* If `a = b` and `P a` holds for a predicate `P`, then `P b` holds.
-* If `a = b` and `f` is a function, then `f a = f b`.
-
-In Lean, these are called the _substitution principle_ and _congruence_, respectively.
-
--/
-example
-  (α : Sort u) (P : α → Prop) (a b : α)
-  (h1 : a = b) (h2 : P a)
-  : P b
-:= Eq.rec h2 h1
-
-example
-  (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
-  (h : a = b)
-  : f a = f b
-:= Eq.rec rfl h
-/-
-
-The substitution principle and congruence are available as theorems.
--/
-example
-  (α : Sort u) (P : α → Prop) (a b : α)
-  (h1 : a = b) (h2 : P a)
-  : P b
-:= Eq.subst h1 h2
-
-example
-  (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
-  (h : a = b)
-  : f a = f b
-:= congrArg f h
-/-
-
-In fact, congruence is substitution for the equality-valued predicate `λ x ↦ f a = f x`. The predicate is an implicit argument of {lean}`Eq.subst` called `motive`, in line with `Eq.rec`.
+In Lean, the following substitution is called _congruence_: if `a = b` and `f` is a function, then `f a = f b`.
 -/
 example
   (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
@@ -289,7 +209,23 @@ example
   : f a = f b
 := Eq.subst (motive := λ x ↦ f a = f x) h rfl
 /-
-Named arguments allow specifying implicit parameters explicitly. {index}[`(… := …)`] A variation of the motive, namely `(motive := λ x _ ↦ f a = f x)`, can be used in the earlier proof by `Eq.rec` to make it more explicit.
+
+Symmetry, transitivity, and congruence are available as theorems.
+-/
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= Eq.symm h
+
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:= Eq.trans h1 h2
+
+example
+  (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
+  (h : a = b)
+  : f a = f b
+:= congrArg f h
+/-
 
 
 # Constructor distinctness
@@ -379,9 +315,129 @@ No injectivity theorem is generated for `Eq.refl` since it has no fields.
 
 # Further proofs
 
+We will give proofs of symmetry, transitivity, and congruence directly using `Eq.rec`.
+
+
+## Symmetry
+
+-/
+example :
+  (α : Sort u) → (a : α) /- parameters -/ →
+  (motive : (x : α) → a = x → Sort v) /- motive -/ →
+  motive a (Eq.refl a) /- minor premise -/ →
+  (b : α) /- index -/ →
+  (h : a = b) /- major premise -/ →
+  motive b h /- codomain -/
+:= @Eq.rec
+
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= @Eq.rec
+  α a /- parameters -/
+  (λ x _ ↦ x = a) /- motive -/
+  rfl /- minor premise -/
+  b /- index -/
+  h /- major premise -/
+/-
+The proof works, since the codomain `motive b h` is `b = a`,
+-/
+example (α : Sort u) (a b : α) (h : a = b) :
+  let motive := (λ x _ ↦ x = a)
+  (b = a) = motive b h := rfl
+/-
+and since {lean}`rfl` has the type of the minor premise,
+-/
+example (α : Sort u) (a : α) :
+  let motive := (λ x _ ↦ x = a)
+  motive a (Eq.refl a) := rfl
+/-
+This type is simply the proposition `a = a`,
+-/
+example (α : Sort u) (a : α) :
+  let motive := (λ x _ ↦ x = a)
+  (a = a) = motive a (Eq.refl a) := rfl
+/-
+It admits the proof {lean}`rfl`.
+
+A short proof is obtained by letting Lean infer all implicit arguments.
+-/
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:= Eq.rec rfl h
+/-
+
+Proofs by pattern matching are translated to a similar use of `Eq.rec` as above.
+-/
+example (α : Sort u) (a b : α) (h : a = b) : b = a
+:=
+  match h with
+  | rfl => rfl
+/-
+
+
+## Transitivity
+
+-/
+example :
+  (α : Sort u) → (b : α) /- parameters -/ →
+  (motive : (x : α) → b = x → Sort v) /- motive -/ →
+  motive b (Eq.refl b) /- minor premise -/ →
+  (c : α) /- index -/ →
+  (h2 : b = c) /- major premise -/ →
+  motive c h2 /- codomain -/
+:= @Eq.rec
+
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:= @Eq.rec
+  α b /- parameters -/
+  (λ x _ ↦ a = x) /- motive -/
+  h1 /- minor premise -/
+  c /- index -/
+  h2 /- major premise -/
+/-
+The motive `λ x _ ↦ a = x` is different from the one in the proof of symmetry: its body is `a = x` while for symmetry it was `x = a`. The proof works, since the codomain `motive c h2` is `a = c`,
+-/
+example (α : Sort u) (a b c : α) (h2 : b = c) :
+  let motive := (λ x _ ↦ a = x)
+  (a = c) = motive c h2 := rfl
+/-
+and since `h1 : a = b` has the type of the minor premise,
+-/
+example (α : Sort u) (a b : α) (h1 : a = b) :
+  let motive := (λ x _ ↦ a = x)
+  motive b (Eq.refl b) := h1
+/-
+Indeed,
+-/
+example (α : Sort u) (a b : α) :
+  let motive := (λ x _ ↦ a = x)
+  (a = b) = motive b (Eq.refl b) := rfl
+/-
+
+A short proof is obtained by letting Lean infer all implicit arguments.
+-/
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:= Eq.rec h1 h2
+/-
+
+A proof by pattern matching is translated to a similar use of `Eq.rec` as above.
+-/
+example
+  (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
+  : a = c
+:=
+  match h2 with
+  | rfl => h1
+/-
+
+
+## Congruence
+
 -/
 example
   (α : Sort u) (β : Sort v) (a b : α) (f : α → β)
   (h : a = b)
   : f a = f b
-:= Eq.rec (motive := λ x _ ↦ f a = f x) rfl h
+:= Eq.rec rfl h
