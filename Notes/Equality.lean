@@ -284,7 +284,7 @@ example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
   Eq.trans hnp (Eq.trans hpp hpm)
 /-
 
-The keyword `calc` provides surface syntax for step-wise reasoning over transitive relations.{margin}[We use also a shorthand notation for pattern matching.]
+The keyword `calc` {index}[`calc`] provides surface syntax for step-wise reasoning over transitive relations.{margin}[We use also a shorthand notation for pattern matching.]
 -/
 example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
 :=
