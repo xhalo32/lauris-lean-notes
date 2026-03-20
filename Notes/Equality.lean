@@ -23,15 +23,12 @@ tag := "sec-definitional-equality"
 %%%
 
 
-We have made extensive use of {lean}`rfl`, which is simply the constructor {lean}`Eq.refl` of {lean}`Eq`, with both the arguments implicit.
+We have made extensive use of {lean}`rfl`, which is simply the constructor {lean}`Eq.refl` of {lean}`Eq`, with both the arguments implicit. It proves reflexivity of equality.
 -/
 #print rfl
 
 example : @rfl = @Eq.refl := rfl
-/-
 
-Reflexivity of equality is proven by {lean}`rfl`, which is, in fact, named after reflexivity.
--/
 example (α : Sort u) (a : α) : a = a := rfl
 /-
 
@@ -165,7 +162,8 @@ example (α : Sort u) (a b : α) (h : a = b) : b = a
 Proofs by pattern matching are translated to a similar use of `Eq.rec` as above.{margin}[We could replace `rfl` on the left of `=>` with `Eq.refl _`. Using `rfl` avoids having to ignore the explicit parameter of `Eq.refl`.]
 -/
 example (α : Sort u) (a b : α) (h : a = b) : b = a
-:= match h with
+:=
+  match h with
   | rfl => rfl
 /-
 
@@ -231,7 +229,8 @@ A proof by pattern matching is translated to a similar use of `Eq.rec` as above.
 example
   (α : Sort u) (a b c : α) (h1 : a = b) (h2 : b = c)
   : a = c
-:= match h2 with
+:=
+  match h2 with
   | rfl => h1
 /-
 
@@ -295,9 +294,7 @@ Named arguments allow specifying implicit parameters explicitly. {index}[`(… :
 
 # Constructor distinctness
 
-Expressions given by distinct constructors of an inductive type are not equal. This _constructor distinctness_ can be proven using the substitution principle.
-
-As an illustration, consider an inductive type with two constructors.
+Expressions given by distinct constructors of an inductive type are not equal. This _constructor distinctness_ can be proven using the substitution principle. As an illustration, consider an inductive type with two constructors.
 -/
 inductive S where
   | a
@@ -308,7 +305,9 @@ open S
 
 We can show that `a = b` leads to a contradiction by applying the substitution principle to the predicate
 -/
-def P (s : S) : Prop := match s with
+def P (s : S) : Prop
+:=
+  match s with
   | a => True
   | b => False
 /-
@@ -335,14 +334,13 @@ example : a ≠ b := λ h ↦
 
 Proofs by pattern matching are translated to a similar use of {lean}`Eq.subst` and `S.rec` as above.
 -/
-example : a ≠ b := λ h ↦ nomatch h
 example : a ≠ b := nofun
 /-
 
 
 # Constructor injectivity
 
-Applications of a constructor at distinct arguments are not equal. That is, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using deconstruction together with congruence and transitivity.
+Applications of a constructor at distinct arguments are not equal. Equivalently, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using deconstruction together with congruence and transitivity.
 -/
 example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
 :=
@@ -381,12 +379,6 @@ No injectivity theorem is generated for `Eq.refl` since it has no fields.
 ```lean +error
 #print Eq.refl.inj
 ```
-
-{ref "sec-indexed-families"}[Recall] that
--/
-example : (α : Sort u) → (a : α) → a = a := @Eq.refl
-/-
-where both `α` and `a` are parameters rather than fields.
 
 
 # Further proofs
