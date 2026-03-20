@@ -294,47 +294,43 @@ Named arguments allow specifying implicit parameters explicitly. {index}[`(… :
 
 # Constructor distinctness
 
-Expressions given by distinct constructors of an inductive type are not equal. This _constructor distinctness_ can be proven using the substitution principle. As an illustration, consider an inductive type with two constructors.
+Expressions given by distinct constructors of an inductive type are not equal. This _constructor distinctness_ can be proven using the substitution principle. As an illustration, we show that `0 = n + 1` leads to a contradiction by applying the substitution principle to the predicate
 -/
-inductive S where
-  | a
-  | b
-
-open S
-/-
-
-We can show that `a = b` leads to a contradiction by applying the substitution principle to the predicate
--/
-def P (s : S) : Prop
+def P (n : ℕ) : Prop
 :=
-  match s with
-  | a => True
-  | b => False
+  match n with
+  | 0 => True
+  | m + 1 => False
 /-
 Indeed,
 -/
-example (h : a = b) : False :=
-  let ha : P a := trivial
-  Eq.subst h ha
-/-
-
-Recall that `¬(a = b)` is syntactic sugar. Additional syntactic sugar is provided.
--/
-example : (¬(a = b)) = (a = b → False) := rfl
-example : (a ≠ b) = (a = b → False) := rfl
-/-
-
-A reformulation of the above contradiction, with a proof using `S.rec` directly, can be given as follows.
--/
-example : a ≠ b := λ h ↦
-  let P : S → Prop := S.rec True False
-  have : P a := trivial
+example (n : ℕ) (h : 0 = n + 1) : False :=
+  let : P 0 := trivial
   Eq.subst h this
 /-
 
-Proofs by pattern matching are translated to a similar use of {lean}`Eq.subst` and `S.rec` as above.
+Recall that `¬` is syntactic sugar. Additional syntactic sugar is provided.
 -/
-example : a ≠ b := nofun
+example (n : ℕ) :
+  (¬(0 = n + 1)) = (0 = n + 1 → False)
+:= rfl
+
+example(n : ℕ) : (0 ≠ n + 1) = (0 = n + 1 → False) := rfl
+/-
+
+Here is a reformulation of the above contradiction, with a proof that uses `Nat.rec` directly.
+-/
+example (n : ℕ) : 0 ≠ n + 1
+:=
+  λ h ↦
+  let P : ℕ → Prop := Nat.rec True (λ _ _ ↦ False)
+  have : P 0 := trivial
+  Eq.subst h this
+/-
+
+Here is a proof by pattern matching.
+-/
+example (n : ℕ) : 0 ≠ n + 1 := nofun
 /-
 
 
