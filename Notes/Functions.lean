@@ -573,10 +573,7 @@ Lean's processing of source code can be divided into several [stages][processing
 * _Elaboration_ that translates the remaining user-facing surface syntax into an underlying basic form.
 * _Kernel checking_ that ensures that the translated expressions follow the rules of the type theory.
 
-For instance, implicit arguments are a part of the surface syntax. They are translated into explicit arguments during elaboration. Recall that {lean}`rfl` takes two implicit arguments. From the kernel's perspective, it is simply a function taking two arguments.
--/
-example (α : Sort u) (a : α) : a = a := rfl
-/-
+For instance, implicit arguments are a part of the surface syntax. They are translated into explicit arguments during elaboration.
 
 In addition to enforcing the rules of the type theory, the kernel implements definitional equality. We have encounted the following aspects of definitional equality.
 
