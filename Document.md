@@ -10,15 +10,13 @@ authorshipNote := "lauri.oksanen@helsinki.fi"
 
 # Foundations
 
-We will consider Lean's type theory as a language for writing [formal proofs][formal-proof]. It is remarkable that this language is highly expressive while consisting of only a few kinds of expressions.{margin}[We omit below expressions related to [quotient types][quotient-types], and effectively consider a [sublanguage][sublanguage].] 
-
-Every type is either a universe in the universe hierarchy, a function type, or arises from the type constructor of an inductive type. The remaining expressions can be organized along two axes: 
+We will consider Lean's type theory as a language for writing [formal proofs][formal-proof]. This language is highly expressive while consisting of only a few kinds of expressions.{margin}[We omit below expressions related to [quotient types][quotient-types], and effectively consider a [sublanguage][sublanguage].] Every type is either a universe in the universe hierarchy, a function type, or arises from the type constructor of an inductive type. The remaining expressions can be organized along two axes: 
 
 ```
 <!--HTML-->
 <table class="custom-concepts-2d">
   <thead>
-    <tr><th></th><th>creation</th><th>elimination</th></tr>
+    <tr><th></th><th>introduction</th><th>elimination</th></tr>
   </thead>
   <tbody>
     <tr><th>function</th><td><code class="math inline">\lambda</code>-abstraction</td><td>evaluation</td></tr>
@@ -40,9 +38,9 @@ We begin with an introduction to types and universes. Since our primary goal is 
 
 # Constructions
 
-We have now seen all the primitive notions in Lean's type theory. To reiterate, they are universes, function types, and inductive types,{margin}[We view `→` and `inductive … where` as primitive notions. This does not include concrete function types or inductive types.] together with creation and elimination of expressions of the latter two types. In addition, we have considered the concrete inductive types `Eq` and `Nat`, as well as the product and sum types `Prod` and `Sum`.
+We have now seen all the primitive notions in Lean's type theory. To reiterate, they are universes, function types, and inductive types,{margin}[We view formation of function and inductive types as primitive notions. This does not include concrete function types or inductive types.] together with introduction and elimination of expressions of the latter two types. In addition, we have considered the concrete inductive types `Eq` and `Nat`, as well as the [product][product-type] and [sum][sum-type] types `Prod` and `Sum`.
 
-We begin with an encoding of first-order logic using inductive types. This involves [product][product-type] and [sum][sum-type] types similar to `Prod` and `Sum`, a [dependent sum type][dep-sum-type], a [unit type][unit-type] `⊤`, and an [empty type][empty-type] `⊥`. The remainder of the chapter then takes a deeper look at `Eq` and `Nat`.
+We begin with an encoding of first-order logic using inductive types. This involves product and sum types similar to `Prod` and `Sum`, a [dependent sum type][dep-sum-type], a [unit type][unit-type], and an [empty type][empty-type].{margin}[These types are called `And`, `Or`, `Exists`, `True`, and `False`.] The remainder of the chapter then takes a deeper look at `Eq` and `Nat`.
 
 [product-type]: https://en.wikipedia.org/wiki/Product_type
 [sum-type]: https://en.wikipedia.org/wiki/Sum_type
