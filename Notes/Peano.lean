@@ -18,10 +18,9 @@ We will show that `ℕ` satisfies the second-order formulation of [Peano axioms]
 6. For every natural number `n`, `S n` is a natural number.
 7. For all natural numbers `m` and `n`, if `S m = S n`, then `m = n`.
 8. For every natural number `n`, `S n = 0` is false.
-9. If `φ` is a [unary][unary] predicate such that `φ 0` is true, and for every natural number `n`, `φ n` being true implies that `φ (S n)` is true, then `φ n` is true for every natural number `n`.
+9. If `φ` is a predicate such that `φ 0` is true, and for every natural number `n`, `φ n` being true implies that `φ (S n)` is true, then `φ n` is true for every natural number `n`.
 
 [peano]: https://en.wikipedia.org/wiki/Peano_axioms
-[unary]: https://en.wikipedia.org/wiki/Unary_function
 
 We have already seen axiom 1.
 -/
@@ -136,7 +135,7 @@ lemma axiom9
   | Nat.succ m => h2 m (axiom9 P h1 h2 m)
 /-
 
-Structural recursion is translated to a use of an associated recursor. Here are is a [primitive recursive][primitive-recursive] function, defined with and without pattern matching.
+Structural recursions are translated to evaluations of recursors. As an illustration, we consider a [primitive recursive][primitive-recursive] function, defined in two ways.
 
 [primitive-recursive]: https://en.wikipedia.org/wiki/Primitive_recursive_function
 
@@ -182,15 +181,10 @@ def ackermann' (m n : ℕ) :=
   | m + 1, 0 => ackermann' m 1
   | m + 1, n + 1 => ackermann' m (ackermann' (m + 1) n)
 /-
-However, this version is not translated to a nested use of `Nat.rec` as above. Instead, it uses [well-founded recursion][well-founded-recursion].
+However, this version is not translated to a nested use of `Nat.rec` as above. Instead, it uses [well-founded recursion][well-founded-recursion]. Mathlib's {lean}`ack` is defined in the same way as `ackermann'`. Both our versions coincide with {lean}`ack`.
 
 [well-founded-recursion]: https://lean-lang.org/doc/reference/latest/Definitions/Recursive-Definitions/#well-founded-recursion
--/
-#print ackermann'
-#print ackermann'._unary
-/-
 
-Mathlib's {lean}`ack` is defined in the same way as `ackermann'`. Both our versions coincide with {lean}`ack`.
 -/
 example : ack = ackermann := by
   funext m
@@ -262,7 +256,7 @@ example : ackermann' = ackermann := by
           simp [ackermann', ackermann, ih, ihn]
 /-
 
-Here is a variant of `proxy` with the two first arguments implicit.
+Here is a variant of `proxy` with the first two arguments implicit.
 -/
 lemma proxy'
   {a b : ℕ} (P : ℕ → Prop)
