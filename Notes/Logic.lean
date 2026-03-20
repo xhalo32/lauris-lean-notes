@@ -48,7 +48,7 @@ example : True' := True'.intro
 example : True' := ⟨⟩
 /-
 
-The following syntactic sugar is available for the standard truth
+The following syntactic sugar is available for the standard version.
 -/
 example : ⊤ = True := rfl
 example : trivial = True.intro := rfl
@@ -97,9 +97,7 @@ example : ¬False := id
 # Principle of explosion
 
 Both `False` and `False'` are uninhabited, that is,
-there are no expressions of either type. Uninhabited propositions encode contradictions. From a contradiction, any proposition can be derived by the [principle of explosion][explosion].
-
-{ref "sec-arguments-of-recursors"}[Recall] that `False.rec` is the recursor of {lean}`False`. This recursor encodes the principle of explosion.
+there are no expressions of either type. Uninhabited propositions encode contradictions. From a contradiction, any proposition can be derived by the [principle of explosion][explosion]. The recursor `False.rec` encodes the principle of explosion.
 
 [explosion]: https://en.wikipedia.org/wiki/Principle_of_explosion
 
@@ -109,7 +107,7 @@ there are no expressions of either type. Uninhabited propositions encode contrad
 example : False → False' := False.rec
 /-
 
-The arguments of the recursor are implicit, and Lean infers them from the context. The explicit version {lean}`@False.rec` is
+The arguments of the recursor are implicit, and Lean infers them from the context. The type of {lean}`@False.rec` is
 -/
 example :
   (motive : False → Sort u) /- motive -/ →
@@ -176,18 +174,18 @@ Compound propositions in [propositional calculus][propositional-calculus] are fo
 [propositional-calculus]: https://en.wikipedia.org/wiki/Propositional_calculus
 
 -/
-#print Or
 #print And
+#print Or
+
+inductive And' (p q : Prop) : Prop where
+  | intro (hl : p) (hr : q) : And' p q
 
 inductive Or' (p q : Prop) : Prop where
   | inl (h : p) : Or' p q
   | inr (h : q) : Or' p q
-
-inductive And' (p q : Prop) : Prop where
-  | intro (hl : p) (hr : q) : And' p q
 /-
 
-These definitions encode [disjunction][disjunction-intro] and [conjunction introductions][conjunction-intro]{margin}[We use again the anonymous constructor syntax.]
+These definitions encode [conjunction][conjunction-intro] and [disjunction introductions][disjunction-intro].{margin}[We use again the anonymous constructor syntax.]
 
 [disjunction-intro]: https://en.wikipedia.org/wiki/Disjunction_introduction
 [conjunction-intro]: https://en.wikipedia.org/wiki/Conjunction_introduction
@@ -195,16 +193,16 @@ These definitions encode [disjunction][disjunction-intro] and [conjunction intro
 -/
 variable (p q : Prop)
 
+example (hl : p) (hr : q) : And' p q := ⟨hl, hr⟩
+
 example (h : p) : Or' p q := Or'.inl h
 example (h : q) : Or' p q := Or'.inr h
-
-example (hl : p) (hr : q) : And' p q := ⟨hl, hr⟩
 /-
 
 The following syntactic sugar is available for the standard versions.
 -/
-example : (p ∨ q) = Or p q := rfl
 example : (p ∧ q) = And p q := rfl
+example : (p ∨ q) = Or p q := rfl
 /-
 
 
@@ -218,16 +216,19 @@ Deconstruction via pattern matching enables proofs of statements involving compo
 example (h : And' p q) : p
 :=
   match h with
-  | ⟨hp, _⟩ => hp
+  | And'.intro hp _ => hp
 /-
-This is just the projection function associated to the first field of `And'`.{margin}[{ref "sec-structures"}[Recall] that projection functions are generated for structures in this manner. While we could have defined `And'` as a structure, its definition as an inductive type illustrates the fact that structures are merely a convenience.]
-
-An alternative proof uses the shorthand related to the {ref "sec-anon-const-syntax"}[anonymous constructor syntax].
+This is just the projection function associated to the first field of `And'`.{margin}[{ref "sec-structures"}[Recall] that projection functions are generated for structures in this manner. While we could have defined `And'` as a structure, its definition as an inductive type illustrates the fact that structures are merely a convenience.] Here are two alternative proofs using the shorthand related to the {ref "sec-anon-const-syntax"}[anonymous constructor syntax].
 -/
 example (h : And' p q) : p
 :=
   let ⟨hp, _⟩ := h
   hp
+
+example (h : And' p q) : p
+:=
+  let ⟨_, _⟩ := h
+  ‹p›
 /-
 
 Here is a proof that bypasses the user-facing surface syntax and employs the recursor `And'.rec` directly.
@@ -286,7 +287,7 @@ example (h : p ∧ q) : p := h.left
 
 ## Commutativity of disjunction
 
-Let us now turn to disjunction and consider its [commutativity][commutativity]. Deconstruction of a disjunctive hypothesis results in two cases.
+Let us now turn to disjunction and consider its [commutativity][commutativity]. Deconstruction of a disjunctive hypothesis results in two cases. We give two formulations.
 
 [commutativity]: https://en.wikipedia.org/wiki/Commutative_property#Truth_functional_connectives
 
@@ -296,6 +297,13 @@ example (h : Or' p q) : Or' q p
   match h with
   | Or'.inl hp => Or'.inr hp
   | Or'.inr hq => Or'.inl hq
+
+example (h : Or' p q) : Or' q p
+:=
+  match h with
+  | Or'.inl _ => Or'.inr ‹p›
+  | Or'.inr _ => Or'.inl ‹q›
+
 /-
 This is a [proof by case analysis][proof-by-case-analysis]: `h` was either constructed with `inl` or with `inr`. In the former case, we construct a new `Or'` expression using `inr`, and in the latter case `inl` is used. In other words, we swap the roles of `inl` and `inr`.
 
@@ -331,8 +339,8 @@ example (p q : Prop) (h : Or' p q) : Or' q p
   (λ _ ↦ Or' q p) /- motive -/
 
   -- minor premises:
-  (λ hp ↦ Or'.inr hp)
-  (λ hq ↦ Or'.inl hq)
+  (λ hp ↦ Or'.inr hp) /- inl -/
+  (λ hq ↦ Or'.inl hq) /- inr -/
 
   h /- major premise -/
 /-
@@ -411,7 +419,7 @@ inductive Exists' : {α : Sort u} → (P : α → Prop) → Prop
     (a : α) → (h : P a) → Exists' P
 /-
 
-The definition is based on [existential generalization][existential-generalization]
+The definition is based on [existential generalization][existential-generalization]. We give two formulations.
 
 [existential-generalization]: https://en.wikipedia.org/wiki/Existential_generalization
 
@@ -425,7 +433,7 @@ example (α : Sort u) (P : α → Prop) (a : α)
 := ⟨a, h⟩
 /-
 
-Deconstruction enables [existential instantiation][existential-instantiation].
+Deconstruction enables [existential instantiation][existential-instantiation]. We give three formulations.
 
 [existential-instantiation]: https://en.wikipedia.org/wiki/Existential_instantiation
 
@@ -458,127 +466,6 @@ Syntactic sugar is provided for the standard version.
 -/
 example (α : Sort u) (P : α → Prop) :
   (∃ a : α, P a) = Exists P := rfl
-/-
-
-
-# Axioms
-
-Axioms postulate principles that cannot be established otherwise. There are seven [standard axioms][standard-axioms], three of which are important for our present purposes. These three are propositional extensionality, the axiom of choice, and the quotient axiom. We call them the _three mathematical axioms_.
-
-[standard-axioms]: https://lean-lang.org/doc/reference/4.28.0-rc1/Axioms/#standard-axioms
-
--/
-#print propext
-#print Classical.choice
-#print Quot.sound
-/-
-
-The law of excluded middle
--/
-example : Prop := p ∨ ¬p
-/-
-holds in [classical logic][classical-logic] but not in [intuitionistic logic][intuitionistic-logic]. The _three mathematical axioms_ enable encoding of classical logic.
-
-[classical-logic]: https://en.wikipedia.org/wiki/Classical_logic
-[intuitionistic-logic]: https://en.wikipedia.org/wiki/Intuitionistic_logic
-
--/
-lemma excluded_middle : p ∨ ¬p := by grind
-/-
-
-Lean tracks the axioms that each proof depends on.
--/
-#print axioms excluded_middle
-/-
-
-For instance, our earlier proof of conjunction elimination is constructive and does not depend on any axiom.
--/
-lemma and_elim (h : p ∧ q) : p := h.left
-#print axioms and_elim
-/-
-
-Proofs based on function extensionality depend on all three mathematical axioms.
--/
-def plus1  (n : ℕ) := n + 1
-def plus1' (n : ℕ) := 1 + n
-
-lemma plus1s_coincide : plus1 = plus1'
-:= by
-  funext n
-  simp [plus1, plus1']
-  grind
-
-#print axioms plus1s_coincide
-/-
-
-Proving the law of excluded middle from
-propositional extensionality, functional extensionality, and the axiom of choice is called [Diaconescu's theorem][diaconescu]. We can adapt this proof for our `Or'` and `Not'`.
-
-[diaconescu]: https://en.wikipedia.org/wiki/Diaconescu%27s_theorem
-
--/
-lemma excluded_middle' : Or' p (Not' p) :=
-  /-
-  The following three definitions are reproduced from the
-  namespace Classical. They are specialized to the universe
-  of propositions, since universes cannot be introduced in
-  local definitons. We have also removed some syntactic
-  sugar and made all arguments explicit.
-  -/
-  let indefiniteDescription (q : Prop → Prop)
-    (h : ∃ x, q x) :
-    Subtype (λ x ↦ q x) := Classical.choice (
-      let ⟨x, qx⟩ := h
-      Nonempty.intro (Subtype.mk x qx)
-    )
-  let choose (q : Prop → Prop)
-    (h : ∃ x, q x) :
-    Prop := (indefiniteDescription q h).val
-  have choose_spec (q : Prop → Prop)
-    (h : ∃ x, q x)
-    : q (choose q h)
-  :=
-    (indefiniteDescription q h).property
-
-  -- We follow the proof of Classical.em.
-  let U (x : Prop) : Prop := x = True ∨ p
-  let V (x : Prop) : Prop := x = False ∨ p
-  have exU : ∃ x, U x := ⟨True, Or.inl rfl⟩
-  have exV : ∃ x, V x := ⟨False, Or.inl rfl⟩
-  let u : Prop := choose U exU
-  let v : Prop := choose V exV
-  have u_def : U u := choose_spec U exU
-  have v_def : V v := choose_spec V exV
-  have not_uv_or_p : u ≠ v ∨ p :=
-    match u_def, v_def with
-    | Or.inr h, _ => Or.inr h
-    | _, Or.inr h => Or.inr h
-    | Or.inl hut, Or.inl hvf =>
-      have hne : u ≠ v := by simp [hvf, hut]
-      Or.inl hne
-  have p_implies_uv : p → u = v :=
-    λ hp ↦
-    have hpred : U = V :=
-      funext λ x ↦
-        have hl : (x = True ∨ p) → (x = False ∨ p) :=
-          λ _ ↦ Or.inr hp
-        have hr : (x = False ∨ p) → (x = True ∨ p) :=
-          λ _ ↦ Or.inr hp
-        propext (Iff.intro hl hr)
-    have h₀ : ∀ exU exV, choose U exU = choose V exV :=
-      by simp [hpred]
-    h₀ exU exV
-
-  -- The remaining is adapted for Or' and Not'.
-  have mt' {a b : Prop} (h₁ : a → b) (h₂ : ¬b) : Not' a :=
-    λ ha ↦
-      have : False := h₂ (h₁ ha)
-      explosion this
-  match not_uv_or_p with
-  | Or.inl hne => Or'.inr (mt' p_implies_uv hne)
-  | Or.inr h   => Or'.inl h
-
-#print axioms excluded_middle'
 /-
 
 
