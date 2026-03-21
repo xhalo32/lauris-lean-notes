@@ -5,8 +5,8 @@ if test -e _local/config.fish
     source _local/config.fish
 end
  
-set docdir $outdir/Document
-set doc $outdir/Document.lean
+set docdir (path resolve $outdir/Document)
+set doc (path resolve $outdir/Document.lean)
 set srcdir (pwd)
 
 
