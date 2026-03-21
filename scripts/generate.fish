@@ -1,9 +1,12 @@
-# Load outdir and prjdir from config
-source config.fish
+set indir Notes
+set outdir _out
 
+if test -e _local/config.fish
+    source _local/config.fish
+end
+ 
 set docdir $outdir/Document
 set doc $outdir/Document.lean
-
 set srcdir (pwd)
 
 
@@ -22,20 +25,20 @@ rm -f $doc
 rm -rf $docdir
 mkdir -p $docdir
 
-pushd $prjdir
+pushd $indir
 for file in *.lean
     echo "Preprocessing $file"
 
     set name (path basename --no-extension $file)
-    jq --arg ns "$prjdir.$name" -Rsr \
+    jq --arg ns "$indir.$name" -Rsr \
         -f $srcdir/scripts/preprocess.jq \
         <$file >$docdir/$file
     echo "import Document.$name" >>$doc    
 end
 popd 
 
-echo 'import Infra.Preamble' >> $doc
-cat Document.md >> $doc
+echo 'import Infra.Preamble' >>$doc
+cat Document.md >>$doc
 
 cd $outdir 
 rm -rf _out 
