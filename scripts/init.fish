@@ -1,4 +1,4 @@
-#lake init Document math
+lake init Document math
 
 sed -i '/^weak\.linter\.mathlibStandardSet = true$/d' \
     lakefile.toml
