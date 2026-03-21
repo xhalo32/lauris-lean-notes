@@ -69,9 +69,7 @@ inductive NextLevelNat : Sort 2 where
   | zero : NextLevelNat
   | succ : NextLevelNat → NextLevelNat
 /-
-From the mathematical point of view, `NextLevelNat` is [isomorphic][isomorphism] to {lean}`Nat`. They both satisfy the second-order formulation of [Peano axioms][peano]. We will show this {ref "sec-peano"}[later].
-
-The following is not isomorphic to {lean}`Nat`.
+From the mathematical point of view, `NextLevelNat` is [isomorphic][isomorphism] to {lean}`Nat`. They both satisfy the second-order formulation of [Peano axioms][peano], as shown {ref "sec-peano"}[later]. In contrast, the following is not isomorphic to {lean}`Nat`.
 
 [isomorphism]: https://en.wikipedia.org/wiki/Isomorphism
 [peano]: https://en.wikipedia.org/wiki/Peano_axioms
@@ -473,7 +471,7 @@ inductive GoodWrap : Type (u + 1) where
   | mk (α : Type u) : GoodWrap
 /-
 
-There are other requirements as well, the most important of which is [strict-positivity][strict-positivity]. For example, the following definition is invalid since it violates this requirement.
+There are other requirements as well, the most important of which is [strict-positivity][strict-positivity]. For instance, the following definition is invalid since it violates this requirement.
 
 [strict-positivity]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#strict-positivity
 
@@ -481,6 +479,37 @@ There are other requirements as well, the most important of which is [strict-pos
 inductive Bad where
   | mk : (Bad → Bad) → Bad
 ```
+
+To understand why `Bad` must be rejected, consider
+-/
+inductive NotBad where
+  | mk : (True → NotBad) → NotBad
+
+set_option pp.proofs true in
+#print NotBad.rec
+/-
+Extrapolating naively from the type of `NotBad.rec` by replacing `NotBad` and `True` with `Bad`, we are led to the following hypothetical recursor `rec` for `Bad`. The existence of such a recursor would yield a contradiction.
+-/
+example (Bad : Sort u) (mk : (Bad → Bad) → Bad)
+  (rec :
+    (motive : Bad → Prop) /- motive -/ →
+
+    -- minor premise:
+    (
+      (f : Bad → Bad) →
+      ((hi : Bad) → motive (f hi)) →
+      motive (mk f)
+    ) →
+
+    (b : Bad) /- major premise -/ →
+    motive b /- codomain -/
+  )
+  : 1 = 0
+:=
+  let motive := λ _ ↦ 1 = 0
+  let b := mk (λ x ↦ x)
+  rec motive (λ f hi ↦ hi (mk f)) b
+/-
 
 
 # Structures
