@@ -53,6 +53,20 @@ We begin with an encoding of first-order logic using inductive types. This invol
 {include 2 Document.Peano}
 
 
+# Relating types
+
+Lean provides several mechanisms for relating and organizing types:
+
+* _Type classes_ enable the representation of shared algebraic structure and support hierarchical organization via inheritance.
+
+* _Coercions_ represent embeddings of one type into another.
+
+* _Quotient types_ allow formation of new types by identifying elements under an equivalence relation, together with canonical maps relating the original type and the quotient.
+
+{include 2 Document.Type_classes}
+{include 2 Document.Coercions}
+
+
 # Index
 
 {theIndex}
