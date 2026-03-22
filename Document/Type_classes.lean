@@ -105,7 +105,7 @@ example (α : Type u) [Add α] : HAdd α α α
 
 # Class hierarchy
 
-The mathematical concept corresponding to `Add` is [magma][magma]. A [semigroup][semigroup] is a magma whose binary operation is associative. In Lean, there are parallel hierarchies for multiplication and addition. The two hierarchies are isomorphic from the mathematical point of view, only the notation differs.
+The mathematical concept corresponding to `Add` is [magma][magma]. A [semigroup][semigroup] is a magma whose binary operation is associative. In Lean, there are parallel hierarchies for multiplication and addition. The two hierarchies are isomorphic from the mathematical point of view, only the notation differs. {index}[extends]
 
 [magma]: https://en.wikipedia.org/wiki/Magma_(algebra)
 [semigroup]: https://en.wikipedia.org/wiki/Semigroup
@@ -141,4 +141,96 @@ We state associativity for the underlying operation `Nat'.add`, rather than the 
 Mathlib has a rich hierarchy of classes. [Mathematics in Lean][mathematics-in-lean] gives an introduction to this hierarchy.
 
 [mathematics-in-lean]: https://leanprover-community.github.io/mathematics_in_lean
+
+
+# Ordering
+
+Similarly to the class hierarchy that is related to addition, there is a hierarchy related to orderings. The class analogous to `Add` is `LE`. It is responsible for the `≤` notation.
 -/
+#print LE
+/-
+
+The _less or equal_ relation on `Nat` is defined as an inductive type.
+-/
+#print Nat.le
+/-
+It has two constructors `Nat.le.refl` and `Nat.le.step`. The former is analogous to `Eq.refl`, while the latter encodes the implication: if `n ≤ m` then `n ≤ m + 1`.
+
+We define our version.
+-/
+inductive Nat'.le (n : Nat') : Nat' → Prop
+  | refl : n.le n
+  | step {m : Nat'} : n.le m → n.le (m.succ)
+
+instance : LE Nat' where
+  le := Nat'.le
+/-
+
+We can now show that `zero` is the smallest natural number, and that `zero.succ` is the second smallest.
+-/
+lemma Nat'.zero_smallest (n : Nat') : Nat'.zero ≤ n
+:= by
+  induction n with
+  | zero => exact Nat'.le.refl
+  | succ m hi => exact Nat'.le.step hi
+
+lemma Nat'.le_succ {n m : Nat'}
+  (h : n ≤ m)
+  : (n.succ ≤ m.succ)
+:= by
+  induction h with
+  | refl => exact Nat'.le.refl
+  | step _ hi => exact Nat'.le.step hi
+
+example (n : Nat')
+  (h : n ≠ Nat'.zero)
+  : Nat'.zero.succ ≤ n
+:= by
+  induction n with
+  | zero => contradiction
+  | succ m hi =>
+    have := Nat'.zero_smallest m
+    exact Nat'.le_succ this
+/-
+
+A [preorder][preorder] is a binary relation that is reflexive and transitive.
+
+[preorder]: https://en.wikipedia.org/wiki/Preorder
+-/
+class Preorder' (α : Type u) extends LE α where
+  le_refl : ∀ a : α, a ≤ a
+  le_trans : ∀ a b c : α, a ≤ b → b ≤ c → a ≤ c
+/-
+
+Let us show that `Nat'.le` is transitive.
+-/
+lemma Nat'.le_trans {n m k : Nat'}
+  : Nat'.le n m → Nat'.le m k → Nat'.le n k
+:= by
+  intro h1 h2
+  induction h2 with
+  | refl => exact h1
+  | step _ hi => exact Nat'.le.step hi
+
+instance : Preorder' Nat' where
+  le_refl := @Nat'.le.refl
+  le_trans := @Nat'.le_trans
+/-
+
+The standard `Preorder` comes with the relation `a < b` as well.
+-/
+example (α : Type u) [Preorder α] (a b : α)
+  : a < b ↔ a ≤ b ∧ ¬b ≤ a
+:= Preorder.lt_iff_le_not_ge a b
+
+instance : Preorder Nat' where
+  le_refl := @Nat'.le.refl
+  le_trans := @Nat'.le_trans
+
+open Nat'
+
+example : zero < zero.succ
+:=
+  have hl : zero ≤ zero.succ := le.step le.refl
+  have hr : ¬zero.succ ≤ zero := nofun
+  ⟨hl, hr⟩
