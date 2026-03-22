@@ -1,11 +1,11 @@
-set indir Notes
+set indir Document
 set outdir _out
 
 if test -e _local/config.fish
     source _local/config.fish
 end
  
-set docdir (path resolve $outdir/Document)
+set docdir (path resolve $outdir/$indir)
 set doc (path resolve $outdir/Document.lean)
 set srcdir (pwd)
 
@@ -33,7 +33,7 @@ for file in *.lean
     jq --arg ns "$indir.$name" -Rsr \
         -f $srcdir/scripts/preprocess.jq \
         <$file >$docdir/$file
-    echo "import Document.$name" >>$doc    
+    echo "import $indir.$name" >>$doc    
 end
 popd 
 
