@@ -524,13 +524,13 @@ The user-facing surface syntax `structure` {index}[structure] offers a number of
 -/
 #print Prod
 
-namespace Demo'
+namespace Demo
 
 structure Prod (α : Type u) (β : Type v) where
   fst : α
   snd : β
 
-end Demo'
+end Demo
 /-
 
 The constructor is named `mk`,{margin}[Name `mk` is used unless a name is provided with `::` {index}[`::`] [syntax][constructor-name].] and it has the fields `fst : α` and `snd : β`. Therefore, the above structure declaration yields the same constructor as our earlier definition of `Prod`.
@@ -564,10 +564,13 @@ Structures also support a record-style notation.
 -/
 example
   (α : Type u) (β : Type v) (a : α) (b : β) :
-  Prod α β := {
+  Prod α β where
     fst := a
     snd := b
-  }
+
+def origin : ℕ × ℕ where
+  fst := 0
+  snd := 0
 /-
 
 
