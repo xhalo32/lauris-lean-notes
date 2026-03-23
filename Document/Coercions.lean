@@ -8,13 +8,12 @@ import Mathlib
 import Document.Type_classes
 /-
 ```lean -show
+open Document.Peano
 open Document.Type_classes
 ```
 When Lean's elaborator encounters an expression with unexpected type, it attempts to automatically insert a coercion, that is, a function from the unexpected type to the expected type. The search of a suitable function is based on instance synthesis.
 
-As an illustration, consider our version of natural numbers `Nat'`. We have [imported][import] {index}[`import`] our earlier definitions, and have also the `+` notation at our use.{margin}[In the example, `Nat'` is a link that takes to its definition.]
-
-[import]: https://lean-lang.org/doc/reference/latest/Source-Files-and-Modules/#module-headers
+As an illustration, consider our version of natural numbers `Nat'`{margin}[We have imported our earlier definitions.]
 -/
 example (x y : Nat') : Nat' := x + y
 /-
@@ -35,7 +34,7 @@ instance : Coe Nat Nat' where
   coe := Nat'.ofNat
 /-
 
-Now we can add expression of types `Nat` and `Nat'`.
+We can now add expressions of types `Nat` and `Nat'`.
 -/
 example (x : Nat) (y : Nat') : Nat' := x + y
 
@@ -50,7 +49,7 @@ Coercions are not used to resolve numeric literals.
 example : Nat' := 0
 ```
 
-Instead, the numeric literal parser is guided by the `OfNat` type class.
+Instead, the numeric literal parser is guided by `OfNat` type class.
 -/
 instance (n : Nat) : OfNat Nat' n where
   ofNat := n
@@ -58,8 +57,12 @@ instance (n : Nat) : OfNat Nat' n where
 example : Nat' := 0
 /-
 
-Now we can compute in `Nat'` using numeric literals.
+We can now compute in `Nat'` using numeric literals with type annotation.
 -/
 #reduce (2 : Nat')
 
-example : (2 : Nat') = (1 : Nat') + (1 : Nat') := rfl
+example : (2 : Nat') + (2 : Nat') = (4 : Nat') := rfl
+/-
+
+
+-/
