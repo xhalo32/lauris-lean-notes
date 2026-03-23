@@ -132,7 +132,7 @@ lemma axiom9
 :=
   match n with
   | 0 => h1
-  | Nat.succ m => h2 m (axiom9 P h1 h2 m)
+  | Nat.succ n => h2 n (axiom9 P h1 h2 n)
 /-
 
 Structural recursions are translated to evaluations of recursors. As an illustration, we consider a [primitive recursive][primitive-recursive] function, defined in two ways.
@@ -143,7 +143,7 @@ Structural recursions are translated to evaluations of recursors. As an illustra
 def add (x y : ℕ) :=
   match y with
   | Nat.zero => x
-  | Nat.succ z => Nat.succ (add x z)
+  | Nat.succ y => Nat.succ (add x y)
 
 def add₁ (x y : ℕ) : ℕ := Nat.rec x (λ _ hi ↦ Nat.succ hi) y
 /-
@@ -154,7 +154,7 @@ lemma add_coincides (x y : Nat) : add x y = x + y
 :=
   match y with
   | 0 => rfl
-  | z + 1 => congrArg Nat.succ (add_coincides x z)
+  | y + 1 => congrArg Nat.succ (add_coincides x y)
 
 example (x y : Nat) : add₁ x y = x + y
 := Nat.rec rfl (λ _ hi ↦ congrArg Nat.succ hi) y
@@ -192,17 +192,18 @@ However, this version is not translated to a nested use of `Nat.rec` as above. I
 -/
 example : ack = ackermann := by
   funext m
+  simp [ackermann]
   induction m with
   | zero =>
-      funext n
-      simp [ackermann]
-  | succ m ih =>
+      funext _
+      simp
+  | succ _ ih =>
       funext n
       induction n with
       | zero =>
-          simp [ackermann, ih]
-      | succ n ihn =>
-          simp [ackermann, ih, ihn]
+          simp [ih]
+      | succ _ ihn =>
+          simp [ih, ihn]
 /-
 
 
@@ -217,7 +218,7 @@ inductive Nat' : Type where
 def Nat'.add (x y : Nat') :=
   match y with
   | zero => x
-  | succ z => succ (add x z)
+  | succ y => succ (add x y)
 /-
 Here `add` is defined in the namespace `Nat'`, and names from `Nat'` are available unqualified in the definition.
 
@@ -336,7 +337,7 @@ lemma Nat'.le_succ {n m : Nat'}
 :=
   match h with
   | le.refl => le.refl
-  | le.step h' => le.step (le_succ h')
+  | le.step h => le.step (le_succ h)
 /-
 
 Inequality is transitive.
@@ -347,7 +348,7 @@ lemma Nat'.le_trans {n m k : Nat'}
 :=
   match h2 with
   | le.refl => h1
-  | le.step h3 => le.step (le_trans h1 h3)
+  | le.step h2 => le.step (le_trans h1 h2)
 /-
 
 
