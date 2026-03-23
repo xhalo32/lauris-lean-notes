@@ -192,7 +192,7 @@ However, this version is not translated to a nested use of `Nat.rec` as above. I
 -/
 example : ack = ackermann := by
   funext m
-  simp [ackermann]
+  simp only [ackermann]
   induction m with
   | zero =>
       funext _
@@ -393,17 +393,18 @@ Our two versions of the Ackermann function coincide.
 -/
 example : ackermann' = ackermann := by
   funext m
+  simp only [ackermann]
   induction m with
   | zero =>
       funext n
-      simp [ackermann', ackermann]
+      simp [ackermann']
   | succ m ih =>
       funext n
       induction n with
       | zero =>
-          simp [ackermann', ackermann, ih]
+          simp [ackermann', ih]
       | succ n ihn =>
-          simp [ackermann', ackermann, ih, ihn]
+          simp [ackermann', ih, ihn]
 /-
 
 Here is a variant of `proxy` with the first two arguments implicit.

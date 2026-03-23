@@ -554,7 +554,7 @@ The principle of [functional extensionality][extensionality-principles] holds in
 example : plus1 = plus1'
 := by
   funext n
-  simp [plus1, plus1', add]
+  simp only [plus1, plus1', add]
   grind
 /-
 

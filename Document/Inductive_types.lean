@@ -303,7 +303,9 @@ To get a glimpse of how `pred` is translated into an application of `Nat'.rec`, 
 example : pred = @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m)
 := by
   funext n
-  cases n <;> rfl
+  induction n with
+  | zero => rfl
+  | succ _ => rfl
 /-
 The first argument of `@Nat'.rec` is called the _motive_. The motive specifies the codomain of the resulting function. Since this codomain may depend on the argument of the function, the motive itself is a function. In the case of `pred`, the codomain `Nat'` does not depend on the argument, and the argument of the motive is ignored.
 
