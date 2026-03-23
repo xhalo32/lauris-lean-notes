@@ -6,6 +6,10 @@ tag := "sec-equality"
 -/
 import Mathlib.Data.Nat.Init
 /-
+-/
+-- -show
+namespace Document.Equality
+/-
 [First-order logic with equality][first-order-logic-with-eq] impose two axioms, reflexivity and substitution principle, on equality.{margin}[Substitution principle is also called Leibniz's law.] These two axioms imply its remaining [basic properties][eq-basic-properties], including symmetry and transitivity. In Lean, reflexivity is the most fundamental property, as it is an interface to definitional equality.
 
 [first-order-logic-with-eq]: https://en.wikipedia.org/wiki/First-order_logic#Equality_and_its_axioms

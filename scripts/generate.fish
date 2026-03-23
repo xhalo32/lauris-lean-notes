@@ -30,7 +30,7 @@ for file in *.lean
     echo "Preprocessing $file"
 
     set name (path basename --no-extension $file)
-    jq --arg ns "$indir.$name" -Rsr \
+    jq -Rsr \
         -f $srcdir/scripts/preprocess.jq \
         <$file >$docdir/$file
     echo "import $indir.$name" >>$doc    

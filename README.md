@@ -20,6 +20,13 @@ tag := "sec-[label]"
 /-
 ```
 
+Code blocks starting with 
+```
+-/
+-- -show
+```
+are hidden in the document. 
+
 [Fish shell](https://fishshell.com/) script [`scripts/generate.fish`](./scripts/generate.fish) does the translation, calls Verso to compile the document, and postprocesses the resulting HTML. It relies on [jq](https://jqlang.org/) together with some Python libraries (see [`scripts/postprocess.py`](./scripts/postprocess.py)).
 
 To inspect the generated site locally, run e.g.

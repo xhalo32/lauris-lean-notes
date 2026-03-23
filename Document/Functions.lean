@@ -6,6 +6,10 @@ tag := "sec-functions"
 -/
 import Mathlib.Data.Nat.Init
 /-
+-/
+-- -show
+namespace Document.Functions
+/-
 We now focus on the $`\lambda`-calculus aspect of Lean's type theory. Functions are given by $`\lambda`-abstractions. {index}[`λ … ↦`]
 
 -/

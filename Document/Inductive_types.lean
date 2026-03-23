@@ -7,6 +7,10 @@ tag := "sec-inductive-types"
 import Mathlib.Data.Nat.Init
 import Mathlib.Util.CompileInductive
 /-
+-/
+-- -show
+namespace Document.Inductive_types
+/-
 The type encoding natural numbers, {lean}`Nat`, is an example of an [inductive type][inductive-types].
 
 [inductive-types]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/
