@@ -4,7 +4,8 @@ First-order logic
 tag := "sec-logic"
 %%%
 -/
-import Mathlib
+import Mathlib.Data.Nat.Init
+import Mathlib.Order.BooleanAlgebra.Defs
 /-
 Proving a proposition in Lean amounts to constructing an expression whose type is that proposition. This is a manifestation of the [Curry–Howard correspondence][Curry-Howard]. More explicitly, the correspondence can be summarized by the following encoding of concepts from [first-order logic][1st-order-logic]:
 

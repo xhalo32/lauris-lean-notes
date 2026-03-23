@@ -4,7 +4,7 @@ Type classes
 tag := "sec-type-classes"
 %%%
 -/
-import Mathlib
+import Mathlib.Algebra.Group.Defs
 import Document.Peano
 /-
 ```lean -show

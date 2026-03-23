@@ -4,7 +4,8 @@ Inductive types
 tag := "sec-inductive-types"
 %%%
 -/
-import Mathlib
+import Mathlib.Data.Nat.Init
+import Mathlib.Util.CompileInductive
 /-
 The type encoding natural numbers, {lean}`Nat`, is an example of an [inductive type][inductive-types].
 

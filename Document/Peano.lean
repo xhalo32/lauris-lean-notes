@@ -4,7 +4,7 @@ Natural numbers
 tag := "sec-peano"
 %%%
 -/
-import Mathlib
+import Mathlib.Computability.Ackermann
 /-
 
 
