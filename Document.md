@@ -3,7 +3,7 @@
 %%%
 shortTitle := "Notes on Lean"
 shortContextTitle := "Notes"
-authors := ["Lauri Oksanen"]
+authors := ["Lauri Oksanen", "Niklas Halonen"]
 authorshipNote := "lauri.oksanen@helsinki.fi"
 %%%
 
