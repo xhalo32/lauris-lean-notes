@@ -5,35 +5,43 @@ tag := "sec-type-classes"
 %%%
 -/
 import Mathlib
+import Document.Peano
 /-
+```lean -show
+open Document.Peano
+```
 One of the simplest type classes is `Add`.
 -/
 #print Add
 /-
 
-The syntax of type class declarations is similar to structures. {index}[`class … where`] We define our version of `Add`.
+Like structures, type classes are a feature at the elaboration stage. We define our version of `Add`. {index}[`class … where`]
 -/
 class Add' (α : Type u) where
   add : α → α → α
 /-
-The `class` declaration results in formation an inductive type, just as if `structure` had been used instead.
+The `class` declaration results in formation of an inductive type with a single constructor called `mk`, just as if `structure` had been used instead.
 -/
 example (α : Type u) : Type u := Add' α
+
+example :
+  (α : Type u) /- parameter -/ →
+  (α → α → α) /- field (add) -/ →
+  Add' α /- codomain -/
+:= @Add'.mk
 /-
 
-Let us return to our version of natural numbers and define addition using structural recursion.
+Let us return to our version of natural numbers `Nat'`, and define an instance `Add' Nat`. We have [imported][import] {index}[`import`] our earlier definitions.{margin}[In the next example, `Nat'` is a link that takes to its definition.] The syntax of instance declarations is similar to that of record-style definitions, such as
+
+[import]: https://lean-lang.org/doc/reference/latest/Source-Files-and-Modules/#module-headers
+
 -/
-inductive Nat' : Type where
-  | zero : Nat'
-  | succ : Nat' → Nat'
-
-def Nat'.add (x y : Nat') :=
-  match y with
-  | Nat'.zero => x
-  | Nat'.succ z => Nat'.succ (add x z)
+def origin : Prod ℕ ℕ where
+  fst := 0
+  snd := 0
 /-
 
-The syntax of instance declarations is similar to that of definitions using `def`. {index}[`instance … where`]
+Indeed, {index}[`instance … where`]
 -/
 instance instAdd'Nat' : Add' Nat' where
   add := Nat'.add
@@ -41,7 +49,7 @@ instance instAdd'Nat' : Add' Nat' where
 example : Add' Nat' := instAdd'Nat'
 /-
 
-Giving a name is optional in instance declarations, and Lean's instance synthesis can search for an expression of a required type. Instance synthesis can be tested using `#synth` command. {index}[`#synth`]
+Giving a name is optional in instance declarations, and Lean's instance synthesis can search for an expression of a required type at the elaboration stage. Instance synthesis can be tested using `#synth` command. {index}[`#synth`]
 -/
 #synth Add' Nat'
 /-
@@ -96,12 +104,6 @@ example (x y : Nat') : Nat' := x + y
 example (x y : Nat') : x + y = Nat'.add x y := rfl
 /-
 
-The standard version `Add` overloads `+` in the same way. This can be shown using `infer_instance` tactic.
--/
-example (α : Type u) [Add α] : HAdd α α α
-:= by infer_instance
-/-
-
 
 # Class hierarchy
 
@@ -118,79 +120,33 @@ class AddSemigroup' (G : Type u) extends Add' G where
   add_assoc : ∀ a b c : G, (a + b) + c = a + (b + c)
 /-
 
-All instances of `AddSemigroup'` are instances of `Add'`.
+All instances of `AddSemigroup'` are instances of `Add'`, that is, if there is an expression of type `AddSemigroup' G` then there is an expression of type `Add' G`. This can be shown using `infer_instance` tactic.
 -/
 example (G : Type u) [AddSemigroup' G] : Add' G
 := by infer_instance
 /-
 
-Constructing an expression of type `AddSemigroup' Nat'` amounts to providing a proof that `Nat'.add` is associative.
+Constructing an expression of type `AddSemigroup' Nat'` amounts to providing a proof that `Nat'.add` is associative.{margin}[Recall that we have already shown the associativity. In the example, `add_assoc` is a link that takes to its definition.]
 -/
-lemma Nat'.add_assoc (a b c : Nat')
-  : Nat'.add (Nat'.add a b) c = Nat'.add a (Nat'.add b c)
-:= by
-  induction c with
-  | zero => rfl
-  | succ c hi => simp [Nat'.add, hi]
-
 instance : AddSemigroup' Nat' where
   add_assoc := Nat'.add_assoc
 /-
-We state associativity for the underlying operation `Nat'.add`, rather than the notation `+`. Using the notation `+` would require unfolding the abstraction provided by the type class `HAdd`.
 
 Mathlib has a rich hierarchy of classes. [Mathematics in Lean][mathematics-in-lean] gives an introduction to this hierarchy.
 
 [mathematics-in-lean]: https://leanprover-community.github.io/mathematics_in_lean
 
 
-# Ordering
+## Ordering
 
-Similarly to the class hierarchy that is related to addition, there is a hierarchy related to orderings. The class analogous to `Add` is `LE`. It is responsible for the `≤` notation.
+Similarly to the class hierarchy that is related to addition, there is a hierarchy related to ordering. The type class analogous to `Add` is `LE`. It is responsible for the `≤` notation.
 -/
 #print LE
-/-
-
-The _less or equal_ relation on `Nat` is defined as an inductive type.
--/
-#print Nat.le
-/-
-It has two constructors `Nat.le.refl` and `Nat.le.step`. The former is analogous to `Eq.refl`, while the latter encodes the implication: if `n ≤ m` then `n ≤ m + 1`.
-
-We define our version.
--/
-inductive Nat'.le (n : Nat') : Nat' → Prop
-  | refl : n.le n
-  | step {m : Nat'} : n.le m → n.le (m.succ)
 
 instance : LE Nat' where
   le := Nat'.le
-/-
 
-We can now show that `zero` is the smallest natural number, and that `zero.succ` is the second smallest.
--/
-lemma Nat'.zero_smallest (n : Nat') : Nat'.zero ≤ n
-:= by
-  induction n with
-  | zero => exact Nat'.le.refl
-  | succ m hi => exact Nat'.le.step hi
-
-lemma Nat'.le_succ {n m : Nat'}
-  (h : n ≤ m)
-  : (n.succ ≤ m.succ)
-:= by
-  induction h with
-  | refl => exact Nat'.le.refl
-  | step _ hi => exact Nat'.le.step hi
-
-example (n : Nat')
-  (h : n ≠ Nat'.zero)
-  : Nat'.zero.succ ≤ n
-:= by
-  induction n with
-  | zero => contradiction
-  | succ m hi =>
-    have := Nat'.zero_smallest m
-    exact Nat'.le_succ this
+example (n : Nat') : Nat'.zero ≤ n := Nat'.zero_smallest n
 /-
 
 A [preorder][preorder] is a binary relation that is reflexive and transitive.
@@ -200,24 +156,13 @@ A [preorder][preorder] is a binary relation that is reflexive and transitive.
 class Preorder' (α : Type u) extends LE α where
   le_refl : ∀ a : α, a ≤ a
   le_trans : ∀ a b c : α, a ≤ b → b ≤ c → a ≤ c
-/-
-
-Let us show that `Nat'.le` is transitive.
--/
-lemma Nat'.le_trans {n m k : Nat'}
-  : Nat'.le n m → Nat'.le m k → Nat'.le n k
-:= by
-  intro h1 h2
-  induction h2 with
-  | refl => exact h1
-  | step _ hi => exact Nat'.le.step hi
 
 instance : Preorder' Nat' where
   le_refl := @Nat'.le.refl
   le_trans := @Nat'.le_trans
 /-
 
-The standard `Preorder` comes with the relation `a < b` as well.
+The standard `Preorder` comes with the strict inequality `<` as well.
 -/
 example (α : Type u) [Preorder α] (a b : α)
   : a < b ↔ a ≤ b ∧ ¬b ≤ a
