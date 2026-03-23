@@ -59,11 +59,12 @@ Lean provides several mechanisms for relating and organizing types:
 
 * _Type classes_ enable the representation of shared algebraic structure and support hierarchical organization via inheritance.
 
-* _Coercions_ represent embeddings of one type into another.
-
 * _Quotient types_ allow formation of new types by identifying elements under an equivalence relation, together with canonical maps relating the original type and the quotient.
 
+* _Coercions_ represent embeddings of one type into another.
+
 {include 2 Document.Type_classes}
+{include 2 Document.Quotient_types}
 {include 2 Document.Coercions}
 
 
