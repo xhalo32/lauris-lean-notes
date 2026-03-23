@@ -142,7 +142,7 @@ Structural recursions are translated to evaluations of recursors. As an illustra
 -/
 def add (x y : ℕ) :=
   match y with
-  | 0 => x
+  | Nat.zero => x
   | Nat.succ z => Nat.succ (add x z)
 
 def add₁ (x y : ℕ) : ℕ := Nat.rec x (λ _ hi ↦ Nat.succ hi) y
@@ -154,15 +154,19 @@ lemma add_coincides (x y : Nat) : add x y = x + y
 :=
   match y with
   | 0 => rfl
-  | Nat.succ z => congrArg Nat.succ (add_coincides x z)
+  | z + 1 => congrArg Nat.succ (add_coincides x z)
 
 example (x y : Nat) : add₁ x y = x + y
 := Nat.rec rfl (λ _ hi ↦ congrArg Nat.succ hi) y
 /-
 
-The expressive power of `Nat.rec` goes well beyond primitive recursive functions. Here is the [Ackermann function][ackermann].
+
+## Ackermann function
+
+The expressive power of `Nat.rec` extends well beyond primitive recursive functions. The [Ackermann function][ackermann] is a [computable function][computable-function] that is not primitive recursive.
 
 [ackermann]: https://en.wikipedia.org/wiki/Ackermann_function
+[computable-function]: https://en.wikipedia.org/wiki/Computable_function
 
 -/
 def ackermann : Nat → Nat → Nat := Nat.rec
@@ -199,6 +203,151 @@ example : ack = ackermann := by
           simp [ackermann, ih]
       | succ n ihn =>
           simp [ackermann, ih, ihn]
+/-
+
+
+# Proofs by induction
+
+We define addition on our version of natural numbers and prove some properties that will be used later when we define our version of integers.
+-/
+inductive Nat' : Type where
+  | zero : Nat'
+  | succ : Nat' → Nat'
+
+def Nat'.add (x y : Nat') :=
+  match y with
+  | zero => x
+  | succ z => succ (add x z)
+/-
+Here `add` is defined in the namespace `Nat'`, and names from `Nat'` are available unqualified in the definition.
+
+Zero is a [left identity element][identity-element] of addition.{margin}[It is also a right identity element. This can be proven by `rfl`, as seen in the below proof of right cancellation.] The proof uses the congruence property of equality.
+
+[identity-element]: https://en.wikipedia.org/wiki/Identity_element
+
+-/
+lemma Nat'.zero_add (n : Nat')
+  : zero.add n = n
+:=
+  match n with
+  | zero => rfl
+  | succ n => congrArg succ n.zero_add
+/-
+
+The successor function is [equivariant][equivariant] under addition.
+
+[equivariant]: https://en.wikipedia.org/wiki/Equivariant_map
+
+-/
+lemma Nat'.add_succ (n m : Nat')
+  : n.add m.succ = (n.add m).succ
+:=
+  match m with
+  | zero => rfl
+  | succ m => congrArg succ (n.add_succ m)
+
+lemma Nat'.succ_add (n m : Nat')
+  : n.succ.add m = (n.add m).succ
+:=
+  match m with
+  | zero => rfl
+  | succ m => congrArg succ (n.succ_add m)
+/-
+Both these equivariance proofs are analogous to the proof left identity, and so is the following proof of [associativity][associativity] of addition.
+
+[associativity]: https://en.wikipedia.org/wiki/Associative_property
+
+-/
+lemma Nat'.add_assoc (a b c : Nat')
+  : (a.add b).add c = a.add (b.add c)
+:=
+  match c with
+  | zero => rfl
+  | succ c => congrArg succ (a.add_assoc b c)
+/-
+
+Addition has the [right cancellation property][right-cancellation-property].{margin}[We leave the corresponding left cancellation property as an exercise.] The proof uses the constructor injectivity.
+
+[right-cancellation-property]: https://en.wikipedia.org/wiki/Cancellation_property
+-/
+lemma Nat'.add_right_cancel {n m k : Nat'}
+  (h : m.add n = k.add n)
+  : m = k
+:=
+  match n with
+  | zero => calc
+    m = m.add zero := rfl
+    _ = k.add zero := h
+    _ = k := rfl
+  | succ _ => add_right_cancel (succ.inj h)
+/-
+
+Addition is [commutative][commutative]. The proof uses the symmetry of equality.
+
+[commutative]: https://en.wikipedia.org/wiki/Commutative_property
+
+-/
+lemma Nat'.add_comm {n m : Nat'}
+  : n.add m = m.add n
+:=
+  match m with
+  | zero => calc
+    n.add zero
+    _ = n := rfl
+    _ = zero.add n := (zero_add n).symm
+  | succ m => calc
+    n.add m.succ
+    _ = (n.add m).succ := add_succ n m
+    _ = (m.add n).succ := congrArg succ add_comm
+    _ = m.succ.add n := (succ_add m n).symm
+/-
+
+
+# Recursive relations
+
+Inequality `≤` on `Nat` is defined as an inductive type.
+-/
+#print Nat.le
+/-
+It has two constructors `Nat.le.refl` and `Nat.le.step`. The former is analogous to `Eq.refl`, while the latter encodes the implication: if `n ≤ m` then `n ≤ m + 1`.
+
+We define our version and prove some properties.
+-/
+inductive Nat'.le (n : Nat') : Nat' → Prop
+  | refl : n.le n
+  | step {m : Nat'} : n.le m → n.le m.succ
+/-
+
+The smallest natural number is `zero`.
+-/
+lemma Nat'.zero_smallest (n : Nat')
+  : zero.le n
+:=
+  match n with
+  | zero => le.refl
+  | succ n => le.step (zero_smallest n)
+/-
+
+The successor function preserves inequality.
+-/
+lemma Nat'.le_succ {n m : Nat'}
+  (h : n.le m)
+  : (n.succ.le m.succ)
+:=
+  match h with
+  | le.refl => le.refl
+  | le.step h' => le.step (le_succ h')
+/-
+
+Inequality is transitive.
+-/
+lemma Nat'.le_trans {n m k : Nat'}
+  (h1 : n.le m) (h2 : m.le k)
+  : n.le k
+:=
+  match h2 with
+  | le.refl => h1
+  | le.step h3 => le.step (le_trans h1 h3)
 /-
 
 
