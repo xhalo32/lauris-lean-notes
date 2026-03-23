@@ -4,7 +4,7 @@ Quotient types
 tag := "sec-quotient-types"
 %%%
 -/
-import Mathlib
+import Mathlib.Data.Quot
 import Document.Type_classes
 /-
 ```lean -show

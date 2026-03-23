@@ -4,7 +4,6 @@ Coercions
 tag := "sec-coercions"
 %%%
 -/
-import Mathlib
 import Document.Type_classes
 /-
 ```lean -show
