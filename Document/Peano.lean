@@ -6,8 +6,10 @@ tag := "sec-peano"
 -/
 import Mathlib.Computability.Ackermann
 /-
-
-
+-/
+-- -show
+namespace Document.Peano
+/-
 We will show that `ℕ` satisfies the second-order formulation of [Peano axioms][peano]:{margin}[Here `S` is the successor function.]
 
 1. `0` is a natural number.
@@ -210,6 +212,12 @@ example : ack = ackermann := by
 # Proofs by induction
 
 We define addition on our version of natural numbers and prove some properties that will be used later when we define our version of integers.
+
+-/
+-- -show
+-- Expose names for later import
+end Document.Peano
+/-
 -/
 inductive Nat' : Type where
   | zero : Nat'
@@ -349,6 +357,10 @@ lemma Nat'.le_trans {n m k : Nat'}
   match h2 with
   | le.refl => h1
   | le.step h2 => le.step (le_trans h1 h2)
+/-
+-/
+-- -show
+namespace Document.Peano
 /-
 
 
