@@ -7,9 +7,6 @@ tag := "sec-type-classes"
 import Mathlib.Algebra.Group.Defs
 import Document.Peano
 /-
-```lean -show
-open Document.Peano
-```
 One of the simplest type classes is `Add`.
 -/
 #print Add

@@ -6,10 +6,6 @@ tag := "sec-coercions"
 -/
 import Document.Type_classes
 /-
-```lean -show
-open Document.Peano
-open Document.Type_classes
-```
 When Lean's elaborator encounters an expression with unexpected type, it attempts to automatically insert a coercion, that is, a function from the unexpected type to the expected type. The search of a suitable function is based on instance synthesis.
 
 As an illustration, consider our version of natural numbers `Nat'`{margin}[We have imported our earlier definitions.]

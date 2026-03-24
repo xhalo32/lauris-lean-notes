@@ -7,10 +7,6 @@ tag := "sec-quotient-types"
 import Mathlib.Data.Quot
 import Document.Type_classes
 /-
-```lean -show
-open Document.Peano
-open Document.Type_classes
-```
 Integers can be encoded as the quotient set of $`\mathbb N^2` by the equivalence relation $`\sim`, where $`(n_1, k_1) \sim (n_2, k_2)` if and only if $`n_1 + k_2 = n_2 + k_1`.{margin}[Using integers, the relation can be rewritten as $`n_1 - k_1 = n_2 - k_2`.] Positive integers are then given by the [equivalence classes][equivalence-class] $`[(n, 0)]`, $`n \in \mathbb N`, and negative integers by $`[(0, k)]`, $`k \in \mathbb N`. We will use this encoding to implement integers based on `Nat'`.{margin}[We have imported our earlier definitions.]
 
 [equivalence-class]: https://en.wikipedia.org/wiki/Equivalence_class
