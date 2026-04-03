@@ -44,7 +44,7 @@ variable (n : ℕ)
 example (n : ℕ) : n + 1 = n.succ := rfl
 /-
 
-Show that `n + 1` for `n : ℕ` coincides with `Nat.succ n`.
+Show that `n + 1` coincides with `Nat.succ n`.
 -/
 example (n : ℕ) : n + 1 = Nat.succ n := rfl
 /-
@@ -157,7 +157,7 @@ example (α β γ δ : Type) (a : α) (b : β) (c : γ) (d : δ)
 /-
 
 
-# On universe hierarchy
+# Finding types of expressions
 
 Consider
 -/
