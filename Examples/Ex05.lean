@@ -1,36 +1,6 @@
 import Mathlib
 /-
 
-# Mapping functions over products
-
--/
-def map {α β γ δ : Type} (f : α → β) (g : γ → δ) :
-  α × γ → β × δ := λ p ↦ (f p.1, g p.2)
-
-example (α β γ δ : Type) (f : α → β) (g : γ → δ)
-  (a : α) (c : γ)
-  : map f g (a, c) = (f a, g c)
-:= by
-  rfl
-
-example (α β : Type) (p : α × β)
-  : map id id = (id : α × β → α × β)
-:= by
-  funext p
-  cases p
-  rfl
-
-example (α β γ δ ε ζ : Type)
-  (f₁ : α → β) (f₂ : β → γ)
-  (g₁ : δ → ε) (g₂ : ε → ζ)
-  : (map f₂ g₂) ∘ (map f₁ g₁) = map (f₂ ∘ f₁) (g₂ ∘ g₁)
-:= by
-  funext p
-  cases p
-  rfl
-/-
-
-
 # Injectivity of operations on pairs
 
 Commuting components of prod is injective.
@@ -142,43 +112,6 @@ example (α β γ : Type) : (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ) where
   right_inv := by
     intro s
     exact assoc_un s
-/-
-
-
-# Mapping functions over sums
-
--/
-def mapSum {α β γ δ : Type} (f : α → β) (g : γ → δ) :
-  α ⊕ γ → β ⊕ δ
-  :=
-  λ s ↦ match s with
-  | Sum.inl a => Sum.inl (f a)
-  | Sum.inr c => Sum.inr (g c)
-
-example (α β γ δ : Type) (f : α → β) (g : γ → δ) (a : α)
-  : mapSum f g (Sum.inl a) = Sum.inl (f a)
-:= by
-  rfl
-
-example (α β γ δ : Type) (f : α → β) (g : γ → δ) (c : γ)
-  : mapSum f g (Sum.inr c) = Sum.inr (g c)
-:= by
-  rfl
-
-example (α β : Type)
-  : mapSum id id = (id : α ⊕ β → α ⊕ β)
-:= by
-  funext s
-  cases s <;> rfl
-
-example (α β γ δ ε ζ : Type)
-  (f₁ : α → β) (f₂ : β → γ)
-  (g₁ : δ → ε) (g₂ : ε → ζ)
-  : (mapSum f₂ g₂) ∘ (mapSum f₁ g₁)
-    = mapSum (f₂ ∘ f₁) (g₂ ∘ g₁)
-:= by
-  funext s
-  cases s <;> rfl
 /-
 
 
