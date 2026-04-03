@@ -9,21 +9,31 @@ def curry {α β γ : Type} (f : α × β → γ) : α → β → γ :=
   λ a b ↦ f (a, b)
 /-
 
-Find an inverse of `curry` and show that it is indeed an inverse.
+Find an inverse of `curry` and show that it is indeed an inverse. Moreover, show `(α × β → γ) ≃ (α → β → γ)`.
 
 -/
 def uncurry {α β γ : Type} (g : α → β → γ) : α × β → γ :=
   λ p ↦ g p.1 p.2
 
-example (α β γ : Type) (g : α → β → γ)
+lemma un_curry {α β γ : Type} (f : α × β → γ)
+  : uncurry (curry f) = f
+:= by
+  rfl
+
+lemma curry_un {α β γ : Type} (g : α → β → γ)
   : curry (uncurry g) = g
 := by
   rfl
 
-example (α β γ : Type) (f : α × β → γ)
-  : uncurry (curry f) = f
-:= by
-  rfl
+example (α β γ : Type) : (α × β → γ) ≃ (α → β → γ) where
+  toFun := curry
+  invFun := uncurry
+  left_inv := by
+    intro f
+    exact un_curry f
+  right_inv := by
+    intro f
+    exact curry_un f
 /-
 
 
@@ -37,13 +47,23 @@ def swap {α β : Type} : α × β → β × α :=
   λ p ↦ (p.2, p.1)
 /-
 
-Find an inverse of `swap` and show that is indeed an inverse.
+Find an inverse of `swap` and show that is indeed an inverse. Moreover, show `α × β ≃ β × α`.
 
 -/
-example (α β : Type) (p : α × β)
+lemma swap_swap {α β : Type} (p : α × β)
   : swap (swap p) = p
 := by
   rfl
+
+example (α β : Type) : α × β ≃ β × α where
+  toFun := swap
+  invFun := swap
+  left_inv := by
+    intro p
+    exact swap_swap p
+  right_inv := by
+    intro p
+    exact swap_swap p
 /-
 
 
@@ -54,21 +74,31 @@ def assoc {α β γ : Type} : (α × β) × γ → α × (β × γ) :=
   λ p ↦ (p.1.1, (p.1.2, p.2))
 /-
 
-Find an inverse of `assoc` and show that is indeed an inverse.
+Find an inverse of `assoc` and show that is indeed an inverse. Moreover, show `(α × β) × γ ≃ α × (β × γ)`.
 
 -/
 def unassoc {α β γ : Type} : α × (β × γ) → (α × β) × γ :=
   λ p ↦ ((p.1, p.2.1), p.2.2)
 
-example (α β γ : Type) (p : (α × β) × γ)
+lemma un_assoc {α β γ : Type} (p : (α × β) × γ)
   : unassoc (assoc p) = p
 := by
   rfl
 
-example (α β γ : Type) (p : α × (β × γ))
+lemma assoc_un {α β γ : Type} (p : α × (β × γ))
   : assoc (unassoc p) = p
 := by
   rfl
+
+example (α β γ : Type) : (α × β) × γ ≃ α × (β × γ) where
+  toFun := assoc
+  invFun := unassoc
+  left_inv := by
+    intro p
+    exact un_assoc p
+  right_inv := by
+    intro p
+    exact assoc_un p
 /-
 
 
