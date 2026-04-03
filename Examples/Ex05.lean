@@ -1,38 +1,6 @@
 import Mathlib
 /-
 
-# Injectivity of operations on pairs
-
-Commuting components of prod is injective.
--/
-def Injective {α β : Type} (f : α → β) : Prop :=
-  ∀ x y : α, f x = f y → x = y
-
-def swapProd (α β : Type) : α × β → β × α :=
-  fun p ↦ (p.2, p.1)
-
-example (α β : Type)
-  : Injective (swapProd α β)
-:= by
-  intro ⟨a, b⟩ ⟨a', b'⟩ h
-  cases h
-  rfl
-/-
-
-Associating nested pairs to the right is injective.
--/
-def assocProd (α β γ : Type) : (α × β) × γ → α × (β × γ) :=
-  fun p ↦ (p.1.1, (p.1.2, p.2))
-
-example (α β γ : Type)
-  : Injective (assocProd α β γ)
-:= by
-  intro ⟨⟨a, b⟩, c⟩ ⟨⟨a', b'⟩, c'⟩  h
-  cases h
-  rfl
-/-
-
-
 # Components of sum
 
 Show `α ⊕ β ≃ β ⊕ α`.
@@ -162,6 +130,32 @@ example (α β γ : Type) : α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)
   right_inv := by
     intro s
     exact distrib_factor s
+/-
+
+
+# Direct injectivity proofs on pairs
+
+Swapping components of a pair is injective.
+-/
+def Injective {α β : Type} (f : α → β) : Prop :=
+  ∀ x y : α, f x = f y → x = y
+
+example (α β : Type)
+  : Injective (λ p : α × β ↦ (p.2, p.1))
+:= by
+  intro ⟨a, b⟩ ⟨a', b'⟩ h
+  cases h
+  rfl
+/-
+
+Associating nested pairs to the right is injective.
+-/
+example (α β γ : Type)
+  : Injective (fun p : (α × β) × γ ↦ (p.1.1, (p.1.2, p.2)))
+:= by
+  intro ⟨⟨a, b⟩, c⟩ ⟨⟨a', b'⟩, c'⟩  h
+  cases h
+  rfl
 /-
 
 
