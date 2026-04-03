@@ -19,6 +19,10 @@ example (p q : Prop)
   intro hpq hp
   apply hpq
   exact hp
+
+example (p q : Prop)
+  : (p → q) → p → q
+:= by grind
 /-
 
 Identity
@@ -28,6 +32,10 @@ example (p : Prop)
 := by
   intro hp
   exact hp
+
+example (p : Prop)
+  : p → p
+:= by grind
 /-
 
 Composition of implications
@@ -41,6 +49,12 @@ example (p q r : Prop)
   apply h2
   apply h1
   exact hp
+
+example (p q r : Prop)
+  (h1 : p → q)
+  (h2 : q → r)
+  : p → r
+:= by grind
 /-
 
 Weakening (ignoring assumptions)
@@ -51,6 +65,10 @@ example (p q r : Prop)
   intro h hp _
   apply h
   exact hp
+
+example (p q r : Prop)
+  : (p → r) → (p → q → r)
+:= by grind
 /-
 
 Repeating premise
@@ -64,6 +82,11 @@ example (p q : Prop)
   -- We need to prove `p` twice
   · exact hp
   · exact hp
+
+example (p q : Prop)
+  (h : p → p → q)
+  : p → q
+:= by grind
 /-
 
 Reordering arguments
@@ -76,6 +99,10 @@ example (p q r : Prop)
   -- We need to prove `p` and `q`
   · exact hp
   · exact hq
+
+example (p q r : Prop)
+  : (p → q → r) → (q → p → r)
+:= by grind
 /-
 
 Higher-order implication
@@ -86,6 +113,10 @@ example (p q : Prop)
   intro h hp
   apply h
   exact hp
+
+example (p q : Prop)
+  : (p → q) → (p → q)
+:= by grind
 /-
 
 
@@ -98,6 +129,10 @@ example (α : Type) (P : α → Prop)
 := by
   intro h x
   exact h x
+
+example (α : Type) (P : α → Prop)
+  : (∀ x, P x) → ∀ x, P x
+:= by grind
 /-
 
 Application
@@ -107,6 +142,11 @@ example (α : Type) (P : α → Prop) (a : α)
   : P a
 := by
   exact h a
+
+example (α : Type) (P : α → Prop) (a : α)
+  (h : ∀ x, P x)
+  : P a
+:= by grind
 /-
 
 Weakening
@@ -117,6 +157,11 @@ example (α : Type) (P Q : α → Prop)
 := by
   intro x _
   exact h x
+
+example (α : Type) (P Q : α → Prop)
+  (h : ∀ x, P x)
+  : ∀ x, Q x → P x
+:= by grind
 /-
 
 Reordering quantifiers
@@ -126,6 +171,10 @@ example (α β : Type) (P : α → β → Prop)
 := by
   intro h y x
   exact h x y
+
+example (α β : Type) (P : α → β → Prop)
+  : (∀ x y, P x y) → (∀ y x, P x y)
+:= by grind
 /-
 
 Composition under ∀
@@ -139,6 +188,12 @@ example (α : Type) (P Q R : α → Prop)
   apply h2
   apply h1
   exact hp
+
+example (α : Type) (P Q R : α → Prop)
+  (h1 : ∀ x, P x → Q x)
+  (h2 : ∀ x, Q x → R x)
+  : ∀ x, P x → R x
+:= by grind
 /-
 
 Distributing implication over ∀
@@ -150,6 +205,11 @@ example (α : Type) (P Q : α → Prop)
   intro hp x
   apply h
   exact hp x
+
+example (α : Type) (P Q : α → Prop)
+  (h : ∀ x, P x → Q x)
+  : (∀ x, P x) → (∀ x, Q x)
+:= by grind
 /-
 
 Constant proof
@@ -159,6 +219,10 @@ example (α : Type) (P : Prop) :
 := by
   intro hp x
   exact hp
+
+example (α : Type) (P : Prop) :
+  P → ∀ x : α, P
+:= by grind
 /-
 
 Pointwise composition
@@ -172,6 +236,13 @@ example (α : Type) (P Q R : α → Prop) (x : α)
   apply h2
   apply h1
   exact hp
+
+example (α : Type) (P Q R : α → Prop) (x : α)
+  (h1 : ∀ x, P x → Q x)
+  (h2 : ∀ x, Q x → R x)
+  (hp : P x)
+  : R x
+:= by grind
 /-
 
 

@@ -146,6 +146,12 @@ example (α β : Type)
   intro ⟨a, b⟩ ⟨a', b'⟩ h
   cases h
   rfl
+
+example (α β : Type)
+  : Injective (λ p : α × β ↦ (p.2, p.1))
+:= by
+  intro ⟨a, b⟩ ⟨a', b'⟩ h
+  grind
 /-
 
 Associating nested pairs to the right is injective.
@@ -156,6 +162,12 @@ example (α β γ : Type)
   intro ⟨⟨a, b⟩, c⟩ ⟨⟨a', b'⟩, c'⟩  h
   cases h
   rfl
+
+example (α β γ : Type)
+  : Injective (fun p : (α × β) × γ ↦ (p.1.1, (p.1.2, p.2)))
+:= by
+  intro ⟨⟨a, b⟩, c⟩ ⟨⟨a', b'⟩, c'⟩  h
+  grind
 /-
 
 
