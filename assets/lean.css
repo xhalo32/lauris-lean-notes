@@ -22,7 +22,7 @@
 .hl.lean .var {
     color: var(--verso-code-var-color, );
     font-weight: var(--verso-code-var-weight, normal);
-    font-style: var(--verso-code-var-style, italic);
+    font-style: var(--verso-code-var-style, normal);
     font-family: var(--verso-code-var-font-family, );
 
     position: relative;

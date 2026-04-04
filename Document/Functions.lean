@@ -293,7 +293,7 @@ Consider an evaluation of a predicate.
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Prop := P a
 /-
-Since _`P a`_ has type {lean}`Prop`, it is itself a type.{margin}[Once again, all expressions of type {lean}`Prop` are themselves types.]
+Since `P a` has type {lean}`Prop`, it is itself a type.{margin}[Once again, all expressions of type {lean}`Prop` are themselves types.]
 In particular, it can occur as the codomain of a $`\Pi`-type. Such types encode [universal quantification][universal-quantification].
 
 [universal-quantification]: https://en.wikipedia.org/wiki/Universal_quantification
@@ -302,7 +302,7 @@ In particular, it can occur as the codomain of a $`\Pi`-type. Such types encode 
 example (α : Sort u) (P : α → Prop) : Prop := (a : α) → P a
 /-
 
-The type {lean}`Prop` of `(`_`a `_` : α) → `_` P a`_ arises from the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule]. Indeed, since
+The type {lean}`Prop` of `(a : α) → P a` arises from the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule]. Indeed, since
 -/
 example (α : Sort u) (P : α → Prop) (a : α) : Sort 0 := P a
 /-
@@ -329,7 +329,7 @@ example (α : Sort u) (P Q : α → Prop)
   : ∀ a : α, Q a
 := λ a ↦ h1 a (h2 a)
 /-
-In fact, the proof uses universal instantiation twice: first in the application _`h2 a`_ and then in the partial application _`h1 a`_.
+In fact, the proof uses universal instantiation twice: first in the application `h2 a` and then in the partial application `h1 a`.
 
 Recall that {lean}`@rfl` has the following type.
 -/
@@ -402,16 +402,16 @@ example (α : Sort u) (P Q : α → Prop)
 /-
 We can read the first line of the example as introducing the symbols involved in the statement, which itself consists of the second and third lines. The statement is:
 
-* Suppose _`h1`_ `: …` and _`h2`_ `: …`.
-* Then `∀` _`a`_ `:` _`α`_`,` _`Q a`_.
+* Suppose `h1 : …` and `h2 : …`.
+* Then `∀ a : α, Q a`.
 
 The leading `:` on the third line reads as "Then" and `:=` on the fourth line as "Proof:".{margin}[It is due to this reading that we prefer the indentation in the example over the one in [Mathlib's style guidelines][style-guide]. When not proving a proposition, we adopt the usual indentation style.] The proof has the reading:
 
 [style-guide]: https://leanprover-community.github.io/contribute/style.html#structuring-definitions-and-theorems
 
-1. Let _`a`_ `:` _`α`_.
-2. We have _`P a`_ by hypothesis _`h2`_, applied to _`a`_.
-3. We conclude by hypothesis _`h1`_, applied to _`a`_ and the fact _`P a`_.
+1. Let `a : α`.
+2. We have `P a` by hypothesis `h2`, applied to `a`.
+3. We conclude by hypothesis `h1`, applied to `a` and the fact `P a`.
 
 Naming every intermediate step can become cumbersome. Omitting the name after `have` makes the step accessible as `this`.
 -/

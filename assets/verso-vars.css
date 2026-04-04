@@ -49,7 +49,7 @@
     /* Local bindings (e.g. `x` in `let x := 5`) */
     --verso-code-var-color: var(--verso-code-color);
     --verso-code-var-weight: normal;
-    --verso-code-var-style: italic;
+    --verso-code-var-style: normal;
     --verso-code-kw-font-family: var(--verso-code-font-family);
 }
 
