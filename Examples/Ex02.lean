@@ -3,10 +3,11 @@ import Mathlib
 
 # Syntactic sugar
 
-Consider the type
+Consider
 -/
 example : Type := ℕ ⊕ ℕ
 /-
+
 Write `ℕ ⊕ ℕ` in reduced form without syntactic sugar.
 -/
 set_option pp.notation false in
@@ -15,10 +16,11 @@ set_option pp.notation false in
 example : (ℕ ⊕ ℕ) = (Sum Nat Nat) := rfl
 /-
 
-Consider the expression
+Consider
 -/
 example (n : ℕ) : ℕ := n + 0
 /-
+
 Write `n + 0` in reduced form without syntactic sugar.
 -/
 variable (n : ℕ)
@@ -32,13 +34,14 @@ Show that `0` coincides with `Nat.zero`.
 example : 0 = Nat.zero := rfl
 /-
 
-Consider the expression
+Consider
 -/
 example (n : ℕ) : ℕ := n + 1
 /-
+
 Write `n + 1` in reduced form without syntactic sugar.
 -/
-variable (n : ℕ)
+-- __Solution__
 #reduce n + 1
 
 example (n : ℕ) : n + 1 = n.succ := rfl
@@ -46,20 +49,24 @@ example (n : ℕ) : n + 1 = n.succ := rfl
 
 Show that `n + 1` coincides with `Nat.succ n`.
 -/
+-- __Solution__
 example (n : ℕ) : n + 1 = Nat.succ n := rfl
 /-
 
 Show that `1` coincides with `Nat.zero.succ`.
 -/
+-- __Solution__
 example : 1 = Nat.zero.succ := rfl
 /-
 
-Consider the type
+Consider
 -/
 example (p q : Prop) : Prop := p ∧ q
 /-
+
 Write `p ∧ q` in reduced form without syntactic sugar.
 -/
+-- __Solution__
 variable (p q : Prop)
 set_option pp.notation false in
 #reduce p ∧ q
@@ -67,13 +74,14 @@ set_option pp.notation false in
 example : (p ∧ q) = (And p q) := rfl
 /-
 
-Consider the type
+Consider
 -/
 example (p : Prop) : Prop := ¬p
 /-
+
 Write `¬p` in reduced form without syntactic sugar, forcing reduction inside types.
 -/
-variable (p : Prop)
+-- __Solution__
 set_option pp.notation false in
 #reduce (types := true) ¬p
 
@@ -100,9 +108,10 @@ example (α β γ : Type) (a : α) (b : β) (c : γ)
   : ((a, b), c).1.1 = a
 := rfl
 /-
-Extract `b` and `c` from `((a, b), c)`.
 
+Extract `b` and `c` from `((a, b), c)`.
 -/
+-- __Solution__
 example (α β γ : Type) (a : α) (b : β) (c : γ)
   : ((a, b), c).1.2 = b
 := rfl
@@ -118,9 +127,10 @@ example (α β γ δ : Type) (a : α) (b : β) (c : γ) (d : δ)
   : ((a, b), (c, d)).1.1 = a
 := rfl
 /-
-Extract `b`, `c`, and `d` from `((a, b), (c, d))`.
 
+Extract `b`, `c`, and `d` from `((a, b), (c, d))`.
 -/
+-- __Solution__
 example (α β γ δ : Type) (a : α) (b : β) (c : γ) (d : δ)
   : ((a, b), (c, d)).1.2 = b
 := rfl
@@ -140,9 +150,10 @@ example (α β γ δ : Type) (a : α) (b : β) (c : γ) (d : δ)
   : (a, (b, (c, d))).1 = a
 := rfl
 /-
-Extract `b`, `c`, and `d` from `(a, (b, (c, d)))`.
 
+Extract `b`, `c`, and `d` from `(a, (b, (c, d)))`.
 -/
+-- __Solution__
 example (α β γ δ : Type) (a : α) (b : β) (c : γ) (d : δ)
   : (a, (b, (c, d))).2.1 = b
 := rfl
@@ -173,6 +184,7 @@ example : Type (max u v) := Prod α β
 
 Find the type of `Sum α β`.
 -/
+-- __Solution__
 #check Sum α β
 
 example : Type (max u v) := Sum α β
@@ -180,6 +192,7 @@ example : Type (max u v) := Sum α β
 
 Find the type of `α → β`.
 -/
+-- __Solution__
 #check α → β
 
 example : Type (max u v) := α → β
@@ -189,8 +202,10 @@ Consider
 -/
 variable (γ : Sort u) (δ : Sort v)
 /-
+
 Find the type of `γ → δ`.
 -/
+-- __Solution__
 #check γ → δ
 
 example : Sort (imax u v) := γ → δ

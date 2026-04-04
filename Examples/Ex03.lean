@@ -10,7 +10,6 @@ def curry {α β γ : Type} (f : α × β → γ) : α → β → γ :=
 /-
 
 Find an inverse of `curry` and show that it is indeed an inverse. Moreover, show `(α × β → γ) ≃ (α → β → γ)`.
-
 -/
 def uncurry {α β γ : Type} (g : α → β → γ) : α × β → γ :=
   λ p ↦ g p.1 p.2
@@ -48,8 +47,8 @@ def swap {α β : Type} : α × β → β × α :=
 /-
 
 Find an inverse of `swap` and show that is indeed an inverse. Moreover, show `α × β ≃ β × α`.
-
 -/
+-- __Solution__
 lemma swap_swap {α β : Type} (p : α × β)
   : swap (swap p) = p
 := by
@@ -69,14 +68,15 @@ example (α β : Type) : α × β ≃ β × α where
 
 ## Associating nested products
 
+Consider
 -/
 def assoc {α β γ : Type} : (α × β) × γ → α × (β × γ) :=
   λ p ↦ (p.1.1, (p.1.2, p.2))
 /-
 
 Find an inverse of `assoc` and show that is indeed an inverse. Moreover, show `(α × β) × γ ≃ α × (β × γ)`.
-
 -/
+-- __Solution__
 def unassoc {α β γ : Type} : α × (β × γ) → (α × β) × γ :=
   λ p ↦ ((p.1, p.2.1), p.2.2)
 
@@ -104,6 +104,7 @@ example (α β γ : Type) : (α × β) × γ ≃ α × (β × γ) where
 
 # Function composition
 
+Function composition `∘` is associative.
 -/
 example (α β γ : Type) (f : α → β) (g : β → γ) (a : α)
   : (g ∘ f) a = g (f a)
@@ -123,7 +124,6 @@ example (α : Type) :
 /-
 
 Show that `(α → α, ∘)` forms a semigroup.
-
 -/
 instance (α : Type) : Semigroup (α → α) where
   mul := λ f g ↦ f ∘ g
@@ -135,6 +135,7 @@ instance (α : Type) : Semigroup (α → α) where
 
 # Identity function
 
+Identity function `id` has the following properties.
 -/
 example (α : Type) : id = λ x : α ↦ x := rfl
 
@@ -150,14 +151,15 @@ example (α β : Type) (f : α → β)
 /-
 
 Show that `(α → α, ∘, id)` forms a monoid.
-
 -/
 instance (α : Type) : Monoid (α → α) where
   one := id
   one_mul := by
+    -- __Solution__
     intro f
     rfl
   mul_one := by
+    -- __Solution__
     intro f
     rfl
 /-
@@ -185,19 +187,25 @@ by
 
 # Uniqueness of identity function
 
+Left uniqueness
 -/
 example (α : Type) (e : α → α)
   (h : e ∘ id = id)
   : e = id
 := by
+  -- __Solution__
   calc
     e = e ∘ id := by rfl
     _ = id := by rw [h]
+/-
 
+Right uniqueness
+-/
 example (α : Type) (e : α → α)
   (h : id ∘ e = id)
   : e = id
 := by
+  -- __Solution__
   calc
     e = id ∘ e := by rfl
     _ = id := by rw [h]
@@ -213,6 +221,7 @@ example (α β : Type) (f : α → β) (l : β → α) (x y : α)
   (h2 : f x = f y)
   : x = y
 := by
+  -- __Solution__
   calc
     x = id x := by rfl
     _ = (l ∘ f) x := by rw [h1]

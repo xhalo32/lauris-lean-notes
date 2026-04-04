@@ -4,7 +4,6 @@ import Mathlib
 # Components of sum
 
 Show `α ⊕ β ≃ β ⊕ α`.
-
 -/
 def swap {α β : Type} (s : α ⊕ β) : β ⊕ α :=
   match s with
@@ -35,7 +34,6 @@ example (α β γ : Type) : α ⊕ β ≃ β ⊕ α where
 /-
 
 Show `(α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ)`.
-
 -/
 def assoc {α β γ : Type} :
   (α ⊕ β) ⊕ γ → α ⊕ (β ⊕ γ)
@@ -65,12 +63,14 @@ lemma un_assoc {α β γ : Type} (s : (α ⊕ β) ⊕ γ)
 lemma assoc_un {α β γ : Type} (s : α ⊕ (β ⊕ γ))
   : assoc (unassoc s) = s
 := by
+  -- __Solution__
   cases s with
   | inl a =>
     rfl
   | inr bc =>
     cases bc <;> rfl
 
+-- __Solution__ packaging into `≃`
 example (α β γ : Type) : (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ) where
   toFun := assoc
   invFun := unassoc
@@ -86,8 +86,8 @@ example (α β γ : Type) : (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ) where
 # Products and sums together
 
 Show `α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)`.
-
 -/
+-- __Solution__
 def distrib {α β γ : Type} :
   α × (β ⊕ γ) → (α × β) ⊕ (α × γ)
   :=
@@ -152,6 +152,7 @@ example (α β γ : Type) (f g : α → β × γ)
     _ = (λ a ↦ (g a).1) a := by rw [h1]
     _ = (g a).1 := by rfl
     _ = g1 := by rw [hg]
+  -- __Solution__
   have hr := calc
     f2
     _ = (f a).2 := by rw [hf]

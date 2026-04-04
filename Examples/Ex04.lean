@@ -30,9 +30,11 @@ Identity
 example (p : Prop)
   : p → p
 := by
+  -- __Solution__
   intro hp
   exact hp
 
+-- __Solution__ by grind
 example (p : Prop)
   : p → p
 := by grind
@@ -45,11 +47,13 @@ example (p q r : Prop)
   (h2 : q → r)
   : p → r
 := by
+  -- __Solution__
   intro hp
   apply h2
   apply h1
   exact hp
 
+-- __Solution__ by grind
 example (p q r : Prop)
   (h1 : p → q)
   (h2 : q → r)
@@ -62,10 +66,12 @@ Weakening (ignoring assumptions)
 example (p q r : Prop)
   : (p → r) → (p → q → r)
 := by
+  -- __Solution__
   intro h hp _
   apply h
   exact hp
 
+-- __Solution__ by grind
 example (p q r : Prop)
   : (p → r) → (p → q → r)
 := by grind
@@ -77,29 +83,33 @@ example (p q : Prop)
   (h : p → p → q)
   : p → q
 := by
+  -- __Solution__
   intro hp
   apply h
   -- We need to prove `p` twice
   · exact hp
   · exact hp
 
+-- __Solution__ by grind
 example (p q : Prop)
   (h : p → p → q)
   : p → q
 := by grind
 /-
 
-Reordering arguments
+Reordering premises
 -/
 example (p q r : Prop)
   : (p → q → r) → (q → p → r)
 := by
+  -- __Solution__
   intro h hq hp
   apply h
   -- We need to prove `p` and `q`
   · exact hp
   · exact hq
 
+-- __Solution__ by grind
 example (p q r : Prop)
   : (p → q → r) → (q → p → r)
 := by grind
@@ -110,10 +120,12 @@ Higher-order implication
 example (p q : Prop)
   : (p → q) → (p → q)
 := by
+  -- __Solution__
   intro h hp
   apply h
   exact hp
 
+-- __Solution__ by grind
 example (p q : Prop)
   : (p → q) → (p → q)
 := by grind
@@ -127,9 +139,11 @@ Identity
 example (α : Type) (P : α → Prop)
   : (∀ x, P x) → ∀ x, P x
 := by
+  -- __Solution__
   intro h x
   exact h x
 
+-- __Solution__ by grind
 example (α : Type) (P : α → Prop)
   : (∀ x, P x) → ∀ x, P x
 := by grind
@@ -141,8 +155,10 @@ example (α : Type) (P : α → Prop) (a : α)
   (h : ∀ x, P x)
   : P a
 := by
+  -- __Solution__
   exact h a
 
+-- __Solution__ by grind
 example (α : Type) (P : α → Prop) (a : α)
   (h : ∀ x, P x)
   : P a
@@ -155,9 +171,11 @@ example (α : Type) (P Q : α → Prop)
   (h : ∀ x, P x)
   : ∀ x, Q x → P x
 := by
+  -- __Solution__
   intro x _
   exact h x
 
+-- __Solution__ by grind
 example (α : Type) (P Q : α → Prop)
   (h : ∀ x, P x)
   : ∀ x, Q x → P x
@@ -169,9 +187,11 @@ Reordering quantifiers
 example (α β : Type) (P : α → β → Prop)
   : (∀ x y, P x y) → (∀ y x, P x y)
 := by
+  -- __Solution__
   intro h y x
   exact h x y
 
+-- __Solution__ by grind
 example (α β : Type) (P : α → β → Prop)
   : (∀ x y, P x y) → (∀ y x, P x y)
 := by grind
@@ -184,11 +204,13 @@ example (α : Type) (P Q R : α → Prop)
   (h2 : ∀ x, Q x → R x)
   : ∀ x, P x → R x
 := by
+  -- __Solution__
   intro x hp
   apply h2
   apply h1
   exact hp
 
+-- __Solution__ by grind
 example (α : Type) (P Q R : α → Prop)
   (h1 : ∀ x, P x → Q x)
   (h2 : ∀ x, Q x → R x)
@@ -202,10 +224,12 @@ example (α : Type) (P Q : α → Prop)
   (h : ∀ x, P x → Q x)
   : (∀ x, P x) → (∀ x, Q x)
 := by
+  -- __Solution__
   intro hp x
   apply h
   exact hp x
 
+-- __Solution__ by grind
 example (α : Type) (P Q : α → Prop)
   (h : ∀ x, P x → Q x)
   : (∀ x, P x) → (∀ x, Q x)
@@ -217,9 +241,11 @@ Constant proof
 example (α : Type) (P : Prop) :
   P → ∀ x : α, P
 := by
+  -- __Solution__
   intro hp x
   exact hp
 
+-- __Solution__ by grind
 example (α : Type) (P : Prop) :
   P → ∀ x : α, P
 := by grind
@@ -233,10 +259,12 @@ example (α : Type) (P Q R : α → Prop) (x : α)
   (hp : P x)
   : R x
 := by
+  -- __Solution__
   apply h2
   apply h1
   exact hp
 
+-- __Solution__ by grind
 example (α : Type) (P Q R : α → Prop) (x : α)
   (h1 : ∀ x, P x → Q x)
   (h2 : ∀ x, Q x → R x)
@@ -256,7 +284,9 @@ def Injective {α β : Type} (f : α → β) : Prop :=
 
 The identity function is injective.
 -/
-example (α : Type) : Injective (id : α → α) := by
+example (α : Type)
+  : Injective (id : α → α)
+:= by
   intro x y h
   exact h
 /-
@@ -279,6 +309,7 @@ example (α β : Type) (f : α → β) (a a' : α)
   (h : f a = f a')
   : a = a'
 := by
+  -- __Solution__
   apply hf
   exact h
 /-
@@ -289,6 +320,7 @@ example (α β γ : Type) (f : α → β) (g : β → γ)
   (hf : Injective f) (hg : Injective g)
   : Injective (g ∘ f)
 := by
+  -- __Solution__
   intro a a' h
   apply hf
   apply hg
@@ -319,6 +351,7 @@ example (α β γ : Type) (f : α → β) (g : β → γ)
   (h : Injective (g ∘ f))
   : Injective f
 := by
+  -- __Solution__
   intro a a' hfa
   apply h
   calc
@@ -335,6 +368,7 @@ example (α β γ : Type) (f g : α → β) (h : β → γ)
   (hfg : h ∘ f = h ∘ g)
   : f = g
 := by
+  -- __Solution__
   funext a
   apply hh
   calc
