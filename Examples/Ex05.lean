@@ -133,44 +133,6 @@ example (α β γ : Type) : α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)
 /-
 
 
-# Direct injectivity proofs on pairs
-
-Swapping components of a pair is injective.
--/
-def Injective {α β : Type} (f : α → β) : Prop :=
-  ∀ x y : α, f x = f y → x = y
-
-example (α β : Type)
-  : Injective (λ p : α × β ↦ (p.2, p.1))
-:= by
-  intro ⟨a, b⟩ ⟨a', b'⟩ h
-  cases h
-  rfl
-
-example (α β : Type)
-  : Injective (λ p : α × β ↦ (p.2, p.1))
-:= by
-  intro ⟨a, b⟩ ⟨a', b'⟩ h
-  grind
-/-
-
-Associating nested pairs to the right is injective.
--/
-example (α β γ : Type)
-  : Injective (fun p : (α × β) × γ ↦ (p.1.1, (p.1.2, p.2)))
-:= by
-  intro ⟨⟨a, b⟩, c⟩ ⟨⟨a', b'⟩, c'⟩  h
-  cases h
-  rfl
-
-example (α β γ : Type)
-  : Injective (fun p : (α × β) × γ ↦ (p.1.1, (p.1.2, p.2)))
-:= by
-  intro ⟨⟨a, b⟩, c⟩ ⟨⟨a', b'⟩, c'⟩  h
-  grind
-/-
-
-
 # A uniqueness principle for pairing
 
 If two functions into a product have equal first and second projections, then the functions are equal.
