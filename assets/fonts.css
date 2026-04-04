@@ -15,3 +15,17 @@
     font-style: italic;
     font-weight: 400;
 }
+
+@font-face {
+    font-family: JuliaMono;
+    src: url("https://cdn.jsdelivr.net/gh/cormullion/juliamono/webfonts/JuliaMono-Bold.woff2");
+    font-style: normal;
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: JuliaMono;
+    src: url("https://cdn.jsdelivr.net/gh/cormullion/juliamono/webfonts/JuliaMono-BoldItalic.woff2");
+    font-style: italic;
+    font-weight: 700;
+}
