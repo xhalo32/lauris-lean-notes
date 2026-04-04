@@ -160,17 +160,17 @@ inductive Prod' (α : Type u) (β : Type v) : Type (max u v)
   where
   | mk : (fst : α) → (snd : β) → Prod' α β
 /-
-The type constructor {lean}`Prod` is a function taking two arguments.
+The type constructor `Prod'` is a function taking two arguments.
 -/
-example : Type u → Type v → Type (max u v) := Prod
+example : Type u → Type v → Type (max u v) := Prod'
 /-
-The only constructor {lean}`Prod.mk` has the type
+The only constructor `Prod'.mk` has the type
 -/
 example :
   (α : Type u) → (β : Type v) →
-  (fst : α) → (snd : β) → Prod α β := @Prod.mk
+  (fst : α) → (snd : β) → Prod' α β := @Prod'.mk
 /-
-The arguments `α` and `β` are called _parameters_. They are shared by the type constructor `Prod` and the constructor `Prod.mk`. The latter takes them as implicit arguments. Its remaining arguments, `fst` and `snd`, are called _fields_.
+The arguments `α` and `β` are called _parameters_. They are shared by the type constructor `Prod'` and the constructor `Prod'.mk`. The latter takes them as implicit arguments. Its remaining arguments, `fst` and `snd`, are called _fields_.
 
 Earlier we considered the product of `ℕ` with itself and used the notation `(0, 1)`, which is syntactic sugar for `Prod.mk 0 1`.
 -/
@@ -191,11 +191,11 @@ Both the constructors `inl` and `inr` take the parameters `α` and `β` as impli
 -/
 example :
   (α : Type u) → (β : Type v) →
-  (x : α) → Sum α β := @Sum.inl
+  (x : α) → Sum' α β := @Sum'.inl
 
 example :
   (α : Type u) → (β : Type v) →
-  (x : β) → Sum α β := @Sum.inr
+  (x : β) → Sum' α β := @Sum'.inr
 /-
 
 The parameters `(a1 : α1), …, (an: αn)` of the type constructor `T` of an inductive type are subject to the following _uniformity requirement_: for any application `T b1 … bm` of `T` in the definition of the type, `bj` must be definitionally equal to `aj` for `j = 1, …, n`.
@@ -208,7 +208,7 @@ inductive BadSum (α : Type u) (β : Type v) : Type (max u v)
   | inr (x : β) : BadSum β α
 ```
 
-We can define a version of `Prod` in a convoluted way, making use of the fact that `(λ t ↦ t) α` is definitionally equal to `\alpha`.
+We can define a version of `Prod` in a convoluted way, making use of the fact that `(λ t ↦ t) α` is definitionally equal to `α`.
 -/
 inductive Pro'' (α : Type u) (β : Type v) : Type (max u v)
   where
@@ -260,16 +260,16 @@ inductive Eq' {α : Sort u} (a : α) : α → Prop where
 #print Eq'
 /-
 
-The type constructor {lean}`@Eq` is a function taking three arguments.
+The type constructor `@Eq'` is a function taking three arguments.
 -/
-example : (α : Sort u) → (a : α) → α → Prop := @Eq
+example : (α : Sort u) → (a : α) → α → Prop := @Eq'
 /-
-The first two arguments are parameters, while the third argument is an index. The constructor {lean}`@Eq.refl` has no fields.
+The first two arguments are parameters, while the third argument is an index. The constructor `@Eq'.refl` has no fields.
 -/
-example : (α : Sort u) → (a : α) → Eq a a := @Eq.refl
+example : (α : Sort u) → (a : α) → Eq' a a := @Eq'.refl
 /-
 
-Applying the constructor {lean}`Eq.refl` to an expression `a` gives `Eq a a`, where the parameter and index of type `α` take the same value `a`. As a result, we can construct an expression of type `Eq a a` for any `a`, but we cannot construct expressions of type `Eq a b` when `a` and `b` are distinct (modulo definitional equality). In this way, `Eq` encodes the equality between expressions.
+Applying the constructor `Eq'.refl` to an expression `a` gives `Eq' a a`, where the parameter and index of type `α` take the same value `a`. As a result, we can construct an expression of type `Eq' a a` for any `a`, but we cannot construct expressions of type `Eq' a b` when `a` and `b` are distinct (modulo definitional equality). In this way, `Eq'` encodes the equality between expressions.
 
 
 # Recursors
@@ -327,66 +327,66 @@ takes a _recursive argument_, that is, an argument of the same inductive type it
 tag := "sec-arguments-of-recursors"
 %%%
 
-Consider the type of {lean}`@Nat.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- … -/`] Here they are used to label parts of the type.]
+-/
+-- -show
+compile_inductive% Nat'
+compile_inductive% Prod'
+compile_inductive% Eq'
+/-
+Consider the type of `@Nat'.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- … -/`] Here they are used to label parts of the type.]
 -/
 example :
-  (motive : Nat → Sort u) /- motive -/ →
+  (motive : Nat' → Sort u) /- motive -/ →
 
   -- minor premises:
-  motive Nat.zero /- zero -/ →
-  ((m : Nat) → motive m → motive m.succ) /- succ -/ →
+  motive Nat'.zero /- zero -/ →
+  ((m : Nat') → motive m → motive m.succ) /- succ -/ →
 
-  (n : Nat) /- major premise -/ →
+  (n : Nat') /- major premise -/ →
   motive n /- codomain -/
-:= @Nat.rec
+:= @Nat'.rec
 /-
-As above, the first argument of {lean}`@Nat.rec` is the motive. The last argument is called the _major premise_. In the case of {lean}`@Nat.rec`, the remaining arguments are called the _minor premises_.
+As above, the first argument of `@Nat'.rec` is the motive. The last argument is called the _major premise_. In the case of `@Nat'.rec`, the remaining arguments are called the _minor premises_.
 
-There is one minor premise for each constructor. The type or codomain of each minor premise is determined by the motive. A minor premise takes arguments of the same type as the constructor, excluding the parameters of the type. If the constructor takes recursive arguments, the minor premise additionally takes one induction hypothesis for each such argument. In the example above, the only induction hypothesis is the argument with type `motive m` in the minor premise associated to {lean}`Nat.succ`.
+There is one minor premise for each constructor. The type or codomain of each minor premise is determined by the motive. A minor premise takes arguments of the same type as the constructor, excluding the parameters of the type. If the constructor takes recursive arguments, the minor premise additionally takes one induction hypothesis for each such argument. In the example above, the only induction hypothesis is the argument with type `motive m` in the minor premise associated to `Nat'.succ`.
 
-Next, consider the type of {lean}`@Prod.rec`.
+Next, consider the type of `@Prod'.rec`.
 -/
 example :
   (α : Type u) → (β : Type v) /- parameters -/ →
-  (motive : α × β → Sort w) /- motive -/ →
+  (motive : Prod' α β → Sort w) /- motive -/ →
 
-  -- minor premises:
-  ((fst : α) → (snd : β) → motive (fst, snd)) /- mk -/ →
+  -- minor premises (mk):
+  ((fst : α) → (snd : β) → motive (Prod'.mk fst snd)) →
 
-  (pair : α × β) /- major premise -/ →
+  (pair : Prod' α β) /- major premise -/ →
   motive pair /- codomain -/
-:= @Prod.rec
+:= @Prod'.rec
 /-
-{lean}`Prod` is an inductive type with parameters. Its parameters precede the motive. As {lean}`Prod` has a single constructor {lean}`Prod.mk`, there is a single minor premise. Like {lean}`Nat.succ`, {lean}`Prod.mk` is a function, but unlike {lean}`Nat.succ`, it is not recursive as it does not take an argument of type {lean}`Prod`. Hence the minor premise does not take any induction hypotheses. Apart from the parameters `α : Type u` and `β : Type v`, the minor premise takes the same arguments as the constructor {lean}`@Prod.mk`:
+`Prod'` is an inductive type with parameters. Its parameters precede the motive. As `Prod'` has a single constructor `Prod'.mk`, there is a single minor premise. Like `Nat'.succ`, `Prod'.mk` is a function, but unlike `Nat'.succ`, it is not recursive as it does not take an argument of type `Prod'`. Hence the minor premise does not take any induction hypotheses. Apart from the parameters `α : Type u` and `β : Type v`, the minor premise takes the same arguments as the constructor `@Prod'.mk`:
 -/
 example :
   (α : Type u) → (β : Type v) →
-  (fst : α) → (snd : β) → Prod α β := @Prod.mk
+  (fst : α) → (snd : β) → Prod' α β := @Prod'.mk
 /-
 
-Finally, consider the type of {lean}`@Eq.rec`.
+Finally, consider the type of `@Eq'.rec`.
 -/
 example :
   (α : Sort u) → (a : α) /- parameters -/ →
-  (motive : (x : α) → a = x → Sort v) /- motive -/ →
+  (motive : (x : α) → Eq' a x → Sort v) /- motive -/ →
 
   -- minor premises:
-  motive a (Eq.refl a) /- refl -/ →
+  motive a Eq'.refl /- refl -/ →
 
   (b : α) /- indices -/ →
-  (h : a = b) /- major premise -/ →
+  (h : Eq' a b) /- major premise -/ →
   motive b h /- codomain -/
-:= @Eq.rec
+:= @Eq'.rec
 /-
-Like for {lean}`Prod`, the parameters of {lean}`Eq` precede the motive. As {lean}`Eq` has a single constructor {lean}`Eq.refl`, there is a single minor premise. Unlike {lean}`Nat` and {lean}`Prod`, {lean}`Eq` is an indexed family of types. Its index precedes the major premise.
+Like for `Prod'`, the parameters of `Eq'` precede the motive. As `Eq'` has a single constructor `Eq'.refl`, there is a single minor premise. Unlike `Nat'` and `Prod'`, `Eq'` is an indexed family of types. Its index precedes the major premise.
 
-For {lean}`Nat` and {lean}`Prod`, the domain of the motive coincides with the type of major premise. For {lean}`Eq`, the domain of the motive is a Π-type
--/
-example (α : Sort u) (a : α) :
-  ((x : α) → a = x) = ((x : α) → Eq a x)
-:= rfl
-/-
-The index `x : α` of the Π-type is of the same type as the index of {lean}`Eq`. The codomain of the Π-type differs from the type of major premise only in the index.
+For `Nat'` and `Prod'`, the domain of the motive coincides with the type of major premise. For `Eq'`, the domain of the motive is the Π-type `(x : α) → Eq' a x`. Its index `x : α` is of the same type as the index of `Eq'`, and its codomain `Eq' a x` differs from the type of major premise only in the index.
 
 The distinction between parameters and indices is apparent in recursors. Parameters are uniform in the sense that they precede all other arguments of the recursor. By contrast, indices precede only the major premise and occur as additional arguments of the motive.
 
@@ -570,8 +570,8 @@ example
 Structures also support a record-style notation.
 -/
 example
-  (α : Type u) (β : Type v) (a : α) (b : β) :
-  Prod α β where
+  (α : Type u) (β : Type v) (a : α) (b : β) : Prod α β
+  where
     fst := a
     snd := b
 

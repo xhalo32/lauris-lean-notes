@@ -238,18 +238,22 @@ example (p q : Prop) (h : And' p q) : p
 := And'.rec (λ hp _ ↦ hp) h
 /-
 
-Let us write this proof more explicitly. The recursor of `And` has the type{margin}[Recursors are not fully exposed for all types. This example checking the type of `@And.rec` does not work for the recursor of `@And'.rec`. The actual proof works, though, and the type is shown by `#print And'.rec`. To see the fully expanded type, set the option `pp.proofs` to `true` before the `#print` command.]
+-/
+-- -show
+compile_inductive% And'
+/-
+Let us write this proof more explicitly. The recursor of `And'` has the type
 -/
 example :
   (p q : Prop) /- parameters -/ →
-  {motive : And p q → Sort u} /- motive -/ →
+  {motive : And' p q → Sort u} /- motive -/ →
 
   -- minor premises:
-  ((hl : p) → (hr : q) → motive (And.intro hl hr)) →
+  ((hl : p) → (hr : q) → motive (And'.intro hl hr)) →
 
-  (h : And p q) /- major premise -/ →
+  (h : And' p q) /- major premise -/ →
   motive h /- codomain -/
-:= @And.rec
+:= @And'.rec
 /-
 The minor premise corresponds to the only constructor `intro`. The explicit proof
 -/
@@ -323,15 +327,15 @@ An explicit version reads
 -/
 example :
   (p q : Prop) /- parameters -/ →
-  (motive : Or p q → Prop) /- motive -/ →
+  (motive : Or' p q → Prop) /- motive -/ →
 
   -- minor premises:
-  ((h : p) → motive (Or.inl h)) /- inl -/ →
-  ((h : q) → motive (Or.inr h)) /- inr -/ →
+  ((h : p) → motive (Or'.inl h)) /- inl -/ →
+  ((h : q) → motive (Or'.inr h)) /- inr -/ →
 
-  (h : Or p q) /- major premise -/ →
+  (h : Or' p q) /- major premise -/ →
   motive h /- codomain -/
-:= @Or.rec
+:= @Or'.rec
 
 
 example (p q : Prop) (h : Or' p q) : Or' q p
