@@ -457,7 +457,7 @@ example (α : Sort u) (P : α → Prop)
   Exists'.rec (λ a h ↦ h2 a h) h1
 /-
 
-Propositions of form `Exists' p` can be eleminated only into expressions of type `Prop`, as seen from the motive in
+Propositions of form `Exists' p` can be eliminated only into expressions of type `Prop`, as seen from the motive in
 -/
 #print Exists'.rec
 /-
@@ -484,5 +484,3 @@ example (h : And' p q) : q
   | ⟨_, hq⟩ => hq
 
 example (h : p ∧ q) : q := h.right
-
-#print Acc.rec

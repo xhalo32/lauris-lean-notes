@@ -491,7 +491,7 @@ example : ℕ2 = (ℕ × ℕ) := rfl
 #reduce (types := true) ℕ × ℕ
 /-
 
-A function such as `plus1` cannot be employed to demonstrate $`\delta`-reduction in isolation. Indeed, the normal form of `plus1` differs from its defition.{margin}[The `#print` command queries information about definitions.] {index}[#print]
+A function such as `plus1` cannot be employed to demonstrate $`\delta`-reduction in isolation. Indeed, the normal form of `plus1` differs from its definition.{margin}[The `#print` command queries information about definitions.] {index}[#print]
 -/
 #reduce plus1
 #print plus1

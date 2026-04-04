@@ -208,7 +208,7 @@ inductive BadSum (α : Type u) (β : Type v) : Type (max u v)
   | inr (x : β) : BadSum β α
 ```
 
-We can define a version of `Prod` in a convoluted way.
+We can define a version of `Prod` in a convoluted way, making use of the fact that `(λ t ↦ t) α` is definitionally equal to `\alpha`.
 -/
 inductive Pro'' (α : Type u) (β : Type v) : Type (max u v)
   where
@@ -218,7 +218,7 @@ inductive Pro'' (α : Type u) (β : Type v) : Type (max u v)
 #print Pro''
 /-
 
-The following user-facing surface syntax is also supported.
+The following user-facing surface syntax is also supported. This syntax is relevant because `Eq` makes use of it, as we will see shortly.
 -/
 inductive Pr''' :
   (α : Type u) → (β : Type v) → Type (max u v)
@@ -438,7 +438,7 @@ tag := "sec-well-formedness"
 
 [well-formedness-req]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#well-formed-inductives
 
-Inductive type definintions are subject to a number of [well-formedness requirements][well-formedness-req]. The _basic shape requirements_ are:
+Inductive type definitions are subject to a number of [well-formedness requirements][well-formedness-req]. The _basic shape requirements_ are:
 
 * The type or codomain of the type constructor is a universe.
 * The type or codomain of each constructor is a saturated application of the type constructor.

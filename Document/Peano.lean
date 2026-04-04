@@ -122,7 +122,7 @@ example (P : ℕ → Prop) :
 
 # Recursion
 
-Axiom of induction can be proven using pattern matching together with [structural recursion][structural-recursion].
+The axiom of induction can be proven using pattern matching together with [structural recursion][structural-recursion].
 
 [structural-recursion]: https://lean-lang.org/doc/reference/latest/Definitions/Recursive-Definitions/#structural-recursion
 

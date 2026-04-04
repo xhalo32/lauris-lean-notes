@@ -90,7 +90,7 @@ Propositions are expressions of type {lean}`Prop`.
 example : Prop := 0 = 0
 example : Prop := 1 = 0
 /-
-The first proposition is provable, while the second is not.{margin}[In fact, the negation of `1 = 0` is a consequence  the Peano axioms that we prove {ref "sec-peano"}[later]] Interestingly, the proposition `0 = 0` is itself a type,{margin}[The expression `0 = 0` is syntactic sugar for `Eq 0 0`. We will {ref "sec-equality"}[return] to this later.] and an expression of type `0 = 0` encodes a proof of `0 = 0`. In general, all expressions of type {lean}`Prop` are themselves types. To prove a proposition in Lean is to construct an expression inabiting the proposition.
+The first proposition is provable, while the second is not.{margin}[In fact, the negation of `1 = 0` is a consequence  of the Peano axioms that we prove {ref "sec-peano"}[later]] Interestingly, the proposition `0 = 0` is itself a type,{margin}[The expression `0 = 0` is syntactic sugar for `Eq 0 0`. We will {ref "sec-equality"}[return] to this later.] and an expression of type `0 = 0` encodes a proof of `0 = 0`. In general, all expressions of type {lean}`Prop` are themselves types. To prove a proposition in Lean is to construct an expression inhabiting the proposition.
 -/
 example : 0 = 0 := rfl
 /-

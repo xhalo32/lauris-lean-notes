@@ -10,7 +10,7 @@ import Mathlib.Data.Nat.Init
 -- -show
 namespace Document.Equality
 /-
-[First-order logic with equality][first-order-logic-with-eq] impose two axioms, reflexivity and substitution principle, on equality.{margin}[Substitution principle is also called Leibniz's law.] These two axioms imply its remaining [basic properties][eq-basic-properties], including symmetry and transitivity. In Lean, reflexivity is the most fundamental property, as it is an interface to definitional equality.
+[First-order logic with equality][first-order-logic-with-eq] imposes two axioms, reflexivity and substitution principle, on equality.{margin}[Substitution principle is also called Leibniz's law.] These two axioms imply its remaining [basic properties][eq-basic-properties], including symmetry and transitivity. In Lean, reflexivity is the most fundamental property, as it is an interface to definitional equality.
 
 [first-order-logic-with-eq]: https://en.wikipedia.org/wiki/First-order_logic#Equality_and_its_axioms
 [eq-basic-properties]: https://en.wikipedia.org/wiki/Equality_(mathematics)#Basic_properties
@@ -301,7 +301,7 @@ example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
     _ = m := rfl
 /-
 
-Lean generates an injectivity theorem for each constructor taking fields, unless those fields appear in constructor's codomain.
+Lean generates an injectivity theorem for each constructor taking fields, unless those fields appear in the constructor's codomain.
 -/
 example (n m : ℕ) (h : Nat.succ n = Nat.succ m) : n = m
 := Nat.succ.inj h
