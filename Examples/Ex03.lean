@@ -3,6 +3,10 @@ import Mathlib
 
 # Currying
 
+[Currying][currying] is the technique of translating a function that takes a pair as its argument into a function whose codomain is a function type.
+
+[currying]: https://en.wikipedia.org/wiki/Currying
+
 Consider
 -/
 def curry {α β γ : Type} (f : α × β → γ) : α → β → γ :=
