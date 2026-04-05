@@ -1,6 +1,120 @@
 import Mathlib
 /-
 
+# Equivalence of types
+
+Recall that currying, together with its inverse, establishes the equivalence `(α × β → γ) ≃ (α → β → γ)`. Here `≃` is syntactic sugar for a structure. Find this structure and write your own version of it.
+-/
+variable (α β : Type)
+set_option pp.notation false in
+#reduce α ≃ β
+
+example : (α ≃ β) = (Equiv α β) := rfl
+
+#print Equiv
+#print Function.LeftInverse
+#print Function.RightInverse
+
+-- Equiv uses [default values](https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#structure-fields)
+-- We omit default values in our versions
+
+-- A version unpacking `left_inv` and `right_inv`
+structure Equiv' (α β : Type) where
+  toFun : α → β
+  invFun : β → α
+  left_inv : ∀ (a : α), invFun (toFun a) = a
+  right_inv : ∀ (b : β), toFun (invFun b) = b
+
+-- A version using our own `LeftInverse` and `RightInverse`
+def LeftInverse {α β : Type}
+  (l : β → α) (f : α → β) : Prop :=
+  ∀ (x : α), l (f x) = x
+
+def RightInverse {α β : Type}
+  (r : β → α) (f : α → β) : Prop :=
+  LeftInverse f r
+
+structure Equiv'' (α β : Type) where
+  toFun : α → β
+  invFun : β → α
+  left_inv : LeftInverse invFun toFun
+  right_inv : RightInverse invFun toFun
+/-
+
+
+# Embedding of types
+
+Embedding of types is written as `α ↪ β`. Here `↪` is syntactic sugar for a structure. Find this structure and write your own version of it using `Injective`.
+-/
+def Injective {α β : Type} (f : α → β) : Prop :=
+  ∀ x y : α, f x = f y → x = y
+
+-- __Solution__
+set_option pp.notation false in
+#reduce α ↪ β
+
+example : (α ↪ β) = (Function.Embedding α β) := rfl
+
+#print Function.Embedding
+#print Function.Injective
+
+structure Embedding' (α β : Type) where
+  toFun : α → β
+  inj' : Injective toFun
+/-
+
+Equivalence `α ≃ β` gives `α ↪ β`.
+-/
+-- Recall our earlier proof
+lemma left_inv_inj {α β : Type} (f : α → β) (l : β → α)
+  (h : l ∘ f = id)
+  : Injective f
+:= by
+  intro a a' hf
+  calc
+    a
+    _ = id a := by rfl
+    _ = (l ∘ f) a := by rw [h]
+    _ = l (f a) := by rfl
+    _ = l (f a') := by rw [hf]
+    _ = (l ∘ f) a' := by rfl
+    _ = id a' := by rw [h]
+    _ = a' := by rfl
+
+example (α β : Type)
+  (e : α ≃ β)
+  : α ↪ β
+where
+  toFun := e.toFun
+  inj'  := by
+    apply left_inv_inj e.toFun e.invFun
+    funext a
+    calc
+      (e.invFun ∘ e.toFun) a
+      _ = e.invFun (e.toFun a) := by rfl
+      _ = a := by rw [e.left_inv]
+      _ = id a := by rfl
+/-
+
+Show that `α ≃ β` gives `β ↪ α`.
+-/
+example (α β : Type)
+  (e : α ≃ β)
+  : β ↪ α
+where
+  toFun := e.invFun
+  inj'  := by
+    -- __Solution__
+    apply left_inv_inj e.invFun e.toFun
+    funext b
+    calc
+      (e.toFun ∘ e.invFun) b
+      _ = e.toFun (e.invFun b) := by rfl
+      _ = b := by rw [e.right_inv]
+      _ = id b := by rfl
+/-
+
+
 # Components of sum
 
 Show `α ⊕ β ≃ β ⊕ α`.
