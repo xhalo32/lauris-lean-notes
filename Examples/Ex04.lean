@@ -291,7 +291,7 @@ example (α : Type)
   exact h
 /-
 
-A constant function is injective only if the domain has at most one element.
+A constant function is injective only if its domain has at most one element.
 -/
 example (α β : Type) (b : β)
   (h : Injective (λ _ : α ↦ b))

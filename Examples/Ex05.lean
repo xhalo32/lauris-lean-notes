@@ -139,7 +139,8 @@ def uninjs {α β γ : Type} :
   | Sum.inl a => p.1 a
   | Sum.inr b => p.2 b
 
-example (α β γ : Type) : (α ⊕ β → γ) ≃ (α → γ) × (β → γ) where
+example (α β γ : Type) : (α ⊕ β → γ) ≃ (α → γ) × (β → γ)
+  where
   toFun := injs
   invFun := uninjs
   left_inv := by
