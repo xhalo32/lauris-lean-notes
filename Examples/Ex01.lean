@@ -16,14 +16,16 @@ lemma diff_sq (x y : ℝ)
 Proof uses
 
 * properties of ℝ as a commutative ring
-* classical logic (grind uses techniques inspired by modern SMT solvers, it always attempts to derive a contradiction)
+* classical logic (grind uses techniques inspired by modern [SMT][SMT] solvers, it always attempts to derive a contradiction)
 
 Lean consists of
 
 * High level automation
 * Low level proof checked by a relatively simple (< 9000 lines of code) program called the kernel.
--/
 
+[SMT]: https://en.wikipedia.org/wiki/Satisfiability_modulo_theories
+
+-/
 example (a b c : ℕ)
   : a * b * c = b * c * a
 := by
@@ -37,16 +39,20 @@ example (G : Type) [Semigroup G] (a b c : G)
   grind
 
 #print Semigroup
-
 /-
-Magma is a set with a closed binary operation. A semigroup is a magma whose binary operation is associative. Magma is called Mul in Lean.
+
+[Magma][magma] is a set with a closed binary operation. A [semigroup][semigroup] is a magma whose binary operation is associative. Magma is called `Mul` in Lean.
+
+[magma]: https://en.wikipedia.org/wiki/Magma_(algebra)
+[semigroup]: https://en.wikipedia.org/wiki/Semigroup
+
+We define our own version of `Semigroup`.
 -/
 class Semigroup' (G : Type) extends Mul G where
   mul_assoc : ∀ a b c : G, (a * b) * c = a * (b * c)
 /-
 
-We need to write a step by step proof (or implement further automation).
-
+When using this version, we need to write a step by step proof (or implement further automation).
 -/
 example (G : Type) [Semigroup' G] (a b c : G)
   (h1 : a * b = b * a)
