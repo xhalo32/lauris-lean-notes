@@ -240,18 +240,14 @@ example (α β γ : Type) : (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ) where
   left_inv := by
     intro s
     cases s with
-    | inl ab =>
-      cases ab <;> rfl
-    | inr c =>
-      rfl
+    | inl ab => cases ab <;> rfl
+    | inr c => rfl
   right_inv := by
     -- __Solution__
     intro s
     cases s with
-    | inl a =>
-      rfl
-    | inr bc =>
-      cases bc <;> rfl
+    | inl a => rfl
+    | inr bc => cases bc <;> rfl
 /-
 
 Here is a variation of `left_inv`.
