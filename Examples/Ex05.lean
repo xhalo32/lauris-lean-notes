@@ -115,15 +115,61 @@ where
 /-
 
 
-# Components of sum
+# Universal property of coproduct
 
-Show `α ⊕ β ≃ β ⊕ α`.
+`Sum` is a [coproduct][coproduct] in the sense of category theory, that is, it satisfies the below universal property.
+
+[coproduct]: https://en.wikipedia.org/wiki/Coproduct
+
+Consider
+-/
+def injs {α β γ : Type} :
+  (α ⊕ β → γ) → (α → γ) × (β → γ)
+  :=
+  λ f ↦ (λ a ↦ f (Sum.inl a), λ b ↦ f (Sum.inr b))
+/-
+
+Show that `injs` gives the equivalence
+`(α ⊕ β → γ) ≃ (α → γ) × (β → γ)`.
+-/
+def uninjs {α β γ : Type} :
+  (α → γ) × (β → γ) → (α ⊕ β → γ)
+  :=
+  λ p ↦ λ s ↦ match s with
+  | Sum.inl a => p.1 a
+  | Sum.inr b => p.2 b
+
+example (α β γ : Type) : (α ⊕ β → γ) ≃ (α → γ) × (β → γ) where
+  toFun := injs
+  invFun := uninjs
+  left_inv := by
+    intro f
+    funext s
+    cases s with
+    | inl a => rfl
+    | inr b => rfl
+  right_inv := by
+    intro p
+    rfl
+/-
+
+
+# Sum as symmetric monoidal category
+
+## Symmetry
+
+Consider the swap map
 -/
 def swap {α β : Type} (s : α ⊕ β) : β ⊕ α :=
   match s with
   | Sum.inl a => Sum.inr a
   | Sum.inr b => Sum.inl b
+/-
 
+Show that `swap` gives the equivalence
+`α ⊕ β ≃ β ⊕ α`.
+-/
+-- __Solution__
 lemma swap_swap {α β : Type} (s : α ⊕ β)
   : swap (swap s) = s
 := by
@@ -140,17 +186,8 @@ example (α β γ : Type) : α ⊕ β ≃ β ⊕ α where
   right_inv := by
     intro s
     exact swap_swap s
-/-
 
-Here are some variations of `swap_swap`.
--/
-example (α β : Type) (s : α ⊕ β)
-  : swap (swap s) = s
-:= by
-  cases s with
-  | inl => rfl
-  | inr => rfl
-
+-- Here are some variations of `swap_swap`.
 example (α β : Type) (s : α ⊕ β)
   : swap (swap s) = s
 := by
@@ -171,7 +208,10 @@ example (α β : Type) (s : α ⊕ β)
   · rfl
 /-
 
-Show `(α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ)`.
+
+## Associativity
+
+Consider
 -/
 def assoc {α β γ : Type} :
   (α ⊕ β) ⊕ γ → α ⊕ (β ⊕ γ)
@@ -180,7 +220,11 @@ def assoc {α β γ : Type} :
   | Sum.inl (Sum.inl a) => Sum.inl a
   | Sum.inl (Sum.inr b) => Sum.inr (Sum.inl b)
   | Sum.inr c           => Sum.inr (Sum.inr c)
+/-
 
+Show that `assoc` gives the equivalence
+`(α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ)`.
+-/
 def unassoc {α β γ : Type} :
   α ⊕ (β ⊕ γ) → (α ⊕ β) ⊕ γ
   :=
@@ -189,38 +233,27 @@ def unassoc {α β γ : Type} :
   | Sum.inr (Sum.inl b) => Sum.inl (Sum.inr b)
   | Sum.inr (Sum.inr c) => Sum.inr c
 
-lemma un_assoc {α β γ : Type} (s : (α ⊕ β) ⊕ γ)
-  : unassoc (assoc s) = s
-:= by
-  cases s with
-  | inl ab =>
-    cases ab <;> rfl
-  | inr c =>
-    rfl
-
-lemma assoc_un {α β γ : Type} (s : α ⊕ (β ⊕ γ))
-  : assoc (unassoc s) = s
-:= by
-  -- __Solution__
-  cases s with
-  | inl a =>
-    rfl
-  | inr bc =>
-    cases bc <;> rfl
-
--- __Solution__ packaging into `≃`
 example (α β γ : Type) : (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ) where
   toFun := assoc
   invFun := unassoc
   left_inv := by
     intro s
-    exact un_assoc s
+    cases s with
+    | inl ab =>
+      cases ab <;> rfl
+    | inr c =>
+      rfl
   right_inv := by
+    -- __Solution__
     intro s
-    exact assoc_un s
+    cases s with
+    | inl a =>
+      rfl
+    | inr bc =>
+      cases bc <;> rfl
 /-
 
-Here is a variation of `un_assoc`.
+Here is a variation of `left_inv`.
 -/
 example (α β γ : Type) (s : (α ⊕ β) ⊕ γ)
   : unassoc (assoc s) = s
@@ -231,7 +264,52 @@ example (α β γ : Type) (s : (α ⊕ β) ⊕ γ)
   . rfl
 /-
 
-# Products and sums together
+
+## Unit coherence
+
+`Empty` is the canonical type with no elements. It is the monoidal unit for `Sum`.
+
+Show `α ⊕ Empty ≃ α`.
+-/
+example (α : Type) : α ⊕ Empty ≃ α where
+  toFun :=
+    λ s ↦ match s with
+    | Sum.inl a => a
+    | Sum.inr e => e.elim
+  invFun := λ a ↦ Sum.inl a
+  left_inv := by
+    intro s
+    cases s with
+    | inl a => rfl
+    | inr e => exact e.elim
+  right_inv := by
+    intro a
+    rfl
+/-
+
+Show `Empty ⊕ α ≃ α`.
+-/
+-- __Solution__
+example (α : Type) : Empty ⊕ α ≃ α where
+  toFun :=
+    λ s ↦ match s with
+    | Sum.inl e => e.elim
+    | Sum.inr a => a
+  invFun := λ a ↦ Sum.inr a
+  left_inv := by
+    intro s
+    cases s with
+    | inl e => exact e.elim
+    | inr a => rfl
+  right_inv := by
+    intro a
+    rfl
+/-
+
+
+# Product and sum as distributive category
+
+`Prod` and `Sum` form a [distributive category](https://en.wikipedia.org/wiki/Distributive_category).
 
 Show `α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)`.
 -/
@@ -250,36 +328,20 @@ def factor {α β γ : Type} :
   | Sum.inl p => (p.1, Sum.inl p.2)
   | Sum.inr p => (p.1, Sum.inr p.2)
 
-lemma factor_distrib {α β γ : Type} (p : α × (β ⊕ γ))
-  : factor (distrib p) = p
-:= by
-  cases p with
-  | mk a s =>
-    cases s <;> rfl
-
-lemma distrib_factor {α β γ : Type} (s : (α × β) ⊕ (α × γ))
-  : distrib (factor s) = s
-:= by
-  cases s with
-  | inl p =>
-    cases p
-    rfl
-  | inr p =>
-    cases p
-    rfl
-
 example (α β γ : Type) : α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)
   where
   toFun := distrib
   invFun := factor
   left_inv := by
-    intro p
-    exact factor_distrib p
+    intro ⟨a, s⟩
+    cases s <;> rfl
   right_inv := by
     intro s
-    exact distrib_factor s
+    cases s with
+    | inl p => rfl
+    | inr p => rfl
 
--- Here is a variation of `factor_distrib`
+-- Here is a variation of `left_inv`
 example (α β γ : Type) (p : α × (β ⊕ γ))
   : factor (distrib p) = p
 := by
@@ -287,153 +349,10 @@ example (α β γ : Type) (p : α × (β ⊕ γ))
   · rfl
   · rfl
 
--- Here is a variation of `distrib_factor`
+-- Here is a variation of `right_inv`
 example (α β γ : Type) (s : (α × β) ⊕ (α × γ))
   : distrib (factor s) = s
 := by
   obtain (⟨a, b⟩ | ⟨a, c⟩) := s
   · rfl
   · rfl
-/-
-
-
-# Function from a sum
-
-Function from a disjoint union is determined by its restrictions.
--/
-example (α β γ : Type) (f g : α ⊕ β → γ) (x : α ⊕ β)
-  (hl : ∀ a, f (Sum.inl a) = g (Sum.inl a))
-  (hr : ∀ b, f (Sum.inr b) = g (Sum.inr b))
-  : f x = g x
-:= by
-  obtain (a | b) := x
-  · -- 1st case x = a : α
-    -- __Solution__
-    exact hl a
-  · -- 2nd case x = b : β
-    -- __Solution__
-    exact hr b
-
--- __Solution__ using grind
-example (α β γ : Type) (f g : α ⊕ β → γ) (x : α ⊕ β)
-  (hl : ∀ a, f (Sum.inl a) = g (Sum.inl a))
-  (hr : ∀ b, f (Sum.inr b) = g (Sum.inr b))
-  : f x = g x
-:= by
-  grind
-/-
-
-A slightly harder variant.
--/
-example (α β γ : Type) (f g : α ⊕ β → γ)
-  (hl : (λ a ↦ f (Sum.inl a)) = (λ a ↦ g (Sum.inl a)))
-  (hr : (λ b ↦ f (Sum.inr b)) = (λ b ↦ g (Sum.inr b)))
-  : f = g
-:= by
-  -- __Solution__
-  funext x
-  obtain (a | b) := x
-  · calc
-    f (Sum.inl a)
-    _ = (λ a ↦ f (Sum.inl a)) a := by rfl
-    _ = (λ a ↦ g (Sum.inl a)) a := by rw [hl]
-    _ = g (Sum.inl a) := by rfl
-  · calc
-    f (Sum.inr b)
-    _ = (λ b ↦ f (Sum.inr b)) b := by rfl
-    _ = (λ b ↦ g (Sum.inr b)) b := by rw [hr]
-    _ = g (Sum.inr b) := by rfl
-/-
-
-
-# Pairs and equality
-
-Extensionality of pairs.
--/
-lemma prod_ext {α β : Type} {p q : α × β}
-  (h1 : p.1 = q.1)
-  (h2 : p.2 = q.2)
-  : p = q
-:= by
-  obtain ⟨p1, p2⟩ := p
-  obtain ⟨q1, q2⟩ := q
-  cases h1
-  cases h2
-  rfl
-
-example (α β : Type) (p q : α × β)
-  (h1 : p.1 = q.1)
-  (h2 : p.2 = q.2)
-  : p = q
-:= by
-  grind
-/-
-
-Equality of pairs implies equality of components.
--/
-example (α β : Type) (p q : α × β)
-  (h : p = q)
-  : p.1 = q.1
-:= by
-  -- __Solution__
-  cases h
-  rfl
-
--- __Solution__ by grind
-example (α β : Type) (p q : α × β)
-  (h : p = q)
-  : p.1 = q.1
-:= by
-  grind
-/-
-
-
-# Function to a product
-
-Function to a product is determined by its components.
--/
-example (α β γ : Type) (f g : α → β × γ) (a : α)
-  (h1 : ∀ a, (f a).1 = (g a).1)
-  (h2 : ∀ a, (f a).2 = (g a).2)
-  : f a = g a
-:= by
-  apply prod_ext
-  · -- 1st case/component
-    -- __Solution__
-    exact h1 a
-  · -- 2nd case/component
-    -- __Solution__
-    exact h2 a
-
--- __Solution__ using grind
-example (α β γ : Type) (f g : α → β × γ) (a : α)
-  (h1 : ∀ a, (f a).1 = (g a).1)
-  (h2 : ∀ a, (f a).2 = (g a).2)
-  : f a = g a
-:= by
-  grind
-/-
-
-A slightly harder variant.
--/
-example (α β γ : Type) (f g : α → β × γ)
-  (h1 : (λ a ↦ (f a).1) = (λ a ↦ (g a).1))
-  (h2 : (λ a ↦ (f a).2) = (λ a ↦ (g a).2))
-  : f = g
-:= by
-  funext a
-  apply prod_ext
-  · -- 1st case/component
-    -- __Solution__
-    calc
-    (f a).1
-    _ = (λ a ↦ (f a).1) a := by rfl
-    _ = (λ a ↦ (g a).1) a := by rw [h1]
-    _ = (g a).1 := by rfl
-  · -- 2nd case/component
-    -- __Solution__
-    calc
-    (f a).2
-    _ = (λ a ↦ (f a).2) a := by rfl
-    _ = (λ a ↦ (g a).2) a := by rw [h2]
-    _ = (g a).2 := by rfl

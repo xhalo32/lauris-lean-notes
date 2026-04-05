@@ -13,17 +13,18 @@ def curry {α β γ : Type} (f : α × β → γ) : α → β → γ :=
   λ a b ↦ f (a, b)
 /-
 
-Find an inverse of `curry` and show that it is indeed an inverse. Moreover, show `(α × β → γ) ≃ (α → β → γ)`.
+Find an inverse of `curry` and show that it is indeed an inverse. Moreover, show that `curry` gives the equivalence
+`(α × β → γ) ≃ (α → β → γ)`.
 -/
 def uncurry {α β γ : Type} (g : α → β → γ) : α × β → γ :=
   λ p ↦ g p.1 p.2
 
-lemma un_curry {α β γ : Type} (f : α × β → γ)
+lemma uncurry_curry {α β γ : Type} (f : α × β → γ)
   : uncurry (curry f) = f
 := by
   rfl
 
-lemma curry_un {α β γ : Type} (g : α → β → γ)
+lemma curry_uncurry {α β γ : Type} (g : α → β → γ)
   : curry (uncurry g) = g
 := by
   rfl
@@ -33,24 +34,64 @@ example (α β γ : Type) : (α × β → γ) ≃ (α → β → γ) where
   invFun := uncurry
   left_inv := by
     intro f
-    exact un_curry f
+    exact uncurry_curry f
   right_inv := by
     intro f
-    exact curry_un f
+    exact curry_uncurry f
 /-
 
 
-# Components of product
+# Universal property of product
 
-## Swapping the components of a product
+`Prod` is a [product][product] in the sense of category theory, that is, it satisfies the below universal property.
+
+[product]: https://en.wikipedia.org/wiki/Product_(category_theory)
 
 Consider
+-/
+def projs {α β γ : Type} :
+  (α → β × γ) → (α → β) × (α → γ)
+  :=
+  λ f ↦ (λ a ↦ (f a).1, λ a ↦ (f a).2)
+/-
+
+Show that `projs` gives the equivalence
+`(α → β × γ) ≃ (α → β) × (α → γ)`.
+-/
+-- __Solution__
+def unprojs {α β γ : Type} :
+  (α → β) × (α → γ) → (α → β × γ)
+  :=
+  λ p ↦ λ a ↦ (p.1 a, p.2 a)
+
+example (α β γ : Type) : (α → β × γ) ≃ (α → β) × (α → γ) where
+  toFun := projs
+  invFun := unprojs
+  left_inv := by
+    intro f
+    rfl
+  right_inv := by
+    intro p
+    rfl
+/-
+
+
+# Product as symmetric monoidal category
+
+Let us show that `Prod` forms a
+[symmetric monoidal category](https://en.wikipedia.org/wiki/Symmetric_monoidal_category).
+
+
+## Symmetry
+
+Consider the swap map
 -/
 def swap {α β : Type} : α × β → β × α :=
   λ p ↦ (p.2, p.1)
 /-
 
-Find an inverse of `swap` and show that is indeed an inverse. Moreover, show `α × β ≃ β × α`.
+Show that `swap` gives the equivalence
+`α × β ≃ β × α`.
 -/
 -- __Solution__
 lemma swap_swap {α β : Type} (p : α × β)
@@ -70,7 +111,7 @@ example (α β : Type) : α × β ≃ β × α where
 /-
 
 
-## Associating nested products
+## Associativity
 
 Consider
 -/
@@ -78,31 +119,54 @@ def assoc {α β γ : Type} : (α × β) × γ → α × (β × γ) :=
   λ p ↦ (p.1.1, (p.1.2, p.2))
 /-
 
-Find an inverse of `assoc` and show that is indeed an inverse. Moreover, show `(α × β) × γ ≃ α × (β × γ)`.
+Show that `assoc` gives the equivalence
+`(α × β) × γ ≃ α × (β × γ)`.
 -/
 -- __Solution__
 def unassoc {α β γ : Type} : α × (β × γ) → (α × β) × γ :=
   λ p ↦ ((p.1, p.2.1), p.2.2)
-
-lemma un_assoc {α β γ : Type} (p : (α × β) × γ)
-  : unassoc (assoc p) = p
-:= by
-  rfl
-
-lemma assoc_un {α β γ : Type} (p : α × (β × γ))
-  : assoc (unassoc p) = p
-:= by
-  rfl
 
 example (α β γ : Type) : (α × β) × γ ≃ α × (β × γ) where
   toFun := assoc
   invFun := unassoc
   left_inv := by
     intro p
-    exact un_assoc p
+    rfl
   right_inv := by
     intro p
-    exact assoc_un p
+    rfl
+/-
+
+
+## Unit coherence
+
+`Unit` is the canonical type with one element. It is the monoidal unit for `Prod`, and its unique element is written `()`.
+
+Show `α × Unit ≃ α`.
+-/
+example (α : Type) : α × Unit ≃ α where
+  toFun := λ p ↦ p.1
+  invFun := λ a ↦ (a, ())
+  left_inv := by
+    intro a
+    rfl
+  right_inv := by
+    intro a
+    rfl
+/-
+
+Show `Unit × α ≃ α `.
+-/
+-- __Solution__
+example (α : Type) : Unit × α ≃ α where
+  toFun := λ p ↦ p.2
+  invFun := λ a ↦ ((), a)
+  left_inv := by
+    intro a
+    rfl
+  right_inv := by
+    intro a
+    rfl
 /-
 
 
