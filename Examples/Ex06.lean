@@ -103,7 +103,7 @@ example (p q : Prop) (h : p → q) : p ↪ q where
 
 # Universal property of product
 
-Show the universal property of `And` as a product in sense of category theory.
+Show the universal property of `And` as a product.
 -/
 example (p q r : Prop)
   : (p → q ∧ r) ↔ ((p → q) ∧ (p → r))
@@ -132,7 +132,7 @@ example (p q r : Prop)
 
 # Universal property of coproduct
 
-Show the universal property of `Or` as a coproduct in sense of category theory.
+Show the universal property of `Or` as a coproduct.
 -/
 example (p q r : Prop)
   : (p ∨ q → r) ↔ ((p → r) ∧ (q → r))
@@ -161,7 +161,7 @@ example (p q r : Prop)
 
 # Conjunction as symmetric monoidal category
 
-Like `Prod`, `And` forms a symmetric monoidal category.
+Like `Prod`, `And` forms a symmetric monoidal category. Since `MonoidalCategory`  applies to types rather than propositions, we cannot declare `And` its instance.
 
 Show the symmetry
 -/

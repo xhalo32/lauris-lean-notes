@@ -3,7 +3,7 @@ import Mathlib
 
 # Equivalence of types
 
-Recall that currying, together with its inverse, establishes the equivalence `(α × β → γ) ≃ (α → β → γ)`. Here `≃` is syntactic sugar for a structure. Find this structure and write your own version of it.
+Recall that currying, together with its inverse, establishes the equivalence `(α × β → γ) ≃ (α → β → γ)`. Here `≃` is syntactic sugar for a structure. Find this structure.
 -/
 variable (α β : Type)
 set_option pp.notation false in
@@ -14,10 +14,14 @@ example : (α ≃ β) = (Equiv α β) := rfl
 #print Equiv
 #print Function.LeftInverse
 #print Function.RightInverse
+/-
 
--- Equiv uses [default values](https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#structure-fields)
--- We omit default values in our versions
+`Equiv` uses [default values][defaults] enabling the automation that we used earlier for currying among other things.
 
+[defaults]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#structure-fields
+
+Write your own version of `Equiv` omitting the default values.
+-/
 -- A version unpacking `left_inv` and `right_inv`
 structure Equiv' (α β : Type) where
   toFun : α → β
@@ -66,7 +70,7 @@ structure Embedding (α β : Type) where
 
 # Universal property of coproduct
 
-`Sum` is a [coproduct][coproduct] in the sense of category theory, that is, it satisfies the below universal property.
+`Sum` is a [coproduct][coproduct] in the sense that it satisfies the below universal property.
 
 [coproduct]: https://en.wikipedia.org/wiki/Coproduct
 
@@ -128,7 +132,7 @@ lemma swap_swap {α β : Type} (s : α ⊕ β)
   | inl a => rfl
   | inr b => rfl
 
-example (α β γ : Type) : α ⊕ β ≃ β ⊕ α where
+def braiding {α β : Type} : α ⊕ β ≃ β ⊕ α where
   toFun := swap
   invFun := swap
   left_inv := by
@@ -184,7 +188,9 @@ def unassoc {α β γ : Type} :
   | Sum.inr (Sum.inl b) => Sum.inl (Sum.inr b)
   | Sum.inr (Sum.inr c) => Sum.inr c
 
-example (α β γ : Type) : (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ) where
+def sum_associator {α β γ : Type} :
+  (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ)
+where
   toFun := assoc
   invFun := unassoc
   left_inv := by
@@ -205,10 +211,7 @@ Here is a variation of `left_inv`.
 example (α β γ : Type) (s : (α ⊕ β) ⊕ γ)
   : unassoc (assoc s) = s
 := by
-  obtain ((a | b) | c) := s
-  · rfl
-  · rfl
-  . rfl
+  obtain ((_ | _) | _) := s <;> rfl
 /-
 
 
@@ -216,28 +219,9 @@ example (α β γ : Type) (s : (α ⊕ β) ⊕ γ)
 
 `Empty` is the canonical type with no elements. It is the monoidal unit for `Sum`.
 
-Show `α ⊕ Empty ≃ α`.
--/
-example (α : Type) : α ⊕ Empty ≃ α where
-  toFun :=
-    λ s ↦ match s with
-    | Sum.inl a => a
-    | Sum.inr e => e.elim
-  invFun := λ a ↦ Sum.inl a
-  left_inv := by
-    intro s
-    cases s with
-    | inl a => rfl
-    | inr e => exact e.elim
-  right_inv := by
-    intro a
-    rfl
-/-
-
 Show `Empty ⊕ α ≃ α`.
 -/
--- __Solution__
-example (α : Type) : Empty ⊕ α ≃ α where
+def leftUnitor {α : Type} : Empty ⊕ α ≃ α where
   toFun :=
     λ s ↦ match s with
     | Sum.inl e => e.elim
@@ -248,9 +232,23 @@ example (α : Type) : Empty ⊕ α ≃ α where
     cases s with
     | inl e => exact e.elim
     | inr a => rfl
-  right_inv := by
-    intro a
-    rfl
+/-
+Observe that the default value works for `right_inv`.
+
+Show `α ⊕ Empty ≃ α`.
+-/
+-- __Solution__
+def rightUnitor {α : Type} : α ⊕ Empty ≃ α where
+  toFun :=
+    λ s ↦ match s with
+    | Sum.inl a => a
+    | Sum.inr e => e.elim
+  invFun := λ a ↦ Sum.inl a
+  left_inv := by
+    intro s
+    cases s with
+    | inl a => rfl
+    | inr e => exact e.elim
 /-
 
 
@@ -275,7 +273,8 @@ def factor {α β γ : Type} :
   | Sum.inl p => (p.1, Sum.inl p.2)
   | Sum.inr p => (p.1, Sum.inr p.2)
 
-example (α β γ : Type) : α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)
+def prod_sum_distrib {α β γ : Type} :
+  α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)
   where
   toFun := distrib
   invFun := factor
@@ -290,14 +289,74 @@ example (α β γ : Type) : α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)
 example (α β γ : Type) (p : α × (β ⊕ γ))
   : factor (distrib p) = p
 := by
-  obtain ⟨a, (b | c)⟩ := p
-  · rfl
-  · rfl
+  obtain ⟨_, (_ | _)⟩ := p <;> rfl
 
 -- Here is a variation of `right_inv`
 example (α β γ : Type) (s : (α × β) ⊕ (α × γ))
   : distrib (factor s) = s
 := by
-  obtain (⟨a, b⟩ | ⟨a, c⟩) := s
-  · rfl
-  · rfl
+  obtain (⟨_, _⟩ | ⟨_, _⟩) := s <;> rfl
+/-
+
+
+# Further remarks
+
+We can show that `Sum`, `Empty`, and
+-/
+def tensorHom {α β γ δ : Type}
+  (f : α → γ) (g : β → δ) (s : α ⊕ β) : γ ⊕ δ :=
+  match s with
+  | Sum.inl a => Sum.inl (f a)
+  | Sum.inr b => Sum.inr (g b)
+/-
+form a `MonoidalCategory`.
+-/
+-- This is more of a remark than a problem, but it depends on the solutions above.
+-- __Solution__
+def whiskerLeft {α β δ : Type}
+  (g : β → δ) := tensorHom (id : α → α) g
+
+def whiskerRight {α β γ : Type}
+  (f : α → γ) := tensorHom f (id : β → β)
+
+instance : CategoryTheory.MonoidalCategory Type where
+  tensorObj := Sum
+  tensorUnit := Empty
+  tensorHom := tensorHom
+  whiskerLeft _ _ _ := whiskerLeft
+  whiskerRight f _ := whiskerRight f
+  associator _ _ _ := sum_associator.toIso
+  leftUnitor _ := leftUnitor.toIso
+  rightUnitor _ := rightUnitor.toIso
+/-
+
+In order to show that this category is symmetric, we need to provide several properties that the automation fails to prove.
+-/
+-- This is more of a remark than a problem, but it depends on the solutions above.
+-- __Solution__
+instance : CategoryTheory.SymmetricCategory Type where
+  braiding _ _ := braiding.toIso
+  braiding_naturality_left _ _ := by
+    funext s
+    cases s <;> rfl
+  braiding_naturality_right _ _ := by
+    intros
+    funext s
+    cases s <;> rfl
+  hexagon_forward _ _ _ := by
+    funext s
+    obtain ((_ | _) | _) := s <;> rfl
+  hexagon_reverse _ _ _ := by
+    funext s
+    obtain (_ | (_ | _)) := s <;> rfl
+  symmetry _ _ := by
+    funext s
+    cases s <;> rfl
+/-
+
+We omit showing that `Prod` and `Sum` form
+-/
+#print CategoryTheory.IsMonoidalDistrib
+/-
+Showing this would require combining the monoidal structures of `Prod` and `Sum` and lies beyond our scope.
+-/

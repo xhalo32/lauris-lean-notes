@@ -40,10 +40,17 @@ example (α β γ : Type) : (α × β → γ) ≃ (α → β → γ) where
     exact curry_uncurry f
 /-
 
+Lean can prove automatically that `uncurry` is an inverse of `curry`.
+-/
+example (α β γ : Type) : (α × β → γ) ≃ (α → β → γ) where
+  toFun := curry
+  invFun := uncurry
+/-
+
 
 # Universal property of product
 
-`Prod` is a [product][product] in the sense of category theory, that is, it satisfies the below universal property.
+`Prod` is a [product][product] in the sense that it satisfies the below universal property.
 
 [product]: https://en.wikipedia.org/wiki/Product_(category_theory)
 
@@ -64,15 +71,10 @@ def unprojs {α β γ : Type} :
   :=
   λ p ↦ λ a ↦ (p.1 a, p.2 a)
 
-example (α β γ : Type) : (α → β × γ) ≃ (α → β) × (α → γ) where
+example (α β γ : Type) : (α → β × γ) ≃ (α → β) × (α → γ)
+where
   toFun := projs
   invFun := unprojs
-  left_inv := by
-    intro f
-    rfl
-  right_inv := by
-    intro p
-    rfl
 /-
 
 
@@ -94,20 +96,9 @@ Show that `swap` gives the equivalence
 `α × β ≃ β × α`.
 -/
 -- __Solution__
-lemma swap_swap {α β : Type} (p : α × β)
-  : swap (swap p) = p
-:= by
-  rfl
-
 example (α β : Type) : α × β ≃ β × α where
   toFun := swap
   invFun := swap
-  left_inv := by
-    intro p
-    exact swap_swap p
-  right_inv := by
-    intro p
-    exact swap_swap p
 /-
 
 
@@ -129,12 +120,6 @@ def unassoc {α β γ : Type} : α × (β × γ) → (α × β) × γ :=
 example (α β γ : Type) : (α × β) × γ ≃ α × (β × γ) where
   toFun := assoc
   invFun := unassoc
-  left_inv := by
-    intro p
-    rfl
-  right_inv := by
-    intro p
-    rfl
 /-
 
 
@@ -142,31 +127,19 @@ example (α β γ : Type) : (α × β) × γ ≃ α × (β × γ) where
 
 `Unit` is the canonical type with one element. It is the monoidal unit for `Prod`.
 
-Show `α × Unit ≃ α`.
+Show `Unit × α ≃ α`.
 -/
-example (α : Type) : α × Unit ≃ α where
-  toFun := λ p ↦ p.1
-  invFun := λ a ↦ (a, ⟨⟩)
-  left_inv := by
-    intro a
-    rfl
-  right_inv := by
-    intro a
-    rfl
-/-
-
-Show `Unit × α ≃ α `.
--/
--- __Solution__
-example (α : Type) : Unit × α ≃ α where
+def leftUnitor {α : Type} : Unit × α ≃ α where
   toFun := λ p ↦ p.2
   invFun := λ a ↦ (⟨⟩, a)
-  left_inv := by
-    intro a
-    rfl
-  right_inv := by
-    intro a
-    rfl
+/-
+
+Show `α × Unit ≃ α`.
+-/
+-- __Solution__
+def rightUnitor {α : Type} : α × Unit ≃ α where
+  toFun := λ p ↦ p.1
+  invFun := λ a ↦ (a, ⟨⟩)
 /-
 
 
@@ -298,3 +271,63 @@ example (α β : Type) (f : α → β) (l : β → α) (x y : α)
     _ = (l ∘ f) y := by rfl
     _ = id y := by rw [h1]
     _ = y := by rfl
+/-
+
+
+# Further remarks
+
+We can show that `Prod` and `Unit`, together with the following definition telling how `Prod` acts on functions,
+-/
+def tensorHom {α β γ δ : Type}
+  (f : α → γ) (g : β → δ) (p : α × β) := (f p.1, g p.2)
+/-
+form
+-/
+#print CategoryTheory.MonoidalCategory
+/-
+
+For technical reasons, Mathlib separates out the special cases of `tensorHom` where one argument is `id`. These are called `whiskerLeft` and `whiskerRight`,
+-/
+def whiskerLeft {α β δ : Type}
+  (g : β → δ) := tensorHom (id : α → α) g
+
+def whiskerRight {α β γ : Type}
+  (f : α → γ) := tensorHom f (id : β → β)
+/-
+
+An equivalence can be turned into a categorical isomorphism using `toIso`.
+-/
+example (α : Type) : Unit × α ≅ α := leftUnitor.toIso
+/-
+
+Bundling up.
+-/
+-- This is more of a remark than a problem, but it depends on the solutions above.
+-- __Solution__
+instance : CategoryTheory.MonoidalCategory Type where
+  tensorObj := Prod
+  tensorUnit := Unit
+  tensorHom := tensorHom
+  whiskerLeft _ _ _ := whiskerLeft
+  whiskerRight f _ := whiskerRight f
+  leftUnitor _ := leftUnitor.toIso
+  rightUnitor _ := rightUnitor.toIso
+  associator _ _ _ := {
+    hom := assoc
+    inv := unassoc
+  }
+/-
+
+Furthermore, `Prod`, `Unit`, and `tensorHom` form
+-/
+#print CategoryTheory.SymmetricCategory
+/-
+This can be shown by providing `braiding` only.
+-/
+-- This is more of a remark than a problem, but it depends on the solutions above.
+-- __Solution__
+instance : CategoryTheory.SymmetricCategory Type where
+  braiding _ _ := {
+    hom := swap
+    inv := swap
+  }
