@@ -140,13 +140,13 @@ example (α β γ : Type) : (α × β) × γ ≃ α × (β × γ) where
 
 ## Unit
 
-`Unit` is the canonical type with one element. It is the monoidal unit for `Prod`, and its unique element is written `()`.
+`Unit` is the canonical type with one element. It is the monoidal unit for `Prod`.
 
 Show `α × Unit ≃ α`.
 -/
 example (α : Type) : α × Unit ≃ α where
   toFun := λ p ↦ p.1
-  invFun := λ a ↦ (a, ())
+  invFun := λ a ↦ (a, ⟨⟩)
   left_inv := by
     intro a
     rfl
@@ -160,7 +160,7 @@ Show `Unit × α ≃ α `.
 -- __Solution__
 example (α : Type) : Unit × α ≃ α where
   toFun := λ p ↦ p.2
-  invFun := λ a ↦ ((), a)
+  invFun := λ a ↦ (⟨⟩, a)
   left_inv := by
     intro a
     rfl
