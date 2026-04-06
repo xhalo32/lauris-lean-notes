@@ -95,9 +95,7 @@ example (α β γ : Type) : (α ⊕ β → γ) ≃ (α → γ) × (β → γ)
   left_inv := by
     intro f
     funext s
-    cases s with
-    | inl a => rfl
-    | inr b => rfl
+    cases s <;> rfl
   right_inv := by
     intro p
     rfl
@@ -286,9 +284,7 @@ example (α β γ : Type) : α × (β ⊕ γ) ≃ (α × β) ⊕ (α × γ)
     cases s <;> rfl
   right_inv := by
     intro s
-    cases s with
-    | inl p => rfl
-    | inr p => rfl
+    cases s <;> rfl
 
 -- Here is a variation of `left_inv`
 example (α β γ : Type) (p : α × (β ⊕ γ))
