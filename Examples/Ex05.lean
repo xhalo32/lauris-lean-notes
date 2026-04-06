@@ -190,7 +190,7 @@ def unassoc {α β γ : Type} :
 
 def sum_associator {α β γ : Type} :
   (α ⊕ β) ⊕ γ ≃ α ⊕ (β ⊕ γ)
-where
+  where
   toFun := assoc
   invFun := unassoc
   left_inv := by

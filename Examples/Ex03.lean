@@ -72,7 +72,7 @@ def unprojs {α β γ : Type} :
   λ p ↦ λ a ↦ (p.1 a, p.2 a)
 
 example (α β γ : Type) : (α → β × γ) ≃ (α → β) × (α → γ)
-where
+  where
   toFun := projs
   invFun := unprojs
 /-

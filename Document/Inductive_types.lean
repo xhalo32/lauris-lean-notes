@@ -569,12 +569,6 @@ example
 
 Structures also support a record-style notation.
 -/
-example
-  (α : Type u) (β : Type v) (a : α) (b : β) : Prod α β
-  where
-    fst := a
-    snd := b
-
 def origin : ℕ × ℕ where
   fst := 0
   snd := 0
