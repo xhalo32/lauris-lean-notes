@@ -58,60 +58,9 @@ example : (α ↪ β) = (Function.Embedding α β) := rfl
 #print Function.Embedding
 #print Function.Injective
 
-structure Embedding' (α β : Type) where
+structure Embedding (α β : Type) where
   toFun : α → β
   inj' : Injective toFun
-/-
-
-Equivalence `α ≃ β` gives `α ↪ β`.
--/
--- Recall our earlier proof
-lemma left_inv_inj {α β : Type} (f : α → β) (l : β → α)
-  (h : l ∘ f = id)
-  : Injective f
-:= by
-  intro a a' hf
-  calc
-    a
-    _ = id a := by rfl
-    _ = (l ∘ f) a := by rw [h]
-    _ = l (f a) := by rfl
-    _ = l (f a') := by rw [hf]
-    _ = (l ∘ f) a' := by rfl
-    _ = id a' := by rw [h]
-    _ = a' := by rfl
-
-example (α β : Type)
-  (e : α ≃ β)
-  : α ↪ β
-where
-  toFun := e.toFun
-  inj'  := by
-    apply left_inv_inj e.toFun e.invFun
-    funext a
-    calc
-      (e.invFun ∘ e.toFun) a
-      _ = e.invFun (e.toFun a) := by rfl
-      _ = a := by rw [e.left_inv]
-      _ = id a := by rfl
-/-
-
-Show that `α ≃ β` gives `β ↪ α`.
--/
-example (α β : Type)
-  (e : α ≃ β)
-  : β ↪ α
-where
-  toFun := e.invFun
-  inj'  := by
-    -- __Solution__
-    apply left_inv_inj e.invFun e.toFun
-    funext b
-    calc
-      (e.toFun ∘ e.invFun) b
-      _ = e.toFun (e.invFun b) := by rfl
-      _ = b := by rw [e.right_inv]
-      _ = id b := by rfl
 /-
 
 
@@ -156,6 +105,9 @@ example (α β γ : Type) : (α ⊕ β → γ) ≃ (α → γ) × (β → γ)
 
 
 # Sum as symmetric monoidal category
+
+Like `Prod`, `Sum` forms a symmetric monoidal category.
+
 
 ## Symmetry
 
@@ -262,7 +214,7 @@ example (α β γ : Type) (s : (α ⊕ β) ⊕ γ)
 /-
 
 
-## Unit coherence
+## Unit
 
 `Empty` is the canonical type with no elements. It is the monoidal unit for `Sum`.
 

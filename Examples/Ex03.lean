@@ -138,7 +138,7 @@ example (α β γ : Type) : (α × β) × γ ≃ α × (β × γ) where
 /-
 
 
-## Unit coherence
+## Unit
 
 `Unit` is the canonical type with one element. It is the monoidal unit for `Prod`, and its unique element is written `()`.
 
