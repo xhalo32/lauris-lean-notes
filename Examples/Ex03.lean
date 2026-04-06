@@ -331,3 +331,6 @@ instance : CategoryTheory.SymmetricCategory Type where
     hom := swap
     inv := swap
   }
+/-
+`SymmetricCategory` does not extend `MonoidalCategory`, rather it assumes an instance of it. This is a recurring idiom in Mathlib to prevent a type class from inheriting the same parent along different paths in the graph of type classes.
+-/
