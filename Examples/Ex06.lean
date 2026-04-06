@@ -30,8 +30,7 @@ example (p q : Prop) (h1 : p → q) (h2 : q → p) : p ↔ q
   · exact h2
 
 example (p q : Prop) (h1 : p → q) (h2 : q → p) : p ↔ q
-:= by
-  grind
+:= by grind
 /-
 
 Formulate and prove [biconditional elimination][bicond-elim] for `Iff'`.
@@ -156,8 +155,7 @@ example (p q r : Prop)
 -- __Solution__ by grind
 example (p q r : Prop)
   : (p ∨ q → r) ↔ ((p → r) ∧ (q → r))
-:= by
-  grind
+:= by grind
 /-
 
 

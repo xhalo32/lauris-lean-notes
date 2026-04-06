@@ -2,13 +2,11 @@ import Mathlib
 
 example (x y : ℝ)
   : x^2 - y^2 = (x + y) * (x - y)
-:= by
-  grind
+:= by grind
 
 lemma diff_sq (x y : ℝ)
   : x^2 - y^2 = (x + y) * (x - y)
-:= by
-  grind
+:= by grind
 
 #print diff_sq
 #print diff_sq._proof_1_1
@@ -28,15 +26,13 @@ Lean consists of
 -/
 example (a b c : ℕ)
   : a * b * c = b * c * a
-:= by
-  grind
+:= by grind
 
 example (G : Type) [Semigroup G] (a b c : G)
   (h1 : a * b = b * a)
   (h2 : a * c = c * a)
   : a * b * c = b * c * a
-:= by
-  grind
+:= by grind
 
 #print Semigroup
 /-
