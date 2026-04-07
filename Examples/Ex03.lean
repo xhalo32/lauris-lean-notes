@@ -21,7 +21,7 @@ def uncurry {α β γ : Type} (g : α → β → γ) : α × β → γ :=
 lemma uncurry_curry {α β γ : Type} (f : α × β → γ)
   : uncurry (curry f) = f
 := by
-  unfold curry uncurry -- δ-redution
+  unfold curry uncurry -- δ-reduction
   funext p -- function η-equivalence
   reduce -- β-reduction
   have : (p.1, p.2) = p := by rfl -- structure η-equivalence
@@ -30,7 +30,7 @@ lemma uncurry_curry {α β γ : Type} (f : α × β → γ)
 lemma curry_uncurry {α β γ : Type} (g : α → β → γ)
   : curry (uncurry g) = g
 := by
-  unfold curry uncurry -- δ-redution
+  unfold curry uncurry -- δ-reduction
   funext a b -- function η-equivalence
   reduce -- β-reduction
   rfl
