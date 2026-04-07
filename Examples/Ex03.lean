@@ -13,8 +13,7 @@ def curry {α β γ : Type} (f : α × β → γ) : α → β → γ :=
   λ a b ↦ f (a, b)
 /-
 
-Find an inverse of `curry` and show that it is indeed an inverse. Moreover, show that `curry` gives the equivalence
-`(α × β → γ) ≃ (α → β → γ)`.
+Find an inverse of `curry` and show that it is indeed an inverse.
 -/
 def uncurry {α β γ : Type} (g : α → β → γ) : α × β → γ :=
   λ p ↦ g p.1 p.2
@@ -22,13 +21,37 @@ def uncurry {α β γ : Type} (g : α → β → γ) : α × β → γ :=
 lemma uncurry_curry {α β γ : Type} (f : α × β → γ)
   : uncurry (curry f) = f
 := by
-  rfl
+  unfold curry uncurry
+  funext p -- function η-equivalence
+  reduce
+  have : (p.1, p.2) = p := by rfl -- structure η-equivalence
+  rw [this]
 
 lemma curry_uncurry {α β γ : Type} (g : α → β → γ)
   : curry (uncurry g) = g
 := by
+  unfold curry uncurry
+  funext a b
+  reduce
+  rfl
+/-
+
+In fact, the steps in the above proofs are different aspects of definitional equality.
+-/
+example (α β γ : Type) (f : α × β → γ)
+  : uncurry (curry f) = f
+:= by
   rfl
 
+example {α β γ : Type} (g : α → β → γ)
+  : curry (uncurry g) = g
+:= by
+  rfl
+/-
+
+Show that `curry` gives the equivalence
+`(α × β → γ) ≃ (α → β → γ)`.
+-/
 example (α β γ : Type) : (α × β → γ) ≃ (α → β → γ) where
   toFun := curry
   invFun := uncurry
