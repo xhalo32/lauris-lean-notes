@@ -21,7 +21,8 @@ Exercises
 Fill in the parts labeled with __TODO__.
 
 -/" > $hwdir/$file
-    awk -f $srcdir/scripts/hw-process.awk \
-        <$file >>$hwdir/$file
+    awk -f $srcdir/scripts/hw-process.awk <$file \
+    | awk -f $srcdir/scripts/hw-process-blank.awk \
+    >>$hwdir/$file
 end
 popd

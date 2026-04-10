@@ -32,7 +32,7 @@ BEGIN {
                     }
                 } else {
                     printf "%s%s\n", substr(line, 1, marker_indent), \
-                        "sorry -- __TODO__"
+                        "sorry -- __TODO__\n"
                 }
 
                 mode = "skip"
