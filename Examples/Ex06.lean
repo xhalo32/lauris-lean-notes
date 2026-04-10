@@ -101,6 +101,105 @@ example (p q : Prop) (h : p → q) : p ↪ q where
 /-
 
 
+# Truth tables for ¬, ∧, and ∨
+
+-/
+example : (True ∧ True) ↔ True
+:= by
+  constructor
+  · intros
+    exact trivial
+  · intros
+    constructor
+    · exact trivial
+    · exact trivial
+
+example : (True ∧ False) ↔ False
+:= by
+  constructor
+  · intro ⟨_, hf⟩
+    exact hf
+  · intros
+    contradiction
+
+example : (False ∧ True) ↔ False
+:= by
+  -- __Solution__
+  constructor
+  · intro ⟨hf, _⟩
+    exact hf
+  · intros
+    contradiction
+
+example : (False ∧ False) ↔ False
+:= by
+  -- __Solution__
+  constructor
+  · intro ⟨hf, _⟩
+    exact hf
+  · intros
+    contradiction
+
+example : (True ∨ True) ↔ True
+:= by
+  constructor
+  · intros
+    exact trivial
+  · intros
+    left
+    exact trivial
+
+example : (True ∨ False) ↔ True
+:= by
+  -- __Solution__
+  constructor
+  · intros
+    exact trivial
+  · intros
+    left
+    exact trivial
+
+example : (False ∨ True) ↔ True
+:= by
+  -- __Solution__
+  constructor
+  · intros
+    exact trivial
+  · intros
+    right
+    exact trivial
+
+example : (False ∨ False) ↔ False
+:= by
+  -- __Solution__
+  constructor
+  · intro h
+    obtain hf | hf := h
+    · exact hf
+    · exact hf
+  · intros
+    contradiction
+
+example : ¬True ↔ False
+:= by
+  -- __Solution__
+  constructor
+  · intro h
+    exact h trivial
+  · intros
+    contradiction
+
+example : ¬False ↔ True
+:= by
+  -- __Solution__
+  constructor
+  · intros
+    exact trivial
+  · intros
+    exact id
+/-
+
+
 # Universal property of product
 
 Show the universal property of `And` as a product.
@@ -251,12 +350,16 @@ example (p q : Prop)
   constructor
   · intro h
     obtain (hp | hq) := h
-    · exact Or.inr hp
-    · exact Or.inl hq
+    · right
+      exact hp
+    · left
+      exact hq
   · intro h
     obtain (hq | hp) := h
-    · exact Or.inr hq
-    · exact Or.inl hp
+    · right
+      exact hq
+    · left
+      exact hp
 
 -- __Solution__ by grind
 example (p q : Prop)
@@ -273,14 +376,24 @@ example (p q r : Prop)
   constructor
   · intro h
     obtain ((hp | hq) | hr) := h
-    · exact Or.inl hp
-    · exact Or.inr (Or.inl hq)
-    · exact Or.inr (Or.inr hr)
+    · left
+      exact hp
+    · right
+      left
+      exact hq
+    · right
+      right
+      exact hr
   · intro h
     obtain (hp | (hq | hr)) := h
-    · exact Or.inl (Or.inl hp)
-    · exact Or.inl (Or.inr hq)
-    · exact Or.inr hr
+    · left
+      left
+      exact hp
+    · left
+      right
+      exact hq
+    · right
+      exact hr
 
 -- __Solution__ by grind
 example (p q r : Prop)
@@ -302,7 +415,8 @@ example (p : Prop)
     · exact hp
     · exact hf.elim
   · intro hp
-    exact Or.inl hp
+    left
+    exact hp
 
 -- __Solution__ by grind
 example (p : Prop)
@@ -322,7 +436,8 @@ example (p : Prop)
     · exact hf.elim
     · exact hp
   · intro hp
-    exact Or.inr hp
+    right
+    exact hp
 
 -- __Solution__ by grind
 example (p : Prop)
@@ -344,8 +459,10 @@ example (p q r : Prop)
   constructor
   · intro h
     obtain ⟨hp, (hq | hr)⟩ := h
-    · exact Or.inl ⟨hp, hq⟩
-    · exact Or.inr ⟨hp, hr⟩
+    · left
+      exact ⟨hp, hq⟩
+    · right
+      exact ⟨hp, hr⟩
   · intro h
     obtain (⟨hp, hq⟩ | ⟨hp, hr⟩) := h
     · exact ⟨hp, Or.inl hq⟩
