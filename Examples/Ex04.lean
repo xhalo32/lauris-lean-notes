@@ -359,6 +359,15 @@ example (α β γ : Type) (f : α → β) (g : β → γ)
     _ = g (f a) := by rfl
     _ = g (f a') := by rw [hfa]
     _ = (g ∘ f) a' := by rfl
+
+-- __Solution__ by simp
+example (α β γ : Type) (f : α → β) (g : β → γ)
+  (h : Injective (g ∘ f))
+  : Injective f
+:= by
+  intro a a' hfa
+  apply h
+  simp [hfa]
 /-
 
 If functions are equal after composition with an injective map, then they are equal.

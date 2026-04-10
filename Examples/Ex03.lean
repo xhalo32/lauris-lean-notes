@@ -246,6 +246,21 @@ by
     _ = r := by rfl
 /-
 
+A slightly shorter proof using `simp`.
+-/
+example (α β : Type) (f : α → β) (l r : β → α)
+  (h1 : l ∘ f = id)
+  (h2 : f ∘ r = id)
+  : l = r
+:=
+by
+  calc
+    l
+    _ = l ∘ (f ∘ r) := by simp [h2]
+    _ = (l ∘ f) ∘ r := by rfl
+    _ = r := by simp [h1]
+/-
+
 
 # Uniqueness of identity function
 
@@ -292,6 +307,21 @@ example (α β : Type) (f : α → β) (l : β → α) (x y : α)
     _ = (l ∘ f) y := by rfl
     _ = id y := by rw [h1]
     _ = y := by rfl
+
+-- __Solution__ using simp
+example (α β : Type) (f : α → β) (l : β → α) (x y : α)
+  (h1 : l ∘ f = id)
+  (h2 : f x = f y)
+  : x = y
+:= by
+  calc
+    x = id x := by rfl
+    _ = (l ∘ f) x := by rw [h1]
+    _ = l (f y) := by simp [h2]
+    _ = (l ∘ f) y := by rfl
+    _ = id y := by rw [h1]
+    _ = y := by rfl
+-- The two `rw` cannot be replaced by `simp`. This is because `simp` rewrites `(l ∘ f) x` into `l (f x)`. We could use `simp only` but that would not eliminate the `rfl` step.
 /-
 
 
