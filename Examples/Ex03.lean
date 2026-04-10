@@ -238,14 +238,12 @@ example (α β : Type) (f : α → β) (l r : β → α)
   : l = r
 :=
 by
-  funext x
   calc
-    l x
-    _ = l (id x) := by rfl
-    _ = l ((f ∘ r) x) := by rw [h2]
-    _ = (l ∘ f) (r x) := by rfl
-    _ = id (r x) := by rw [h1]
-    _ = r x := by rfl
+    l = l ∘ id := by rfl
+    _ = l ∘ (f ∘ r) := by rw [h2]
+    _ = (l ∘ f) ∘ r := by rfl
+    _ = id ∘ r := by rw [h1]
+    _ = r := by rfl
 /-
 
 
@@ -299,7 +297,7 @@ example (α β : Type) (f : α → β) (l : β → α) (x y : α)
 
 # Further remarks
 
-We can show that `Prod` and `Unit`, together with the following definition telling how `Prod` acts on functions,
+We can show that `Prod` and `Unit`, together with the morphisms defined by
 -/
 def tensorHom {α β γ δ : Type}
   (f : α → γ) (g : β → δ) (p : α × β) := (f p.1, g p.2)
