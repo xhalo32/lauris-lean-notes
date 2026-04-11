@@ -426,7 +426,7 @@ example : (1 || 1) = 1 := rfl
 
 ## Classical logic
 
-Propositions can be mapped to Booleans according to their truth value. However, this cannot be done constructively, since the [law of excluded middle][excluded-middle] is required. We will give more detail later and simply use a truth preserving function from `Prop` to `Bool` defined in `Classical`. Non-constructive functions must be labeled with `noncomputable`.
+Propositions can be mapped to Booleans according to their truth value. However, this cannot be done constructively, since the [law of excluded middle][excluded-middle] is required. We will give more detail later and simply use the truth preserving function `decide` from `Prop` to `Bool`. Non-constructive functions must be labeled with `noncomputable`.
 
 [excluded-middle]: https://en.wikipedia.org/wiki/Law_of_excluded_middle
 
