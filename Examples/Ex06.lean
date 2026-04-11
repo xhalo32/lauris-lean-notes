@@ -28,9 +28,6 @@ example (p q : Prop) (h1 : p → q) (h2 : q → p) : p ↔ q
   constructor
   · exact h1
   · exact h2
-
-example (p q : Prop) (h1 : p → q) (h2 : q → p) : p ↔ q
-:= by grind
 /-
 
 Formulate and prove [biconditional elimination][bicond-elim] for `Iff'`.
@@ -101,106 +98,14 @@ example (p q : Prop) (h : p → q) : p ↪ q where
 /-
 
 
-# Truth tables for ¬, ∧, and ∨
+# Conjunction and disjunction as product and coproduct
 
--/
-example : (True ∧ True) ↔ True
-:= by
-  constructor
-  · intros
-    exact trivial
-  · intros
-    constructor
-    · exact trivial
-    · exact trivial
+`And` and `Or` are the analogues of `Prod` and `Sum` acting on `Prop` rather than on `Type`.
 
-example : (True ∧ False) ↔ False
-:= by
-  constructor
-  · intro ⟨_, hf⟩
-    exact hf
-  · intros
-    contradiction
-
-example : (False ∧ True) ↔ False
-:= by
-  -- __Solution__
-  constructor
-  · intro ⟨hf, _⟩
-    exact hf
-  · intros
-    contradiction
-
-example : (False ∧ False) ↔ False
-:= by
-  -- __Solution__
-  constructor
-  · intro ⟨hf, _⟩
-    exact hf
-  · intros
-    contradiction
-
-example : (True ∨ True) ↔ True
-:= by
-  constructor
-  · intros
-    exact trivial
-  · intros
-    left
-    exact trivial
-
-example : (True ∨ False) ↔ True
-:= by
-  -- __Solution__
-  constructor
-  · intros
-    exact trivial
-  · intros
-    left
-    exact trivial
-
-example : (False ∨ True) ↔ True
-:= by
-  -- __Solution__
-  constructor
-  · intros
-    exact trivial
-  · intros
-    right
-    exact trivial
-
-example : (False ∨ False) ↔ False
-:= by
-  -- __Solution__
-  constructor
-  · intro h
-    obtain hf | hf := h
-    · exact hf
-    · exact hf
-  · intros
-    contradiction
-
-example : ¬True ↔ False
-:= by
-  -- __Solution__
-  constructor
-  · intro h
-    exact h trivial
-  · intros
-    contradiction
-
-example : ¬False ↔ True
-:= by
-  -- __Solution__
-  constructor
-  · intros
-    exact trivial
-  · intros
-    exact id
-/-
+All examples in this section can be solved by `grind`, but you may still want to write them out step by step for practice.
 
 
-# Universal property of product
+## Universal property of product
 
 Show the universal property of `And` as a product.
 -/
@@ -221,15 +126,10 @@ example (p q r : Prop)
     obtain ⟨hpq, hpr⟩ := h
     intro hp
     exact ⟨hpq hp, hpr hp⟩
-
--- __Solution__ by grind
-example (p q r : Prop)
-  : (p → q ∧ r) ↔ ((p → q) ∧ (p → r))
-:= by grind
 /-
 
 
-# Universal property of coproduct
+## Universal property of coproduct
 
 Show the universal property of `Or` as a coproduct.
 -/
@@ -250,15 +150,10 @@ example (p q r : Prop)
     obtain (hp | hq) := hpq
     · exact hpr hp
     · exact hqr hq
-
--- __Solution__ by grind
-example (p q r : Prop)
-  : (p ∨ q → r) ↔ ((p → r) ∧ (q → r))
-:= by grind
 /-
 
 
-# Conjunction as symmetric monoidal category
+## Conjunction as symmetric monoidal category
 
 Like `Prod`, `And` forms a symmetric monoidal category. Since `MonoidalCategory`  applies to types rather than propositions, we cannot declare `And` its instance.
 
@@ -273,11 +168,6 @@ example (p q : Prop)
     exact ⟨hq, hp⟩
   · intro ⟨hq, hp⟩
     exact ⟨hp, hq⟩
-
--- __Solution__ by grind
-example (p q : Prop)
-  : p ∧ q ↔ q ∧ p
-:= by grind
 /-
 
 Show the associativity
@@ -291,11 +181,6 @@ example (p q r : Prop)
     exact ⟨hp, ⟨hq, hr⟩⟩
   · intro ⟨hp, ⟨hq, hr⟩⟩
     exact ⟨⟨hp, hq⟩, hr⟩
-
--- __Solution__ by grind
-example (p q r : Prop)
-  : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r)
-:= by grind
 /-
 
 `True` is the monoidal unit for `And`.
@@ -311,11 +196,6 @@ example (p : Prop)
     exact hp
   · intro hp
     exact ⟨hp, ⟨⟩⟩
-
--- __Solution__ by grind
-example (p : Prop)
-  : p ∧ True ↔ p
-:= by grind
 /-
 
 Show
@@ -329,15 +209,10 @@ example (p : Prop)
     exact hp
   · intro hp
     exact ⟨⟨⟩, hp⟩
-
--- __Solution__ by grind
-example (p : Prop)
-  : True ∧ p ↔ p
-:= by grind
 /-
 
 
-# Disjunction as symmetric monoidal category
+## Disjunction as symmetric monoidal category
 
 Like `Sum`, `Or` forms a symmetric monoidal category.
 
@@ -346,7 +221,6 @@ Show the symmetry
 example (p q : Prop)
   : p ∨ q ↔ q ∨ p
 := by
-  -- __Solution__
   constructor
   · intro h
     obtain (hp | hq) := h
@@ -361,10 +235,16 @@ example (p q : Prop)
     · left
       exact hp
 
--- __Solution__ by grind
+-- An alternative solution by brute force
 example (p q : Prop)
   : p ∨ q ↔ q ∨ p
-:= by grind
+:= by
+  constructor <;> intro h <;> obtain (h | h) := h <;>
+  solve
+  | left
+    exact h
+  | right
+    exact h
 /-
 
 Show the associativity
@@ -395,10 +275,32 @@ example (p q r : Prop)
     · right
       exact hr
 
--- __Solution__ by grind
+-- __Solution__ by brute force
 example (p q r : Prop)
   : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r)
-:= by grind
+:= by
+  constructor <;> intro h <;> (
+    first
+    | obtain ((h | h) | h) := h
+    | obtain (h | (h | h)) := h
+  ) <;>
+  solve
+  | left
+    exact h
+  | right
+    exact h
+  | left
+    left
+    exact h
+  | left
+    right
+    exact h
+  | right
+    left
+    exact h
+  | right
+    right
+    exact h
 /-
 
 `False` is the monoidal unit for `Or`.
@@ -417,11 +319,6 @@ example (p : Prop)
   · intro hp
     left
     exact hp
-
--- __Solution__ by grind
-example (p : Prop)
-  : p ∨ False ↔ p
-:= by grind
 /-
 
 Show
@@ -438,15 +335,10 @@ example (p : Prop)
   · intro hp
     right
     exact hp
-
--- __Solution__ by grind
-example (p : Prop)
-  : False ∨ p ↔ p
-:= by grind
 /-
 
 
-# Conjuction and disjunction as distributive category
+## Conjuction and disjunction as distributive category
 
 Like `Prod` and `Sum`, `And` and `Or` form a distributive category.
 
@@ -467,8 +359,3 @@ example (p q r : Prop)
     obtain (⟨hp, hq⟩ | ⟨hp, hr⟩) := h
     · exact ⟨hp, Or.inl hq⟩
     · exact ⟨hp, Or.inr hr⟩
-
--- __Solution__ by grind
-example (p q r : Prop)
-  : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r)
-:= by grind
