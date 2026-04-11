@@ -493,7 +493,7 @@ Consider a type with three elements.
 inductive Trilean where | F | U | T
 /-
 
-Show that every Trilean involution has a fixed point.
+Show that every trilean involution has a fixed point.
 
 Hint: `grind` can do a lot work.
 
