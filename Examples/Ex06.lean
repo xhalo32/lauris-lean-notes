@@ -359,3 +359,150 @@ example (p q r : Prop)
     obtain (⟨hp, hq⟩ | ⟨hp, hr⟩) := h
     · exact ⟨hp, Or.inl hq⟩
     · exact ⟨hp, Or.inr hr⟩
+/-
+
+
+# Boolean algebra
+
+`Bool` is a canonical type with two elements called `false` and `true`. These should not be confused with the propositions `False` and `True`.
+-/
+#print Bool
+/-
+
+`Bool` is embedded in `ℕ`.
+-/
+example : false = 0 := rfl
+example : true = 1 := rfl
+/-
+
+[Boolean algebra][boolean-algebra] uses three operators that correspond to negation, conjunction and disjunction.
+
+[boolean-algebra]: https://en.wikipedia.org/wiki/Boolean_algebra
+
+Show that the three operators `!`, `&&`, and `||` can be written in terms of arithmetic operators in `ℕ`.
+-/
+example (x : Bool) : !x = 1 - x
+:= by
+  cases x <;> rfl
+
+example (x y : Bool) : (x && y) = x * y
+:= by
+  -- __Solution__
+  rfl
+
+example (x y : Bool) : (x || y) = x + y - x * y
+:= by
+  -- __Solution__
+  cases x <;> cases y <;> rfl
+/-
+
+
+## Truth tables
+
+Form the truth table of negation.
+-/
+example : !0 = 1 := rfl
+example : !1 = 0 := rfl
+/-
+
+Form the truth table of conjunction.
+-/
+-- __Solution__
+example : (0 && 0) = 0 := rfl
+example : (0 && 1) = 0 := rfl
+example : (1 && 0) = 0 := rfl
+example : (1 && 1) = 1 := rfl
+/-
+
+Form the truth table of disjunction.
+-/
+-- __Solution__
+example : (0 || 0) = 0 := rfl
+example : (0 || 1) = 1 := rfl
+example : (1 || 0) = 1 := rfl
+example : (1 || 1) = 1 := rfl
+/-
+
+
+## Classical logic
+
+Propositions can be mapped to Booleans according to their truth value. However, this cannot be done constructively, since the [law of excluded middle][excluded-middle] is required. We will give more detail later and simply use a truth preserving function from `Prop` to `Bool` defined in `Classical`. Non-constructive functions must be labeled with `noncomputable`.
+
+[excluded-middle]: https://en.wikipedia.org/wiki/Law_of_excluded_middle
+
+-/
+noncomputable def decide' : Prop → Bool := by
+  intro p
+  classical
+  exact decide p
+
+example (p : Prop)
+  : decide' p = true ↔ p
+:= by
+  by_cases hp : p <;> simp [decide']
+/-
+
+Show that `decide'` is a Boolean algebra homomorphism.
+-/
+example (p : Prop)
+  : decide' (¬p) = !(decide' p)
+:= by
+  by_cases hp : p <;> simp [decide']
+
+example (p q : Prop)
+  : decide' (p ∧ q) = (decide' p && decide' q)
+:= by
+  by_cases hp : p <;> by_cases hq : q <;>
+  simp [decide', hp]
+
+example (p q : Prop)
+  : decide' (p ∨ q) = (decide' p || decide' q)
+:= by
+  -- __Solution__
+  by_cases hp : p <;> by_cases hq : q <;>
+  simp [decide', hp]
+/-
+
+
+## Fixed points of Boolean functions
+
+Show that every Boolean function, except negation, has a fixed point.
+-/
+example (f : Bool → Bool)
+  : f = (λ x ↦ !x) ∨ ∃ x : Bool, f x = x
+:= by
+  cases h1 : f false <;> cases h2 : f true <;>
+  -- __Solution__
+  solve
+  | left
+    funext x
+    cases x
+    · exact h1
+    · exact h2
+  | right
+    use true
+  | right
+    use false
+/-
+
+
+# Fixed points of trilean involutions
+
+Consider a type with three elements.
+-/
+inductive Trilean where | F | U | T
+/-
+
+Show that every Trilean involution has a fixed point.
+
+Hint: `grind` can do a lot work.
+
+-/
+open Trilean in
+example (f : Trilean → Trilean)
+  (h : ∀ x : Trilean, f (f x) = x)
+  : ∃ x : Trilean, f x = x
+:= by
+  -- __Solution__
+  cases _ : f F <;> cases _ : f U <;> cases _ : f T <;>
+  grind
