@@ -310,56 +310,9 @@ lemma Nat'.add_comm {n m : Nat'}
     _ = (m.add n).succ := congrArg succ add_comm
     _ = m.succ.add n := (succ_add m n).symm
 /-
-
-
-# Recursive relations
-
-Inequality `≤` on `Nat` is defined as an inductive type.
--/
-#print Nat.le
-/-
-It has two constructors `Nat.le.refl` and `Nat.le.step`. The former is analogous to `Eq.refl`, while the latter encodes the implication: if `n ≤ m` then `n ≤ m + 1`.
-
-We define our version and prove some properties.
--/
-inductive Nat'.le (n : Nat') : Nat' → Prop
-  | refl : n.le n
-  | step {m : Nat'} : n.le m → n.le m.succ
-/-
-
-The smallest natural number is `zero`.
--/
-lemma Nat'.zero_smallest (n : Nat')
-  : zero.le n
-:=
-  match n with
-  | zero => le.refl
-  | succ n => le.step (zero_smallest n)
-/-
-
-The successor function preserves inequality.
--/
-lemma Nat'.le_succ {n m : Nat'}
-  (h : n.le m)
-  : (n.succ.le m.succ)
-:=
-  match h with
-  | le.refl => le.refl
-  | le.step h => le.step (le_succ h)
-/-
-
-Inequality is transitive.
--/
-lemma Nat'.le_trans {n m k : Nat'}
-  (h1 : n.le m) (h2 : m.le k)
-  : n.le k
-:=
-  match h2 with
-  | le.refl => h1
-  | le.step h2 => le.step (le_trans h1 h2)
-/-
 -/
 -- -show
+-- The rest is not exposed for later import
 namespace Document.Peano
 /-
 
