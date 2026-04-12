@@ -290,7 +290,7 @@ lemma Nat'.toNat_le_iff {n m : Nat'}
 
 Bundle up as order isomorphism.
 -/
-def orderIso_Nats : Nat' ≃o ℕ where
+example : Nat' ≃o ℕ where
   toEquiv := equiv_Nats
   map_rel_iff' := Nat'.toNat_le_iff
 /-
