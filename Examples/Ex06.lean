@@ -235,7 +235,7 @@ example (p q : Prop)
     · left
       exact hp
 
--- An alternative solution by brute force
+-- An alternative solution using tactic combinators
 example (p q : Prop)
   : p ∨ q ↔ q ∨ p
 := by
@@ -275,31 +275,22 @@ example (p q r : Prop)
     · right
       exact hr
 
--- __Solution__ by brute force
+-- __Solution__ using tactic combinators
 example (p q r : Prop)
   : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r)
 := by
-  constructor <;> intro h <;> (
-    first
-    | obtain ((h | h) | h) := h
-    | obtain (h | (h | h)) := h
-  ) <;>
+  constructor <;> intro h <;>
+  (repeat' obtain (h | h) := h) <;>
   solve
-  | left
+  | repeat left
     exact h
-  | right
-    exact h
-  | left
-    left
+  | repeat right
     exact h
   | left
     right
     exact h
   | right
     left
-    exact h
-  | right
-    right
     exact h
 /-
 
