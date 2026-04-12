@@ -157,8 +157,10 @@ def Nat'.le' := ReflTransGen' Nat'.le_step
 
 Let us show that `le'` and `le` coincide.
 -/
-open ReflTransGen' Nat' in
-example (n m : Nat') : (n.le' m) ↔ (n.le m) := by
+open ReflTransGen' in
+lemma Nat'.le_iff {n m : Nat'}
+  : (n.le' m) ↔ (n.le m)
+:= by
   constructor
   · intro h
     induction h with
@@ -183,6 +185,114 @@ example (n m : Nat') : (n.le' m) → (n.le m) := by
   | @tail x y _ hxy hi =>
     cases hxy
     exact @le.step n x hi
+/-
+
+The two orderings are relation-isomorphic.
+-/
+example : Nat'.le ≃r Nat'.le' where
+  toFun := id
+  invFun := id
+  map_rel_iff' := Nat'.le_iff
+
+example :
+  (Nat'.le ≃r Nat'.le') = RelIso Nat'.le Nat'.le' := rfl
+/-
+
+
+# Order isomorphism
+
+Order isomorphism is defined in terms of relation isomorphism.
+-/
+example (α : Type u) (β : Type v) [LE α] [LE β] :
+  (α ≃o β) = OrderIso (α := α) (β := β) := rfl
+
+#print OrderIso
+/-
+
+Let us show that `(Nat', le)` and `(ℕ, ≤)` are order isomorphic. This requires a number of steps.
+
+First, we declare that `le` is an ordering.
+-/
+instance : LE Nat' where
+  le := Nat'.le
+/-
+
+Show that `Nat' ≃ ℕ`.
+-/
+def Nat'.toNat (n : Nat') :=
+  match n with
+  | zero => 0
+  | succ n => toNat n + 1
+
+def Nat'.ofNat (n : Nat) : Nat' :=
+  match n with
+  | 0 => zero
+  | n + 1 => (ofNat n).succ
+
+lemma Nat'.ofNat_toNat (n : Nat')
+  : ofNat (toNat n) = n
+:= by
+  induction n with
+  | zero => rfl
+  | succ _ hi => simp [toNat, ofNat, hi]
+
+lemma Nat'.toNat_ofNat (n : ℕ)
+  : toNat (ofNat n) = n
+:= by
+  -- __Solution__
+  induction n with
+  | zero => rfl
+  | succ _ hi => simp [toNat, ofNat, hi]
+
+def equiv_Nats : Nat' ≃ ℕ where
+  toFun := Nat'.toNat
+  invFun := Nat'.ofNat
+  left_inv := by
+    intro n
+    exact Nat'.ofNat_toNat n
+  right_inv := by
+    intro n
+    exact Nat'.toNat_ofNat n
+/-
+
+Show that the equivalence preserves order.
+-/
+lemma Nat'.le_toNat_le {n m : Nat'}
+  (h : n ≤ m)
+  : n.toNat ≤ m.toNat
+:= by
+  induction h with
+  | refl => exact Nat.le.refl
+  | step _ _ =>
+    simp [toNat]
+    grind
+
+lemma Nat'.le_ofNat_le {n m : ℕ}
+  (h : n ≤ m)
+  : ofNat n ≤ ofNat m
+:= by
+  -- __Solution__
+  induction h with
+  | refl => exact Nat'.le.refl
+  | step h hi => exact le.step hi
+
+lemma Nat'.toNat_le_iff {n m : Nat'}
+  : n.toNat ≤ m.toNat ↔ n ≤ m
+:= by
+  -- __Solution__
+  constructor
+  · intro h
+    have := le_ofNat_le h
+    simp [ofNat_toNat] at this
+    exact this
+  · exact le_toNat_le
+/-
+
+Bundle up as order isomorphism.
+-/
+def orderIso_Nats : Nat' ≃o ℕ where
+  toEquiv := equiv_Nats
+  map_rel_iff' := Nat'.toNat_le_iff
 /-
 
 
