@@ -194,7 +194,7 @@ example (α β : Type) (a a' : α) (b b' : β)
 := by
   by_contra
   injection this with ha hb
-  obtain (_|_) := h <;> contradiction
+  obtain (_ | _) := h <;> contradiction
 /-
 
 Injectivity of `inl`.
