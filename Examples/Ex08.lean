@@ -1,6 +1,277 @@
 import Mathlib
 /-
 
+# Factorial
+
+Consider the factorial `n!` of a natural number `n`
+-/
+open Nat in
+example (n : ℕ) : factorial n = (n)! := rfl
+/-
+
+We can define our own version.
+-/
+def factorial' (n : ℕ) :=
+  match n with
+  | 0 => 1
+  | n + 1 => (n + 1) * factorial' n
+/-
+
+We will prove `2^n ≤ n! ≤ n^n` for `n ≥ 4`. For a more precise asymptotic result, see [Stirling's approximation][stirling].
+
+[stirling]: https://en.wikipedia.org/wiki/Stirling%27s_approximation
+
+
+## Upper bound
+
+The bound `n! ≤ n^n` is proven in Mathlib.
+-/
+open Nat in
+example (n : ℕ)
+  : n ! ≤ n^n
+:= by exact?
+/-
+
+Let us prove the bound using induction and an auxiliary lemma.
+
+The `nlinarith` tactic can solve certain systems of inequalities. Its use often requires proving additional constraints.
+-/
+lemma pow_le_pow_left (n m : ℕ)
+  (h : n ≤ m)
+  : ∀ i : ℕ, n^i ≤ m^i
+:= by
+  intro i
+  induction i with
+  | zero => rfl
+  | succ i hi =>
+    have : n^i ≥ 0 := by positivity
+    calc
+      n ^ (i + 1)
+      _ = n * n^i := by grind
+      _ ≤ m * m^i := by nlinarith
+      _ ≤ m ^ (i + 1) := by grind
+/-
+
+Show
+-/
+open Nat in
+example (n : ℕ)
+  : n ! ≤ n^n
+:= by
+  -- __Solution__
+  induction n with
+  | zero => rfl
+  | succ n hi =>
+    have : n^n ≤ (n + 1)^n :=
+      pow_le_pow_left n (n + 1) (by nlinarith) n
+    calc
+      (n + 1)!
+      _ = (n + 1) * (n)! := by simp only [factorial]
+      _ ≤ (n + 1) * (n + 1)^n := by nlinarith
+      _ = (n + 1)^(n + 1) := by grind
+/-
+
+
+## Lower bound
+
+The lower bound `fac n ≥ 2^n` holds for all `n ≥ 4`.
+-/
+open Nat in
+example (n : ℕ)
+  (h : n ≥ 4)
+  : n ! ≥ 2^n
+:= by
+  induction n with
+  | zero => norm_num at h -- contradiction
+  | succ n hi =>
+    by_cases hn : n + 1 ≤ 4
+    · -- base case
+      have : n + 1 = 4 := by nlinarith
+      rw [this]
+      norm_num
+    · -- induction step
+      have := hi (by nlinarith)
+      have : 2^n > 0 := by positivity
+      calc
+        (n + 1)!
+        _ = (n + 1) * n ! := by simp only [factorial]
+        _ ≥ 2 * 2^n := by nlinarith
+        _ = 2^(n + 1) := by grind
+/-
+
+
+# Bernoulli's inequality
+
+[Bernoulli's inequality][bernoulli] is slightly awkward to prove since it requires embedding natural numbers into real numbers. Lean has a [coercion][coercion] mechanism to handle this.
+
+[bernoulli]: https://en.wikipedia.org/wiki/Bernoulli%27s_inequality
+[coercion]: https://en.wikipedia.org/wiki/Type_conversion
+
+The following pair of examples illustrates how coercion complicates arithmetic goals.
+-/
+example (x y : ℝ)
+  (h1 : x > 0) (h2 : y > 0)
+  : x * y > 0
+:= by
+  nlinarith
+
+example (n : ℕ) (y : ℝ)
+  (h1 : n > 0) (h2 : y > 0)
+  : n * y > 0
+:= by
+  have : (n : ℝ) > 0 := by positivity
+  nlinarith
+/-
+
+In the proof of Bernoulli's inequality you might need the following equivalence. Here `↑n` means that the natural number `n` is viewed as a real number. The two equivalent expressions differ only in the order of addition and such a coercion.
+-/
+example (n : ℕ) (x : ℝ)
+  : (1 + x) ^ (n + 1) ≥ 1 + (↑n + 1) * x
+    ↔ (1 + x) ^ (n + 1) ≥ 1 + ↑(n + 1) * x
+:= by
+  grind
+/-
+
+The expression with coercion before addition is definitionally equal to automatic coercion, while the other one is not.
+-/
+example (n : ℕ) (x : ℝ)
+  : ((1 + x) ^ (n + 1) ≥ 1 + (↑n + 1) * x)
+    = ((1 + x) ^ (n + 1) ≥ 1 + (n + 1) * x)
+:= rfl
+/-
+
+Show
+-/
+example (n : ℕ) (x : ℝ)
+  (hn: n ≥ 2) (hx1 : x > 0)
+  : (1 + x)^n > 1 + n*x
+:= by
+  -- __Solution__
+  induction n with
+  | zero => norm_num at hn -- contradiction
+  | succ n hi =>
+    by_cases hn' : n + 1 ≤ 2
+    · -- base case
+      have : n + 1 = 2 := by nlinarith
+      rw [this]
+      calc
+        (1 + x) ^ 2
+        _ = 1 + 2 * x + x^2 := by grind
+        _ > 1 + 2 * x := by nlinarith
+    · -- induction step
+      have := hi (by nlinarith)
+      have := calc
+        (1 + x) ^ (n + 1)
+        _ = (1 + x) * (1 + x)^n := by grind
+        _ > (1 + x) * (1 + n * x) := by nlinarith
+        _ = 1 + (n + 1) * x + n * x^2 := by grind
+        _ ≥ 1 + (n + 1) * x := by nlinarith
+      grind
+/-
+
+
+# Fibonacci sequence
+
+Let us consider the [Fibonacci sequence][fibonacci].
+
+[fibonacci]: https://en.wikipedia.org/wiki/Fibonacci_sequence
+
+-/
+def fib (n : ℕ) :=
+  match n with
+  | 0 => 0
+  | 1 => 1
+  | n + 2 => fib (n + 1) + fib n
+/-
+
+The sequence has an exponential bound. We give two proofs: one using structural recursion and one using the `induction` tactic with strong induction.
+-/
+lemma fib_upper_bd (n : ℕ)
+  : fib n ≤ 2^n
+:= by
+  match n with
+  | 0 => simp [fib]
+  | 1 => simp [fib]
+  | n + 2 =>
+    have := fib_upper_bd n
+    have := fib_upper_bd (n + 1)
+    calc
+      fib (n + 2)
+      _ = fib (n + 1) + fib n := by simp only [fib]
+      _ ≤ 2^(n + 1) + 2^n + 2^n := by linarith
+      _ = 2^(n + 2) := by grind
+
+example (n : ℕ)
+  : fib n ≤ 2^n
+:= by
+  induction n using Nat.strong_induction_on with | _ n hi =>
+  match n with
+  | 0 => simp [fib]
+  | 1 => simp [fib]
+  | n + 2 =>
+    have := hi n (by nlinarith)
+    have := hi (n + 1) (by nlinarith)
+    calc
+      fib (n + 2)
+      _ = fib (n + 1) + fib n := by simp only [fib]
+      _ ≤ 2^(n + 1) + 2^n + 2^n := by linarith
+      _ = 2^(n + 2) := by grind
+/-
+
+
+## Binet's formula
+
+The Fibonacci numbers have a closed-form expression in terms of the golden ratio and its conjugate. The expression is called [Binet's formula][binet]
+
+[binet]: https://en.wikipedia.org/wiki/Fibonacci_sequence#Relation_to_the_golden_ratio
+
+Let us define the golden ratio `φ` and its conjugate `ψ`.
+-/
+noncomputable def φ := (1 + √5) / 2
+noncomputable def ψ := (1 - √5) / 2
+/-
+The `noncomputable` keyword is required since the irrational number `√5` cannot be computed exactly.
+
+The key idea in Binet's formula is that `φ` and `ψ` are the two solutions of the quadratic equation `x^2 = x + 1`.
+-/
+lemma aux_binet_φ : φ^2 = φ + 1 := by norm_num [φ]
+
+lemma aux_binet_ψ : ψ^2 = ψ + 1 := by norm_num [ψ]
+/-
+
+As a corollary they satisfy `x^(2 + n) = x^(1 + n) + x^n`.
+-/
+lemma aux_binet_pow {n : ℕ} {x : ℝ}
+  (h : x^2 = x + 1)
+  : x^(n + 2) = x^(n + 1) + x^n
+:= by
+  grind
+/-
+
+Show
+-/
+lemma binet (n : ℕ)
+  : fib n = (φ^n - ψ^n) / √5
+:= by
+  -- __Solution__
+  match n with
+  | 0 => simp [fib]
+  | 1 => simp [fib, φ, ψ]
+  | n + 2 =>
+    calc
+      (fib (n + 2) : ℝ)
+      _ = (φ^(n + 1) - ψ^(n + 1)) / √5 + (φ^n - ψ^n) / √5
+        := by simp [fib, binet n, binet (n + 1)]
+      _ = ((φ^(n + 1) + φ^n) - (ψ^(n + 1) + ψ^n)) / √5
+        := by grind
+      _ = (φ^(n + 2) - ψ^(n + 2)) / √5
+        := by simp only [
+            aux_binet_pow aux_binet_φ,
+            aux_binet_pow aux_binet_ψ
+          ]
+/-
+
+
 # Lists
 
 Lists are [tuples][tuple] of varying length.
@@ -265,7 +536,7 @@ lemma Nat'.le_toNat_le {n m : Nat'}
   | refl => exact Nat.le.refl
   | step _ _ =>
     simp [toNat]
-    grind
+    nlinarith
 
 lemma Nat'.le_ofNat_le {n m : ℕ}
   (h : n ≤ m)
