@@ -256,12 +256,10 @@ example (α β γ δ : Type) (f : α → γ) (g : β → δ)
   : Injective (λ p : α × β ↦ (f p.1, g p.2))
 := by
   intro ⟨a, b⟩ ⟨a', b'⟩ h
-  injection h with hfa hgb
-  congr
-  · apply hf
-    exact hfa
-  · apply hg
-    exact hgb
+  injection h
+  congr <;>
+  (first | apply hf | apply hg) <;>
+  assumption
 /-
 
 Show that a morphism in the symmetric monoidal category of coproducts is injective if both its components are.
@@ -276,14 +274,8 @@ example (α β γ δ : Type) (f : α → γ) (g : β → δ)
 := by
   -- __Solution__
   intro x y h
-  obtain a | b := x <;> obtain a' | b' := y
-  · injection h with hfa
-    congr
-    apply hf
-    exact hfa
-  · injection h
-  · injection h
-  · injection h with hgb
-    congr
-    apply hg
-    exact hgb
+  obtain a | b := x <;> obtain a' | b' := y <;>
+  injection h <;>
+  congr <;>
+  (first | apply hf | apply hg) <;>
+  assumption
