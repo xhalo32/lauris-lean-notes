@@ -243,14 +243,9 @@ example (α β : Type) (a : α) (b : β)
 
 # Injectivity of morphisms in Prod and Sum categories
 
-Recall the definition of injectivity.
--/
-def Injective {α β : Type} (f : α → β) : Prop :=
-  ∀ x y : α, f x = f y → x = y
-/-
-
 Show that a morphism in the symmetric monoidal category of products is injective if both its components are.
 -/
+open Function in
 example (α β γ δ : Type) (f : α → γ) (g : β → δ)
   (hf : Injective f) (hg : Injective g)
   : Injective (λ p : α × β ↦ (f p.1, g p.2))
@@ -264,6 +259,7 @@ example (α β γ δ : Type) (f : α → γ) (g : β → δ)
 
 Show that a morphism in the symmetric monoidal category of coproducts is injective if both its components are.
 -/
+open Function in
 example (α β γ δ : Type) (f : α → γ) (g : β → δ)
   (hf : Injective f) (hg : Injective g)
   : Injective (λ s : α ⊕ β ↦

@@ -6,9 +6,11 @@ import Mathlib
 Like `And`, equivalence `p ↔ q` is a structure. Find this structure and write your own version of it.
 -/
 -- __Solution__
+namespace Demo
 variable (p q : Prop)
 set_option pp.notation false in
 #reduce p ↔ q
+end Demo
 
 example (p q : Prop) : (p ↔ q) = (Iff p q) := rfl
 
@@ -353,22 +355,122 @@ example (p q r : Prop)
 /-
 
 
-# Boolean algebra
+# Injectivity and surjectivity
+
+Definition of surjectivity
+-/
+#print Function.Surjective
+
+open Function in
+example (α β : Type) (f : α → β) :
+  Surjective f = (∀ b : β, ∃ a : α, f a = b) := rfl
+/-
+
+
+## Positive results on surjectivity
+
+Recall that we studied earlier the following example.
+-/
+open Function in
+example (α β γ : Type) (f : α → β) (g : β → γ)
+  (hf : Injective f) (hg : Injective g)
+  : Injective (g ∘ f)
+:= by exact Injective.comp hg hf
+/-
+Here the proof is simply using a lemma in Mathlib. To search for a lemma, use `exact?`.
+
+Show the analogous statement on surjectivity.
+-/
+open Function in
+example (α β γ : Type) (f : α → β) (g : β → γ)
+  (hf : Surjective f) (hg : Surjective g)
+  : Surjective (g ∘ f)
+:= by
+  intro c
+  obtain ⟨b, hb⟩ := hg c
+  obtain ⟨a, ha⟩ := hf b
+  use a
+  simp [ha, hb]
+/-
+
+Show the analogue of
+-/
+open Function in
+example (α β γ : Type) (f : α → β) (g : β → γ)
+  (h : Injective (g ∘ f))
+  : Injective f
+:= by exact Injective.of_comp h
+
+open Function in
+example (α β γ : Type) (f : α → β) (g : β → γ)
+  (h : Surjective (g ∘ f))
+  : Surjective g
+:= by
+  -- __Solution__
+  intro b
+  obtain ⟨a, ha⟩ := h b
+  use f a
+  simp at ha
+  exact ha
+/-
+
+
+## Counterexamples
 
 `Bool` is a canonical type with two elements called `false` and `true`. These should not be confused with the propositions `False` and `True`.
 -/
 #print Bool
 /-
 
+Consider the functions
+-/
+def f (x : Unit) : Bool := false
+
+def g (x : Bool) : Unit :=
+  match x with
+  | false => ⟨⟩
+  | true => ⟨⟩
+/-
+
+The composition `f ∘ g` is injective and surjective.
+-/
+open Function in
+example : Injective (g ∘ f)
+:= by
+  simp [Injective]
+
+open Function in
+example : Surjective (g ∘ f)
+:= by
+  -- __Solution__
+  simp [Surjective]
+/-
+
+However, `g` is not injective and `f` is not surjective.
+-/
+open Function in
+example : ¬Injective g := by
+  -- __Solution__
+  simp [Injective]
+
+open Function in
+example : ¬Surjective f := by
+  -- __Solution__
+  simp [Surjective, f]
+/-
+
+
+# Boolean algebra
+
+[Boolean algebra][boolean-algebra] uses three operators that correspond to negation, conjunction and disjunction.
+
+[boolean-algebra]: https://en.wikipedia.org/wiki/Boolean_algebra
+
 `Bool` is embedded in `ℕ`.
 -/
 example : false = 0 := rfl
 example : true = 1 := rfl
 /-
-
-[Boolean algebra][boolean-algebra] uses three operators that correspond to negation, conjunction and disjunction.
-
-[boolean-algebra]: https://en.wikipedia.org/wiki/Boolean_algebra
 
 Show that the three operators `!`, `&&`, and `||` can be written in terms of arithmetic operators in `ℕ`.
 -/

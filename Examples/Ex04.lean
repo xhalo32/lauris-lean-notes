@@ -201,9 +201,17 @@ example (α : Type) (P Q R : α → Prop) (x : α)
 
 Definition of injectivity
 -/
-def Injective {α β : Type} (f : α → β) : Prop :=
-  ∀ x y : α, f x = f y → x = y
+open Function
+#print Injective
+
+example (α β : Type) (f : α → β) :
+  Injective f = (∀ x y : α, f x = f y → x = y) := rfl
 /-
+
+
+## Basic properties
+
+All examples in this section can be solved by `tauto` (but, curiously, not by `grind`). You may still want to write them out step by step for practice.
 
 The identity function is injective.
 -/
@@ -236,6 +244,9 @@ example (α β : Type) (f : α → β) (a a' : α)
   apply hf
   exact h
 /-
+
+
+## Further properties
 
 The composition of two injective functions is injective.
 -/

@@ -48,11 +48,8 @@ structure Equiv'' (α β : Type) where
 
 # Embedding of types
 
-Embedding of types is written as `α ↪ β`. Here `↪` is syntactic sugar for a structure. Find this structure and write your own version of it using `Injective`.
+Embedding of types is written as `α ↪ β`. Here `↪` is syntactic sugar for a structure. Find this structure and write your own version of it.
 -/
-def Injective {α β : Type} (f : α → β) : Prop :=
-  ∀ x y : α, f x = f y → x = y
-
 -- __Solution__
 set_option pp.notation false in
 #reduce α ↪ β
@@ -60,11 +57,10 @@ set_option pp.notation false in
 example : (α ↪ β) = (Function.Embedding α β) := rfl
 
 #print Function.Embedding
-#print Function.Injective
 
 structure Embedding (α β : Type) where
   toFun : α → β
-  inj' : Injective toFun
+  inj' : Function.Injective toFun
 /-
 
 
