@@ -5,11 +5,11 @@ import Mathlib
 
 Recall that currying, together with its inverse, establishes the equivalence `(α × β → γ) ≃ (α → β → γ)`. Here `≃` is syntactic sugar for a structure. Find this structure.
 -/
-variable (α β : Type)
+variable (α β : Type) in
 set_option pp.notation false in
 #reduce α ≃ β
 
-example : (α ≃ β) = (Equiv α β) := rfl
+example (α β : Type) : (α ≃ β) = (Equiv α β) := rfl
 
 #print Equiv
 #print Function.LeftInverse
@@ -51,10 +51,12 @@ structure Equiv'' (α β : Type) where
 Embedding of types is written as `α ↪ β`. Here `↪` is syntactic sugar for a structure. Find this structure and write your own version of it.
 -/
 -- __Solution__
+variable (α β : Type) in
 set_option pp.notation false in
 #reduce α ↪ β
 
-example : (α ↪ β) = (Function.Embedding α β) := rfl
+example (α β : Type) : (α ↪ β) = Function.Embedding α β
+:= rfl
 
 #print Function.Embedding
 

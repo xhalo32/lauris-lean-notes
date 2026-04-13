@@ -6,11 +6,9 @@ import Mathlib
 Like `And`, equivalence `p ↔ q` is a structure. Find this structure and write your own version of it.
 -/
 -- __Solution__
-namespace Demo
-variable (p q : Prop)
+variable (p q : Prop) in
 set_option pp.notation false in
 #reduce p ↔ q
-end Demo
 
 example (p q : Prop) : (p ↔ q) = (Iff p q) := rfl
 
