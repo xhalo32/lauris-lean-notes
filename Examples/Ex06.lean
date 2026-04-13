@@ -35,12 +35,12 @@ Formulate and prove [biconditional elimination][bicond-elim] for `Iff'`.
 [bicond-elim]: https://en.wikipedia.org/wiki/Biconditional_elimination
 -/
 -- __Solution__
-example (h : Iff' p q) : p → q
+example (p q : Prop) (h : Iff' p q) : p → q
 := by
   obtain ⟨hpq, _⟩ := h
   exact hpq
 
-example (h : Iff' p q) : q → p
+example (p q : Prop) (h : Iff' p q) : q → p
 := by
   obtain ⟨_, hqp⟩ := h
   exact hqp
@@ -488,7 +488,7 @@ example (x y : Bool) : (x || y) = x + y - x * y
 /-
 
 
-## Truth tables
+## Truth tables and tautologies
 
 Form the truth table of negation.
 -/
@@ -498,7 +498,6 @@ example : !1 = 0 := rfl
 
 Form the truth table of conjunction.
 -/
--- __Solution__
 example : (0 && 0) = 0 := rfl
 example : (0 && 1) = 0 := rfl
 example : (1 && 0) = 0 := rfl
@@ -512,6 +511,14 @@ example : (0 || 0) = 0 := rfl
 example : (0 || 1) = 1 := rfl
 example : (1 || 0) = 1 := rfl
 example : (1 || 1) = 1 := rfl
+/-
+
+Tautologies can be shown by `bv_decide`.
+-/
+example (p q : Bool)
+  : (p && q) = (q && p)
+:= by
+  bv_decide
 /-
 
 
