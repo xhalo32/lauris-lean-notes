@@ -4,7 +4,7 @@ Type classes
 tag := "sec-type-classes"
 %%%
 -/
-import Mathlib.Algebra.Group.Defs
+import Mathlib
 import Document.Peano
 /-
 One of the simplest type classes is `Add`.
@@ -133,4 +133,52 @@ Mathlib has a rich hierarchy of classes. [Mathematics in Lean][mathematics-in-le
 
 [mathematics-in-lean]: https://leanprover-community.github.io/mathematics_in_lean
 
+
+# Deriving instances
+
+Lean can automatically generate instances for a number of type classes. We will consider `DecidableEq` as an example. It is an abbreviation for equality being an instance of `Decidable` for all elements of a type.
+-/
+#print DecidableEq
+/-
+
+There are `DecidableEq` instances for natural and rational numbers.
+-/
+example : DecidableEq ℕ := by infer_instance
+example : DecidableEq ℚ := by infer_instance
+/-
+
+But not for real numbers.
+```lean +error
+example : DecidableEq ℝ := by infer_instance
+```
+
+Let us consider trileans with automatically generated `Decidable` instances for equality.
+-/
+inductive Trilean where
+  | F
+  | U
+  | T
+deriving DecidableEq
+
+open Trilean in
+example (x y : Trilean) : Decidable (x = y)
+:= by infer_instance
+/-
+
+Finite sets of elements of a type `α` are represented by the type `Finset α`. If `α` is an instance of `DecidableEq` then the relation `A ⊆ B` is decidable for `A` and `B` of type `Finset α`.
+-/
+example (α : Type) [DecidableEq α] (A B : Finset α) :
+  Decidable (A ⊆ B)
+:= by infer_instance
+
+example : {1,2} ⊆ ({1,2,3} : Finset ℕ) := by decide
+
+open Trilean in
+example : {F} ⊆ ({F, T} : Finset Trilean) := by decide
+/-
+
+The same does not work for potentially infinite sets.
+```lean +error
+example : {1,2} ⊆ ({1,2,3} : Set ℕ) := by decide
+```
 -/
