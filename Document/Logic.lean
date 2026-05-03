@@ -418,10 +418,8 @@ Existential quantification is encoded as an inductive type.
 -/
 #print Exists
 
-inductive Exists' : {α : Sort u} → (P : α → Prop) → Prop
-  where
-  | intro : {α : Sort u} → {P : α → Prop} →
-    (a : α) → (h : P a) → Exists' P
+inductive Exists' {α : Sort u} (P : α → Prop) : Prop where
+  | intro (a : α) (h : P a) : Exists' P
 /-
 
 The definition is based on [existential generalization][existential-generalization]. We give two formulations.
