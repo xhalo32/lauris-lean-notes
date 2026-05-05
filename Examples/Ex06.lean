@@ -458,6 +458,50 @@ example : ¬Surjective f := by
 /-
 
 
+# Convergence of sequences
+
+We give the usual definition of a sequence converging to a limit. A sequence `x₀, x₁, x₂, …` of real numbers is encoded as a function from `ℕ` to `ℝ` sending `0` to `x₀`, `1` to `x₁` and so on.
+-/
+def TendsTo (x : ℕ → ℝ) (t : ℝ) : Prop :=
+  ∀ ε > 0, ∃ N : ℕ, ∀ n, N ≤ n → |x n - t| < ε
+/-
+
+Show that if `x(n)` tends to `t` then `-x(n)` tends to `-t`.
+-/
+example (x : ℕ → ℝ) (t : ℝ)
+  (hx : TendsTo x t)
+  : TendsTo (λ n ↦ -x n) (-t)
+:= by
+  -- Simplify the goal
+  simp [TendsTo] at *
+
+  -- Let ε > 0
+  intro ε hε
+
+  -- From `x(n)` tending to `t` we get `N` such that `x(n)` is `ε`-close to `t` for all `n ≥ N`
+  specialize hx ε hε
+  obtain ⟨N, hN⟩ := hx
+
+  -- Using exactly this N
+  use N
+  -- Let n ≥ N
+  intro n hn
+
+  -- For this `n`, `x(n)` is `ε`-close to `t`
+  specialize hN n hn
+
+  -- Rewrite the absolute value, after which hN applies
+  calc
+    |-x n + t|
+    _ = |x n - t| := by grind
+    _ < ε         := by exact hN
+/-
+
+Similar exercises can be found in Sheets 3, 5, and 6 of  [Section 2][Section02reals] of Formalising Mathematics 2026, a Lean course at Imperial College London.
+
+[Section02reals]: https://github.com/b-mehta/formalising-mathematics-notes/tree/main/FormalisingMathematics2026/Section02reals
+
+
 # Boolean algebra
 
 [Boolean algebra][boolean-algebra] uses three operators that correspond to negation, conjunction and disjunction.
