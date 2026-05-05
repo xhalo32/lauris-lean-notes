@@ -497,7 +497,7 @@ example (x : ℕ → ℝ) (t : ℝ)
     _ < ε         := by exact hN
 /-
 
-Similar exercises can be found in Sheets 3, 5, and 6 of  [Section 2][Section02reals] of Formalising Mathematics 2026, a Lean course at Imperial College London.
+Similar exercises can be found in Sheets 3, 5, and 6 of [Section 2][Section02reals] of Formalising Mathematics 2026, a Lean course at Imperial College London.
 
 [Section02reals]: https://github.com/b-mehta/formalising-mathematics-notes/tree/main/FormalisingMathematics2026/Section02reals
 
