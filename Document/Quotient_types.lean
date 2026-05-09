@@ -13,57 +13,140 @@ Integers can be encoded as the quotient set of $`\mathbb N^2` by the equivalence
 
 The equivalence relation is encoded by
 -/
-def r (p₁ p₂ : Nat' × Nat') : Prop :=
+def N2.r (p₁ p₂ : Nat' × Nat') : Prop :=
   let ⟨n₁, k₁⟩ := p₁
   let ⟨n₂, k₂⟩ := p₂
-  n₁.add k₂ = n₂.add k₁
+  n₁ + k₂ = n₂ + k₁
 /-
 
 It inherits reflexivity and symmetry from equality.
 -/
-lemma r_refl (p : Nat' × Nat') : r p p := rfl
+lemma N2.r_refl (p : Nat' × Nat') : r p p := rfl
 
-lemma r_symm {p₁ p₂ : Nat' × Nat'}
+lemma N2.r_symm {p₁ p₂ : Nat' × Nat'}
   (h : r p₁ p₂)
   : r p₂ p₁
 := h.symm
 /-
 
-Transtivity is shown using properties of addition on `Nat'`.
+Transtivity is shown using properties of addition on `Nat'`. We isolate a step in the proof as a lemma that will be reused.
 -/
-lemma r_trans {p₁ p₂ p₃ : Nat' × Nat'}
+lemma Nat'.add_right_comm {a b c : Nat'}
+  : a + b + c = a + c + b
+:=
+  calc
+    (a + b) + c
+    _ = a + (b + c) := add_assoc
+    _ = a + (c + b) := congrArg (a + ·) add_comm
+    _ = (a + c) + b := add_assoc.symm
+
+open Nat' in
+lemma N2.r_trans {p₁ p₂ p₃ : Nat' × Nat'}
   (h1 : r p₁ p₂) (h2 : r p₂ p₃)
   : r p₁ p₃
-:= by
+:=
   let ⟨n₁, k₁⟩ := p₁
   let ⟨n₂, k₂⟩ := p₂
   let ⟨n₃, k₃⟩ := p₃
-  simp only [r] at *
-  have (x y z : Nat') := calc
-    (x.add y).add z
-    _ = x.add (y.add z) := by simp only [Nat'.add_assoc]
-    _ = x.add (z.add y) := by simp only [Nat'.add_comm]
-    _ = (x.add z).add y := by simp only [Nat'.add_assoc]
   have := calc
-    (n₁.add k₃).add k₂
-    _ = (n₁.add k₂).add k₃ := by simp only [this]
-    _ = (n₂.add k₁).add k₃ := by simp only [h1]
-    _ = (n₂.add k₃).add k₁ := by simp only [this]
-    _ = (n₃.add k₂).add k₁ := by simp only [h2]
-    _ = (n₃.add k₁).add k₂ := by simp only [this]
-  exact Nat'.add_right_cancel this
+    (n₁ + k₃) + k₂
+    _ = (n₁ + k₂) + k₃ := add_right_comm
+    _ = (n₂ + k₁) + k₃ := congrArg (· + k₃) h1
+    _ = (n₂ + k₃) + k₁ := add_right_comm
+    _ = (n₃ + k₂) + k₁ := congrArg (· + k₁) h2
+    _ = (n₃ + k₁) + k₂ := add_right_comm
+  add_right_cancel this
 /-
 
-A [setoid][setoid] is a set equipped with an equivalence relation.
+
+# Formation of quotient types
+
+A quotient type is formed from a [setoid][setoid], a set equipped with an equivalence relation.
 
 [setoid]: https://en.wikipedia.org/wiki/Setoid
 
 -/
-instance s : Setoid (Nat' × Nat') where
+#print Setoid
+
+instance N2.instSetoid : Setoid (Nat' × Nat') where
   r := r
   iseqv := ⟨r_refl, r_symm, r_trans⟩
 /-
 
-A quotient type is formed from a setoid. The formation of quotient types is a primitive feature implemented in the kernel. It is analogous to, but distinct from, the formation of inductive types.
+The formation of a quotient type is a primitive feature implemented in the kernel. It is analogous to, but distinct from, the formation of inductive types.
 -/
-def Int' : Type := Quotient s
+def Z : Type := Quotient N2.instSetoid
+/-
+
+Expressions of type `Z` can be introduced using `Quotient.mk`, coming with syntactic sugar.
+-/
+open Nat' in
+example
+  : Quotient.mk N2.instSetoid (zero, zero) = ⟦(zero, zero)⟧
+:= rfl
+
+def Z.zero : Z := ⟦(Nat'.zero, Nat'.zero)⟧
+/-
+
+The equivalence relation bundled in `Setoid` comes with syntactic sugar.
+-/
+example (p q : Nat' × Nat') : (p ≈ q) = N2.r p q := rfl
+/-
+
+
+# Elimination of quotient expressions
+
+Functions from quotients can be defined by proving that a function from the underlying type respects the quotient's equivalence relation.
+-/
+def N2.add (p₁ p₂ : Nat' × Nat') :=
+  let ⟨n₁, k₁⟩ := p₁
+  let ⟨n₂, k₂⟩ := p₂
+  (n₁ + n₂, k₁ + k₂)
+
+open Nat' in
+lemma N2.add_resp_r {p₁ q₁ p₂ q₂ : Nat' × Nat'}
+  (h1 : p₁ ≈ q₁) (h2 : p₂ ≈ q₂)
+  : add p₁ p₂ ≈ add q₁ q₂
+:=
+  let ⟨n₁, k₁⟩ := p₁
+  let ⟨n₂, k₂⟩ := p₂
+  let ⟨m₁, l₁⟩ := q₁
+  let ⟨m₂, l₂⟩ := q₂
+  have {a b c d : Nat'} := calc
+    (a + b) + (c + d)
+    _ = ((a + b) + c) + d := add_assoc.symm
+    _ = ((a + c) + b) + d := congrArg (· + d) add_right_comm
+    _ = (a + c) + (b + d) := add_assoc
+  calc
+    (n₁ + n₂) + (l₁ + l₂)
+    _ = (n₁ + l₁) + (n₂ + l₂) := this
+    _ = (m₁ + k₁) + (n₂ + l₂) := congrArg (· + (n₂ + l₂)) h1
+    _ = (m₁ + k₁) + (m₂ + k₂) := congrArg ((m₁ + k₁) + ·) h2
+    _ = (m₁ + m₂) + (k₁ + k₂) := this.symm
+
+def Z.add := Quotient.lift₂
+  (λ p q ↦ Quotient.mk N2.instSetoid (N2.add p q))
+  (λ _ _ _ _ h1 h2 ↦ Quotient.sound (N2.add_resp_r h1 h2))
+/-
+
+Here `Quotient.sound` is the quotient axiom.
+-/
+example (α : Sort u) (s : Setoid α) (a b : α) :
+  a ≈ b → (Quotient.mk s a) = (Quotient.mk s b)
+:= Quotient.sound
+/-
+
+We can now show that `1 - 1 = 0`.
+-/
+instance : Add' Z where
+  add := Z.add
+
+def Z.one : Z := ⟦(Nat'.zero.succ, Nat'.zero)⟧
+def Z.minus_one : Z := ⟦(Nat'.zero, Nat'.zero.succ)⟧
+
+open Z in
+example : one + minus_one = zero := Quotient.sound rfl
+/-
+
+The standard integers are not defined as a quotient, and computing with them does not require using the quotient axiom.
+-/
