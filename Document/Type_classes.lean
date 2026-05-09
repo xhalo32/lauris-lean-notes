@@ -44,7 +44,7 @@ example :
 := @Prod'.mk
 /-
 
-Returning to our version of natural numbers `Nat'`, we define an instance `Add' Nat'`. {margin}[We have imported our earlier definitions. In the next example, `Nat'` is a link that takes to its definition.] The syntax of instance declarations resembles record-style definitions, as the side-by-side examples below illustrate. {index}[`instance … where`]
+Returning to our version of natural numbers `Nat'`, we define an instance `Add' Nat'`.{margin}[We have imported our earlier definitions. In the next example, `Nat'` is a link that takes to its definition.] The syntax of instance declarations resembles record-style definitions, as the side-by-side examples below illustrate. {index}[`instance … where`]
 -/
 instance Nat'.instAdd' : Add' Nat' where
   add := Nat'.add
@@ -146,7 +146,7 @@ example (x y : Nat') : Nat' := x + y
 
 example (x y : Nat') : x + y = Nat'.add x y := rfl
 /-
-The `+` notation on `Nat'` is resolved via two< instances, the above unnamed instance and `Nat'.instAdd'` from earlier.
+The `+` notation on `Nat'` is resolved via two instances, the above unnamed instance and `Nat'.instAdd'` from earlier.
 -/
 #synth HAdd Nat' Nat' Nat'
 /-
