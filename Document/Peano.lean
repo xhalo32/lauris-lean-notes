@@ -235,7 +235,7 @@ Zero is a [left identity element][identity-element] of addition.{margin}[It is a
 [identity-element]: https://en.wikipedia.org/wiki/Identity_element
 
 -/
-lemma Nat'.zero_add (n : Nat')
+lemma Nat'.zero_add {n : Nat'}
   : zero.add n = n
 :=
   match n with
@@ -248,31 +248,31 @@ The successor function is [equivariant][equivariant] under addition.
 [equivariant]: https://en.wikipedia.org/wiki/Equivariant_map
 
 -/
-lemma Nat'.add_succ (n m : Nat')
+lemma Nat'.add_succ {n m : Nat'}
   : n.add m.succ = (n.add m).succ
 :=
   match m with
   | zero => rfl
-  | succ m => congrArg succ (n.add_succ m)
+  | succ m => congrArg succ add_succ
 
-lemma Nat'.succ_add (n m : Nat')
+lemma Nat'.succ_add {n m : Nat'}
   : n.succ.add m = (n.add m).succ
 :=
   match m with
   | zero => rfl
-  | succ m => congrArg succ (n.succ_add m)
+  | succ m => congrArg succ succ_add
 /-
 Both these equivariance proofs are analogous to the proof left identity, and so is the following proof of [associativity][associativity] of addition.
 
 [associativity]: https://en.wikipedia.org/wiki/Associative_property
 
 -/
-lemma Nat'.add_assoc (a b c : Nat')
+lemma Nat'.add_assoc {a b c : Nat'}
   : (a.add b).add c = a.add (b.add c)
 :=
   match c with
   | zero => rfl
-  | succ c => congrArg succ (a.add_assoc b c)
+  | succ c => congrArg succ add_assoc
 /-
 
 Addition has the [right cancellation property][right-cancellation-property].{margin}[We leave the corresponding left cancellation property as an exercise.] The proof uses the constructor injectivity.
@@ -303,12 +303,12 @@ lemma Nat'.add_comm {n m : Nat'}
   | zero => calc
     n.add zero
     _ = n := rfl
-    _ = zero.add n := (zero_add n).symm
+    _ = zero.add n := zero_add.symm
   | succ m => calc
     n.add m.succ
-    _ = (n.add m).succ := add_succ n m
+    _ = (n.add m).succ := add_succ
     _ = (m.add n).succ := congrArg succ add_comm
-    _ = m.succ.add n := (succ_add m n).symm
+    _ = m.succ.add n := succ_add.symm
 /-
 -/
 -- -show
