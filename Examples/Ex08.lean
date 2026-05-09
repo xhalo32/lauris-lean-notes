@@ -123,7 +123,7 @@ example (n : ℕ) (y : ℝ)
   nlinarith
 /-
 
-In the proof of Bernoulli's inequality you might need the following equivalence. Here `↑n` means that the natural number `n` is viewed as a real number. The two equivalent expressions differ only in the order of addition and such a coercion.
+In the proof of Bernoulli's inequality you might need the following equivalence. Here `↑n` means that the natural number `n` is viewed as a real number. The two equivalent expressions differ only in the order of addition and such a coercion. In practice, coercions are never written out explicitly.
 -/
 example (n : ℕ) (x : ℝ)
   : (1 + x) ^ (n + 1) ≥ 1 + (↑n + 1) * x
