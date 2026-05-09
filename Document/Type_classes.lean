@@ -40,10 +40,10 @@ def origin : Prod ℕ ℕ where
 
 Indeed, {index}[`instance … where`]
 -/
-instance instAdd'Nat' : Add' Nat' where
+instance Nat'.instAdd' : Add' Nat' where
   add := Nat'.add
 
-example : Add' Nat' := instAdd'Nat'
+example : Add' Nat' := Nat'.instAdd'
 /-
 
 Giving a name is optional in instance declarations, and Lean's instance synthesis can search for an expression of a required type at the elaboration stage. Instance synthesis can be tested using `#synth` command. {index}[`#synth`]
@@ -68,10 +68,10 @@ example (x y : Nat') : Add'.addr x y = Nat'.add y x := rfl
 In these two examples, Lean uses instance synthesis to supply an implicit argument of type `Add' Nat'`. The corresponding explicit versions read
 -/
 example (x y : Nat') : Nat' :=
-  @Add'.addr Nat' instAdd'Nat' x y
+  @Add'.addr Nat' Nat'.instAdd' x y
 
 example (x y : Nat')
-  : @Add'.addr Nat' instAdd'Nat' x y = Nat'.add y x
+  : @Add'.addr Nat' Nat'.instAdd' x y = Nat'.add y x
 := rfl
 /-
 
@@ -117,68 +117,22 @@ class AddSemigroup' (G : Type u) extends Add' G where
   add_assoc : ∀ a b c : G, (a + b) + c = a + (b + c)
 /-
 
-All instances of `AddSemigroup'` are instances of `Add'`, that is, if there is an expression of type `AddSemigroup' G` then there is an expression of type `Add' G`. This can be shown using `infer_instance` tactic.
+All instances of `AddSemigroup'` are instances of `Add'`, that is, if there is an expression of type `AddSemigroup' G` then there is an expression of type `Add' G`. This can be shown using `inferInstance`.
 -/
+#print inferInstance
+
 example (G : Type u) [AddSemigroup' G] : Add' G
-:= by infer_instance
+:= inferInstance
 /-
 
 Constructing an expression of type `AddSemigroup' Nat'` amounts to providing a proof that `Nat'.add` is associative.{margin}[Recall that we have already shown the associativity. In the example, `add_assoc` is a link that takes to its definition.]
 -/
 instance : AddSemigroup' Nat' where
-  add_assoc := Nat'.add_assoc
+  add_assoc := @Nat'.add_assoc
 /-
 
 Mathlib has a rich hierarchy of classes. [Mathematics in Lean][mathematics-in-lean] gives an introduction to this hierarchy.
 
 [mathematics-in-lean]: https://leanprover-community.github.io/mathematics_in_lean
 
-
-# Deriving instances
-
-Lean can automatically generate instances for a number of type classes. We will consider `DecidableEq` as an example. It is an abbreviation for equality being an instance of `Decidable` for all elements of a type.
--/
-#print DecidableEq
-/-
-
-There are `DecidableEq` instances for natural and rational numbers.
--/
-example : DecidableEq ℕ := by infer_instance
-example : DecidableEq ℚ := by infer_instance
-/-
-
-But not for real numbers.
-```lean +error
-example : DecidableEq ℝ := by infer_instance
-```
-
-Let us consider trileans with automatically generated `Decidable` instances for equality.
--/
-inductive Trilean where
-  | F
-  | U
-  | T
-deriving DecidableEq
-
-open Trilean in
-example (x y : Trilean) : Decidable (x = y)
-:= by infer_instance
-/-
-
-Finite sets of elements of a type `α` are represented by the type `Finset α`. If `α` is an instance of `DecidableEq` then the relation `A ⊆ B` is decidable for `A` and `B` of type `Finset α`.
--/
-example (α : Type) [DecidableEq α] (A B : Finset α) :
-  Decidable (A ⊆ B)
-:= by infer_instance
-
-example : {1,2} ⊆ ({1,2,3} : Finset ℕ) := by decide
-
-open Trilean in
-example : {F} ⊆ ({F, T} : Finset Trilean) := by decide
-/-
-
-The same does not work for potentially infinite sets.
-```lean +error
-example : {1,2} ⊆ ({1,2,3} : Set ℕ) := by decide
-```
 -/
