@@ -8,11 +8,11 @@ import Mathlib.Data.Quot
 import Document.Type_classes
 /-
 
-Quotient types encode [equivalence classes][equivalence-class]. As an example, we consider integers as the quotient set of $`\mathbb N^2` by the equivalence relation $`\sim`, where $`(n_1, k_1) \sim (n_2, k_2)` if and only if $`n_1 + k_2 = n_2 + k_1`.{margin}[Using integers, the relation can be rewritten as $`n_1 - k_1 = n_2 - k_2`.] Positive integers are then given by the equivalence classes $`[(n, 0)]`, $`n \in \mathbb N \setminus \{0\}`, and negative integers by $`[(0, k)]`, $`k \in \mathbb N \setminus \{0\}`.
+Quotient types encode [equivalence classes][equivalence-class]. As an example, we construct integers as the quotient set of $`\mathbb N^2` by the equivalence relation $`\sim`, where $`(n_1, k_1) \sim (n_2, k_2)` if and only if $`n_1 + k_2 = n_2 + k_1`.{margin}[Using integers, the relation can be rewritten as $`n_1 - k_1 = n_2 - k_2`.] Positive integers are then given by the equivalence classes $`[(n, 0)]`, $`n \in \mathbb N \setminus \{0\}`, and negative integers by $`[(0, k)]`, $`k \in \mathbb N \setminus \{0\}`.
 
 [equivalence-class]: https://en.wikipedia.org/wiki/Equivalence_class
 
-We will implement integers as the quotient type by the relation{margin}[We have imported our earlier definitions.]
+We will implement integers as the quotient type by the followin relation.{margin}[We have imported our earlier definitions.]
 -/
 def N2.r (p₁ p₂ : Nat' × Nat') : Prop :=
   let ⟨n₁, k₁⟩ := p₁
@@ -86,11 +86,13 @@ The equivalence relation bundled in `Setoid` comes with syntactic sugar.
 example (p q : Nat' × Nat') : (p ≈ q) = N2.r p q := rfl
 /-
 
-Like formation of inductive types using `inductive`, the formation of a quotient type is a primitive feature implemented in the kernel. The primitive is called `Quot`. Like a recursor, it has a function type but is built into the kernel.
+Like the formation of inductive types using `inductive`, the formation of a quotient type is a primitive feature implemented in the kernel. The primitive is called `Quot`. Like a recursor, it has a function type but is built into the kernel.
 -/
+#print Quot
+
 example (α : Sort u) : (α → α → Prop) → Sort u := Quot
 /-
-`Quot` takes a relation as its argument. The variant `Quotient`, parameterized by a setoid, is preferred in practice. It lets instance synthesis find the relation rather than requiring it to be passed explicitly.
+`Quot` takes a relation as its argument. The variant `Quotient`, parameterized by a setoid, is preferred in practice.
 -/
 example (α : Sort u) : Setoid α → Sort u := Quotient
 
@@ -109,6 +111,8 @@ def Z : Type := Quotient N2.instSetoid
 
 Expressions of a quotient type are introduced using `Quot.mk`. Like `Quot`, it has a function type but is built into the kernel.
 -/
+#print Quot.mk
+
 example (α : Sort u) :
   (r : α → α → Prop) → α → Quot r := Quot.mk
 /-
@@ -137,24 +141,30 @@ def Z.zero : Z := ⟦(Nat'.zero, Nat'.zero)⟧
 
 # Equality of quotient expressions
 
-Beyond formation, introduction, and elimination, quotients are characterized by an axiom relating equality of classes to the underlying equivalence.
-
+The quotient axiom and its converse say that two equivalence classes `⟦x⟧` and `⟦y⟧` are equal if and only if `x` and `y` are related by the underlying equivalence.
 
 ## Quotient axiom
 
-Axioms are propositions postulated without proof. `Quot.sound` is one of the small number of axioms postulated by the kernel.{margin}[`Quotient.sound` is essentially synonymous with `Quot.sound`. We prefer the latter to emphasize its role as an axiom.]
+Axioms are propositions postulated without proof. `Quot.sound` is one of the small number of axioms postulated by the kernel.
 -/
 #print Quot.sound
 
-example (α : Sort u) (r : α → α → Prop) (a b : α)
-  (h : r a b)
-  : Quot.mk r a = Quot.mk r b
+example (α : Sort u) (r : α → α → Prop) (x y : α)
+  (h : r x y)
+  : Quot.mk r x = Quot.mk r y
 := Quot.sound h
+/-
+The variant `Quotient.sound` is parametrized by a setoid.
+-/
+example (α : Sort u) (s : Setoid α) (x y : α)
+  (h : x ≈ y)
+  : (⟦x⟧ : Quotient s) = ⟦y⟧
+:= Quotient.sound h
 
-example (α : Sort u) (s : Setoid α) (a b : α)
-  (h : a ≈ b)
-  : Quotient.mk s a = Quotient.mk s b
-:= Quot.sound h
+example (α : Sort u) (s : Setoid α) (x y : α)
+  (h : x ≈ y)
+  : Quotient.sound h = Quot.sound h
+:= rfl
 /-
 
 An integer `⟦(n, k)⟧` is zero if and only if `n = k`. We show now the _if_ direction. The _only if_ direction is shown later.
@@ -170,17 +180,17 @@ example (n k : Nat')
     _ = n := zero_add
     _ = k := h
     _ = zero + k := zero_add.symm
-  Quot.sound this
+  Quotient.sound this
 /-
 
 
 ## Quotient exactness
 
-The implication opposite to `Quot.sound` is called `Quotient.exact`. Contrary to `Quot.sound`, it is a regular theorem, not an axiom.
+The implication opposite to `Quotient.sound` is called `Quotient.exact`. Contrary to `Quotient.sound`, it is a regular theorem, not an axiom.
 -/
-example  (α : Sort u) (s : Setoid α) (a b : α)
-  (h : (⟦a⟧ : Quotient s) = ⟦b⟧)
-  : a ≈ b
+example  (α : Sort u) (s : Setoid α) (x y : α)
+  (h : (⟦x⟧ : Quotient s) = ⟦y⟧)
+  : x ≈ y
 := Quotient.exact h
 /-
 
@@ -199,7 +209,7 @@ example (n k : Nat')
     _ = k := zero_add
 /-
 
-The non-negative integers give an embedding of natural numbers.
+Positive integers were described {ref "sec-quotient-types"}[above] as equivalence classes `⟦(n, 0)⟧` with `n ≠ 0`. The example below justifies this by showing that the map `n ↦ ⟦(n, 0)⟧` is injective.
 -/
 open Nat' in
 example (n m : Nat')
@@ -218,19 +228,22 @@ example (n m : Nat')
 
 # Elimination of quotient expressions
 
-Functions from quotients can be defined by proving that a function from the underlying type respects the quotient's equivalence relation. This elimination principle is `Quot.lift`. Like the introduction principle `Quot.mk`, it has a function type but is built into the kernel.
+The elimination principle for quotients is `Quot.lift`. If a function on the underlying type respects the equivalence relation, as stated in the compatibility condition `h` below, then `Quot.lift` turns it into a function on the quotient. Like the introduction principle, the elimination principle has a function type but is built into the kernel.
 -/
+#print Quot.lift
+
 example (α : Sort u) (r : α → α → Prop) (β : Sort v)
-  (f : α → β)
+  (f : α → β) (q : Quot r)
   (h : ∀ (x y : α), r x y → f x = f y) :
-  Quot r → β := Quot.lift f h
+  β := Quot.lift f h q
 /-
+
 The variant `Quotient.lift` is parametrized by a setoid.
 -/
 example (α : Sort u) (β : Sort v) (s : Setoid α)
-  (f : α → β)
+  (f : α → β) (ec : Quotient s)
   (h : ∀ (x y : α), x ≈ y → f x = f y) :
-  Quotient s → β := Quotient.lift f h
+  β := Quotient.lift f h ec
 
 example (α : Sort u) (β : Sort v) (s : Setoid α)
   (f : α → β)
@@ -259,21 +272,21 @@ lemma N2.neg_resp_r {p q : Nat' × Nat'}
     _ = l + n := add_comm
 /-
 
-The codomain of the lifted negation should be `Z`. For this reason, we need to turn `N2.neg` into a function from `Nat' × Nat'` to `Z` having the below property `h`.
+The codomain of the lifted negation should be `Z`. For this reason, we need to turn `N2.neg` into a function from `Nat' × Nat'` to `Z` satisfying the below compatibility condition `h`.
 -/
-example (f : Nat' × Nat' → Z)
+example (f : Nat' × Nat' → Z) (ec : Z)
   (h : ∀ (x y : Nat' × Nat'), x ≈ y → f x = f y) :
-  Z → Z := Quotient.lift f h
+  Z := Quotient.lift f h ec
 /-
 A suitable function is obtained via introduction.
 -/
 example : Nat' × Nat' → Z := λ p ↦ ⟦N2.neg p⟧
 /-
-The required property follows from `N2.neg_resp_r` and `Quot.sound`. We define negation on `Z` by
+The compatibility condition follows from `N2.neg_resp_r` and `Quotient.sound`. We define negation on `Z` by
 -/
 def Z.neg := Quotient.lift
   (λ p ↦ ⟦N2.neg p⟧)
-  (λ _ _ h ↦ Quot.sound (N2.neg_resp_r h))
+  (λ _ _ h ↦ Quotient.sound (N2.neg_resp_r h))
 /-
 
 
@@ -284,14 +297,14 @@ Analogously to {ref "sec-iota-reduction"}[$`\iota`-reduction] that governs the c
 example (α : Sort u) (β : Sort v) (s : Setoid α)
   (f : α → β) (x : α)
   (h : ∀ (x y : α), x ≈ y → f x = f y)
-  : Quotient.lift f h (Quotient.mk s x) = f x
+  : Quotient.lift f h ⟦x⟧ = f x
 := rfl
 
 variable (α : Sort u) (β : Sort v) (s : Setoid α)
   (f : α → β) (x : α)
   (h : ∀ (x y : α), x ≈ y → f x = f y)
 in
-#reduce Quotient.lift f h (Quotient.mk s x)
+#reduce Quotient.lift f h ⟦x⟧
 /-
 
 Quotient reduction enables the following.
@@ -309,57 +322,82 @@ example (n k : Nat') :
 /-
 
 
-# Further proofs
+# Induction principle for quotients
 
-A non-negative integer satisfies -x = x if and only if it is zero.
+The induction principle for quotients follows the structure of recursors for inductive types: in order to prove that a predicate holds for all equivalence classes, it suffices to prove that it holds for each `⟦a⟧` with `a` inhabiting the underlying type. The induction principle is `Quot.ind`. Like the elimination principle `Quot.lift`, it has a function type but is built into the kernel.
 -/
-open Nat' in
-example (n : Nat')
-  (h : Z.neg ⟦(n, zero)⟧ = ⟦(n, zero)⟧)
-  : n = zero
+#print Quot.ind
+
+example (α : Sort u) (r : α → α → Prop)
+  (motive : Quot r → Prop) (q : Quot r)
+  (h : (∀ (a : α), motive (Quot.mk r a)))
+  : motive q
+:= Quot.ind h q
+/-
+The variant `Quotient.ind` is parametrized by a setoid.
+-/
+#print Quotient.ind
+
+example (α : Sort u) (s : Setoid α)
+  (motive : Quotient s → Prop) (ec : Quotient s)
+  (h : (∀ (a : α), motive ⟦a⟧))
+  : motive ec
+:= Quotient.ind h ec
+/-
+
+Elimination of double negation.
+-/
+example :
+  ∀ x : Z, Z.neg (Z.neg x) = x
+:= Quotient.ind (λ _ ↦ rfl)
+/-
+The following variant fails to compile if the motive is omitted.
+-/
+example (x : Z) :
+  Z.neg (Z.neg x) = x
 :=
-  have h1 : (zero, n) ≈ (n, zero) := Quotient.exact h
-  match n, h1 with
-  | zero, _ => rfl
-  | succ k, h2 =>
-    have contradiction := calc
-      zero
-      _ = zero + zero := zero_add.symm
-      _ = k.succ + k.succ := h2
-      _ = (k.succ + k).succ := add_succ
-    have : zero ≠ (k.succ + k).succ := nofun
-    have : False := this contradiction
-    this.rec
+  (Quotient.ind
+    (motive := λ y ↦ Z.neg (Z.neg y) = y)
+    (λ _ ↦ rfl)
+  ) x
 /-
 
-For binary operations like addition, we use the further variant `Quotient.lift₂`, specialized here to the case where both arguments of the binary operation have the same type.
+
+# Binary operations
+
+Binary operations like addition can be lifted using `Quotient.lift₂`, specialized here to the case where both arguments of the binary operation have the same type. This case is sufficient for our purposes.
 -/
 example (α : Sort u) (β : Sort v) (s : Setoid α)
-  (f : α → α → β)
+  (f : α → α → β) (ec₁ ec₂ : Quotient s)
   (h : ∀ (x₁ y₁ x₂ y₂ : α),
     x₁ ≈ x₂ → y₁ ≈ y₂ → f x₁ y₁ = f x₂ y₂
   ) :
-  Quotient s → Quotient s → β := Quotient.lift₂ f h
+  β := Quotient.lift₂ f h ec₁ ec₂
 /-
 
-The variant is implemented using `Quotient.lift`.
+`Quotient.lift₂` is implemented using `Quotient.lift` twice. We define a partially-applied lift, called `F` below, then lift again. As `F` acts on equivalence classes, the proof of the compatibility condition associated with the second lift relies on the induction principle `Quotient.ind`.
 -/
-set_option pp.proofs true in
-#print Quotient.lift₂._proof_2
-
-#print Quotient.lift₂
-
-
 example (α : Sort u) (β : Sort v) (s : Setoid α)
-  (f : α → α → β)
+  (f : α → α → β) (ec₁ ec₂ : Quotient s)
   (h : ∀ (x₁ y₁ x₂ y₂ : α),
     x₁ ≈ x₂ → y₁ ≈ y₂ → f x₁ y₁ = f x₂ y₂
-  ) :
-  Quotient.lift₂ f h = λ q₁ q₂ ↦
-    Quotient.lift (fun a₁ ↦ Quotient.lift (f a₁) (Quotient.lift₂._proof_1 f h a₁) q₂) (Quotient.lift₂._proof_2 f h q₂) q₁
+  )
+  : (Quotient.lift₂ f h) ec₁ ec₂
+    =
+    let F (x : α) (ec : Quotient s) :=
+      have (y₁ y₂ : α) (hy : y₁ ≈ y₂) : f x y₁ = f x y₂
+        := h x y₁ x y₂ (s.refl x) hy
+      Quotient.lift (f x) this ec
+    have (x₁ x₂ : α) (hx : x₁ ≈ x₂) : F x₁ ec₂ = F x₂ ec₂
+      := Quotient.ind
+        (motive := λ ec ↦ F x₁ ec = F x₂ ec)
+        (λ y ↦ h x₁ y x₂ y hx (s.refl y))
+        ec₂
+    Quotient.lift (λ x ↦ F x ec₂) this ec₁
 := rfl
 /-
 
+We define addition on `Z` by defining addition on `Nat' × Nat'`, showing that it respects `N2.r`, and lifting it.
 -/
 def N2.add (p₁ p₂ : Nat' × Nat') :=
   let ⟨n₁, k₁⟩ := p₁
@@ -388,15 +426,8 @@ lemma N2.add_resp_r {p₁ q₁ p₂ q₂ : Nat' × Nat'}
     _ = (m₁ + m₂) + (k₁ + k₂) := this.symm
 
 def Z.add := Quotient.lift₂
-  (λ p q ↦ Quotient.mk N2.instSetoid (N2.add p q))
-  (λ _ _ _ _ h1 h2 ↦ Quot.sound (N2.add_resp_r h1 h2))
-/-
-
-Here `Quotient.sound` is the quotient axiom.
--/
-example (α : Sort u) (s : Setoid α) (a b : α) :
-  a ≈ b → (Quotient.mk s a) = (Quotient.mk s b)
-:= Quot.sound
+  (λ p q ↦ ⟦N2.add p q⟧)
+  (λ _ _ _ _ hx hy ↦ Quotient.sound (N2.add_resp_r hx hy))
 /-
 
 We can now show that `1 - 1 = 0`. Using `Quotient.sound`, it remains to show `(1, 0) + (0, 1) ≈ (0, 0)`, which reduces to `(1, 1) ≈ (0, 0)` and further to `1 + 0 = 0 + 1`. These hold by `rfl`.
@@ -405,8 +436,8 @@ def Z.one : Z := ⟦(Nat'.zero.succ, Nat'.zero)⟧
 def Z.minus_one : Z := ⟦(Nat'.zero, Nat'.zero.succ)⟧
 
 open Z in
-example : Z.add one minus_one = zero := Quot.sound rfl
+example : Z.add one minus_one = zero := Quotient.sound rfl
 /-
 
-The standard integers are not defined as a quotient, and computing with them does not require using the quotient axiom.
+The standard integers `Int` are not defined as a quotient, but as an inductive type with separate constructors for non-negative and negative cases. Consequently, computing with them does not require the quotient axiom, as we have {ref "sec-definitional-equality-naive"}[seen].
 -/
