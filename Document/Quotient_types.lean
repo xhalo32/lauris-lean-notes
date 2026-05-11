@@ -14,7 +14,7 @@ Quotient types encode [equivalence classes][equivalence-class]. As an example, w
 
 We will implement integers as the quotient type by the followin relation.{margin}[We have imported our earlier definitions.]
 -/
-def N2.r (p₁ p₂ : Nat' × Nat') : Prop :=
+def N2.r (p₁ p₂ : N × N) : Prop :=
   let ⟨n₁, k₁⟩ := p₁
   let ⟨n₂, k₂⟩ := p₂
   n₁ + k₂ = n₂ + k₁
@@ -29,17 +29,17 @@ An [equivalence relation][equivalence-relation] is a binary relation that is ref
 [equivalence-relation]: https://en.wikipedia.org/wiki/Equivalence_relation
 
 -/
-lemma N2.r_refl (p : Nat' × Nat') : r p p := rfl
+lemma N2.r_refl (p : N × N) : r p p := rfl
 
-lemma N2.r_symm {p q : Nat' × Nat'}
+lemma N2.r_symm {p q : N × N}
   (h : r p q)
   : r q p
 := h.symm
 /-
 
-Transitivity follows from properties of addition on `Nat'`. We isolate a step in the proof as a lemma that will be reused.
+Transitivity follows from properties of addition on `N`. We isolate a step in the proof as a lemma that will be reused.
 -/
-lemma Nat'.add_right_comm {a b c : Nat'}
+lemma Nat'.add_right_comm {a b c : N}
   : a + b + c = a + c + b
 :=
   calc
@@ -49,7 +49,7 @@ lemma Nat'.add_right_comm {a b c : Nat'}
     _ = (a + c) + b := add_assoc.symm
 
 open Nat' in
-lemma N2.r_trans {p₁ p₂ p₃ : Nat' × Nat'}
+lemma N2.r_trans {p₁ p₂ p₃ : N × N}
   (h1 : r p₁ p₂) (h2 : r p₂ p₃)
   : r p₁ p₃
 :=
@@ -76,14 +76,14 @@ A quotient type is formed from a [setoid][setoid], a set equipped with an equiva
 -/
 #print Setoid
 
-instance N2.instSetoid : Setoid (Nat' × Nat') where
+instance N2.instSetoid : Setoid (N × N) where
   r := r
   iseqv := ⟨r_refl, r_symm, r_trans⟩
 /-
 
 The equivalence relation bundled in `Setoid` comes with syntactic sugar.
 -/
-example (p q : Nat' × Nat') : (p ≈ q) = N2.r p q := rfl
+example (p q : N × N) : (p ≈ q) = N2.r p q := rfl
 /-
 
 Like the formation of inductive types using `inductive`, the formation of a quotient type is a primitive feature implemented in the kernel. The primitive is called `Quot`. Like a recursor, it has a function type but is built into the kernel.
@@ -103,7 +103,7 @@ example (α : Sort u) (s : Setoid α) :
 
 Integers are encoded by
 -/
-def Z : Type := Quotient N2.instSetoid
+abbrev Z : Type := Quotient N2.instSetoid
 /-
 
 
@@ -170,7 +170,7 @@ example (α : Sort u) (s : Setoid α) (x y : α)
 An integer `⟦(n, k)⟧` is zero if and only if `n = k`. We show now the _if_ direction. The _only if_ direction is shown later.
 -/
 open Nat' in
-example (n k : Nat')
+example (n k : N)
   (h : n = k)
   : ⟦(n, k)⟧ = Z.zero
 :=
@@ -197,7 +197,7 @@ example  (α : Sort u) (s : Setoid α) (x y : α)
 We are now ready to prove the _only if_ direction of the characterization of zero.
 -/
 open Nat' in
-example (n k : Nat')
+example (n k : N)
   (h : ⟦(n, k)⟧ = Z.zero)
   : n = k
 :=
@@ -212,7 +212,7 @@ example (n k : Nat')
 Positive integers were described {ref "sec-quotient-types"}[above] as equivalence classes `⟦(n, 0)⟧` with `n ≠ 0`. The example below justifies this by showing that the map `n ↦ ⟦(n, 0)⟧` is injective.
 -/
 open Nat' in
-example (n m : Nat')
+example (n m : N)
   (h : (⟦(n, 0)⟧ : Z) = ⟦(m, 0)⟧)
   : n = m
 :=
@@ -251,14 +251,14 @@ example (α : Sort u) (β : Sort v) (s : Setoid α)
 := rfl
 /-
 
-In order to define negation on `Z`, we first define negation on `Nat' × Nat'` and show that it respects `N2.r`.
+In order to define negation on `Z`, we first define negation on `N × N` and show that it respects `N2.r`.
 -/
-def N2.neg (p : Nat' × Nat') :=
+def N2.neg (p : N × N) :=
   let ⟨n, k⟩ := p
   (k, n)
 
 open Nat' in
-lemma N2.neg_resp_r {p q : Nat' × Nat'}
+lemma N2.neg_resp_r {p q : N × N}
   (h : p ≈ q)
   : neg p ≈ neg q
 :=
@@ -271,15 +271,15 @@ lemma N2.neg_resp_r {p q : Nat' × Nat'}
     _ = l + n := add_comm
 /-
 
-The codomain of the lifted negation should be `Z`. For this reason, we need to turn `N2.neg` into a function from `Nat' × Nat'` to `Z` satisfying the below compatibility condition `h`.
+The codomain of the lifted negation should be `Z`. For this reason, we need to turn `N2.neg` into a function from `N × N` to `Z` satisfying the below compatibility condition `h`.
 -/
-example (f : Nat' × Nat' → Z) (ec : Z)
-  (h : ∀ (x y : Nat' × Nat'), x ≈ y → f x = f y) :
+example (f : N × N → Z) (ec : Z)
+  (h : ∀ (x y : N × N), x ≈ y → f x = f y) :
   Z := Quotient.lift f h ec
 /-
 A suitable function is obtained via introduction.
 -/
-example : Nat' × Nat' → Z := λ p ↦ ⟦N2.neg p⟧
+example : N × N → Z := λ p ↦ ⟦N2.neg p⟧
 /-
 The compatibility condition follows from `N2.neg_resp_r` and `Quotient.sound`. We define negation on `Z` by
 -/
@@ -311,11 +311,11 @@ Quotient reduction enables the following.
 open Z in
 example : neg zero = zero := rfl
 
-example (n k : Nat') :
+example (n k : N) :
   Z.neg ⟦(n, k)⟧ = ⟦(k, n)⟧
 := rfl
 
-example (n k : Nat') :
+example (n k : N) :
   Z.neg (Z.neg ⟦(n, k)⟧) = ⟦(n, k)⟧
 := rfl
 /-
@@ -396,15 +396,15 @@ example (α : Sort u) (β : Sort v) (s : Setoid α)
 := rfl
 /-
 
-We define addition on `Z` by defining addition on `Nat' × Nat'`, showing that it respects `N2.r`, and lifting it.
+We define addition on `Z` by defining addition on `N × N`, showing that it respects `N2.r`, and lifting it. We register an instance of `Add' Z` as well.
 -/
-def N2.add (p₁ p₂ : Nat' × Nat') :=
+def N2.add (p₁ p₂ : N × N) :=
   let ⟨n₁, k₁⟩ := p₁
   let ⟨n₂, k₂⟩ := p₂
   (n₁ + n₂, k₁ + k₂)
 
 open Nat' in
-lemma N2.add_resp_r {p₁ q₁ p₂ q₂ : Nat' × Nat'}
+lemma N2.add_resp_r {p₁ q₁ p₂ q₂ : N × N}
   (hp : p₁ ≈ q₁) (hq : p₂ ≈ q₂)
   : add p₁ p₂ ≈ add q₁ q₂
 :=
@@ -412,7 +412,7 @@ lemma N2.add_resp_r {p₁ q₁ p₂ q₂ : Nat' × Nat'}
   let ⟨n₂, k₂⟩ := p₂
   let ⟨m₁, l₁⟩ := q₁
   let ⟨m₂, l₂⟩ := q₂
-  have {a b c d : Nat'} := calc
+  have {a b c d : N} := calc
     (a + b) + (c + d)
     _ = ((a + b) + c) + d := add_assoc.symm
     _ = ((a + c) + b) + d := congrArg (· + d) add_right_comm
@@ -427,12 +427,15 @@ lemma N2.add_resp_r {p₁ q₁ p₂ q₂ : Nat' × Nat'}
 def Z.add := Quotient.lift₂
   (λ p q ↦ ⟦N2.add p q⟧)
   (λ _ _ _ _ hp hq ↦ Quotient.sound (N2.add_resp_r hp hq))
+
+instance : Add' Z where
+  add := Z.add
 /-
 
 We can now show that `1 - 1 = 0`.
 -/
-open Z in
-example : add ⟦(1, 0)⟧ ⟦(0, 1)⟧ = zero := Quotient.sound rfl
+example : (⟦(1, 0)⟧ : Z) + (⟦(0, 1)⟧ : Z) = ⟦(0, 0)⟧
+:= Quotient.sound rfl
 /-
 
 The standard integers `Int` are not defined as a quotient, but as an inductive type with separate constructors for non-negative and negative cases. Consequently, computing with them does not require the quotient axiom, as we have {ref "sec-definitional-equality-naive"}[seen].

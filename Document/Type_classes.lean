@@ -64,6 +64,31 @@ Giving a name is optional in instance declarations, and Lean's instance synthesi
 /-
 
 
+# Reducibility
+
+The `def` command generally creates [semireducible][reducibility] names that are unfolded in certain cases, including definitional equality checks, but not during potentially expensive automation such as instance synthesis.
+
+[reducibility]: https://lean-lang.org/doc/reference/latest/Definitions/Recursive-Definitions/#reducibility
+
+Even though `N_semired` below reduces to `Nat'`, instance synthesis does not unfold `N_semired` and therefore does not find the `Add' Nat'` instance.
+```lean +error
+def N_semired := Nat'
+
+#synth Add' N_semired
+```
+
+[Abbreviations][abbrev] {index}[`abbrev`] differ from definitions with `def` only in their reducibility. They create reducible names, which are unfolded even during potentially expensive automation.
+
+[abbrev]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#--tech-term-Abbreviations
+
+Declared as an abbreviation, `N` unfolds to `Nat'` during instance synthesis, and the search succeeds.
+-/
+abbrev N := Nat'
+
+#synth Add' N
+/-
+
+
 # Ad-hoc polymorphism
 
 Type classes enable [ad-hoc polymorphism][ad-hoc-polymorphism], meaning that a function can have different implementations for different types. As an illustration, we consider doubling on `Add'`. {index}[`[…]`]
@@ -74,19 +99,19 @@ Type classes enable [ad-hoc polymorphism][ad-hoc-polymorphism], meaning that a f
 def Add'.double {α : Type u} [Add' α] (x : α) : α :=
   Add'.add x x
 /-
-Here `[Add' α]` denotes an instance argument of type `Add' α`. Like an implicit argument, it is supplied automatically, but via instance synthesis rather than unification. The polymorphism is due to the function `Add'.add` being provided by the instance. Because instance synthesis finds `Nat'.instAdd'`, `Add'.double` works immediately on `Nat'`.
+Here `[Add' α]` denotes an instance argument of type `Add' α`. Like an implicit argument, it is supplied automatically, but via instance synthesis rather than unification. The polymorphism is due to the function `Add'.add` being provided by the instance. Because instance synthesis finds `Nat'.instAdd'`, `Add'.double` works immediately on `N`.
 -/
-example (x : Nat') : Nat' := Add'.double x
+example (x : N) : N := Add'.double x
 
-example (x : Nat') : Add'.double x = x.add x := rfl
+example (x : N) : Add'.double x = x.add x := rfl
 /-
 The corresponding explicit versions read
 -/
-example (x : Nat') : Nat' :=
-  @Add'.double Nat' Nat'.instAdd' x
+example (x : N) : N :=
+  @Add'.double N Nat'.instAdd' x
 
-example (x : Nat') :
-  @Add'.double Nat' Nat'.instAdd' x = x.add x
+example (x : N) :
+  @Add'.double N Nat'.instAdd' x = x.add x
 := rfl
 /-
 
@@ -140,15 +165,15 @@ variable (α : Type u) [Add' α] in
 #synth HAdd α α α
 /-
 
-Now `+` can be used on `Nat'`.
+Now `+` can be used on `N`.
 -/
-example (x y : Nat') : Nat' := x + y
+example (x y : N) : N := x + y
 
-example (x y : Nat') : x + y = Nat'.add x y := rfl
+example (x y : N) : x + y = Nat'.add x y := rfl
 /-
-The `+` notation on `Nat'` is resolved via two instances, the above unnamed instance and `Nat'.instAdd'` from earlier.
+The `+` notation on `N` is resolved via two instances, the above unnamed instance and `Nat'.instAdd'` from earlier.
 -/
-#synth HAdd Nat' Nat' Nat'
+#synth HAdd N N N
 /-
 
 
@@ -156,18 +181,18 @@ The `+` notation on `Nat'` is resolved via two instances, the above unnamed inst
 
 The numeric literal parser is guided by `OfNat` type class.
 -/
-instance (n : Nat) : OfNat Nat' n where
+instance (n : Nat) : OfNat N n where
   ofNat := Nat.rec Nat'.zero (λ _ hi ↦ hi.succ) n
 
 example : Nat'.zero = 0 := rfl
 example : Nat'.zero.succ = 1 := rfl
 /-
 
-We can now compute in `Nat'` using numeric literals with type annotation.
+We can now compute in `N` using numeric literals with type annotation.
 -/
-#reduce (2 : Nat')
+#reduce (2 : N)
 
-example : (2 : Nat') + (2 : Nat') = (4 : Nat') := rfl
+example : (2 : N) + (2 : N) = (4 : N) := rfl
 /-
 
 
@@ -196,9 +221,9 @@ example (G : Type u) [AddSemigroup' G] : Add' G
 := inferInstance
 /-
 
-Constructing an expression of type `AddSemigroup' Nat'` amounts to providing a proof that `Nat'.add` is associative.{margin}[Recall that we have already shown the associativity. In the example, `add_assoc` is a link that takes to its definition.]
+Constructing an expression of type `AddSemigroup' N` amounts to providing a proof that `Nat'.add` is associative.{margin}[Recall that we have already shown the associativity. In the example, `Nat'.add_assoc` is a link that takes to its definition.]
 -/
-instance : AddSemigroup' Nat' where
+instance : AddSemigroup' N where
   add_assoc := @Nat'.add_assoc
 /-
 

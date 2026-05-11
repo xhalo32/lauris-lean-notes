@@ -5,6 +5,7 @@ tag := "sec-coercions"
 %%%
 -/
 import Document.Type_classes
+import Document.Quotient_types
 /-
 When Lean's elaborator encounters an expression with unexpected type, it attempts to automatically insert a coercion, that is, a function from the unexpected type to the expected type. The search of a suitable function is based on instance synthesis.
 
@@ -56,35 +57,15 @@ example (α : Sort u) (P : α → Prop) (a : α) (h : P a) :
 
 A concrete example is given by the even natural numbers.
 -/
-example : {n : ℕ // ∃ m, n = 2 * m} := ⟨4, by use 2⟩
+abbrev EvenNat := {n : ℕ // ∃ m, n = 2 * m}
+
+example : EvenNat := ⟨4, by use 2⟩
 /-
 
 Subtypes come with coercion.
 -/
-example (x : ℕ) (y : {n : ℕ // ∃ m, n = 2 * m}) : ℕ :=
-  x + y
-/-
-
-
-# Reducibility
-
-Corercion works well for named subtypes if names are [reducible][reducible] in the sense that they unfolded automatically. [Abbreviations][abbrev] {index}[`abbrev`] are identical to definitions with `def`, except they are reducible.
-
-[reducible]: https://lean-lang.org/doc/reference/latest/Definitions/Recursive-Definitions/#reducibility
-[abbrev]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#--tech-term-Abbreviations
-
--/
-abbrev EvenNat := {n : ℕ // ∃ m, n = 2 * m}
-
 example (x : ℕ) (y : EvenNat) : ℕ := x + y
 /-
-
-The `def` command generally creates semireducible names that are not unfolded by potentially expensive automation such as type class instance synthesis.
-```lean +error
-def EvenNat' := {n : ℕ // ∃ m, n = 2 * m}
-
-example (x : ℕ) (y : EvenNat') : ℕ := x + y
-```
 
 
 # Subsets
