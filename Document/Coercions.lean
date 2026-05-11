@@ -9,32 +9,27 @@ import Document.Quotient_types
 /-
 When Lean's elaborator encounters an expression with unexpected type, it attempts to automatically insert a coercion, that is, a function from the unexpected type to the expected type. The search of a suitable function is based on instance synthesis.
 
-As an illustration, consider our version of natural numbers `Nat'`.{margin}[We have imported our earlier definitions.]
--/
-example (x y : Nat') : Nat' := x + y
-/-
+As an illustration, consider our versions of natural numbers `Nat'`, with the abbreviation `N`, and integers `Z`.{margin}[We have imported our earlier definitions.]
 
 The following invalid example triggers the coercion mechanism, but instance synthesis fails to find a coercion.
 ```lean +error
-example (x : Nat) (y : Nat') : Nat' := x + y
+example (x : Z) (y : N) : Z := x + y
 ```
 
-We can define a coercion from `Nat` to `Nat'` using `Coe` type class.
+We can define a coercion from `N` to `Z` using `Coe` type class.
 -/
-def Nat'.ofNat (n : Nat) : Nat' :=
-  match n with
-  | 0 => Nat'.zero
-  | n + 1 => (Nat'.ofNat n).succ
+def Z.ofN (n : N) : Z := ⟦(n, 0)⟧
 
-instance : Coe Nat Nat' where
-  coe := Nat'.ofNat
+instance : Coe N Z where
+  coe := Z.ofN
 /-
 
-We can now add expressions of types `Nat` and `Nat'`.
+We can now add expressions inhabiting `N` and `Z`.
 -/
-example (x : Nat) (y : Nat') : Nat' := x + y
+example (x : Z) (y : N) : Z := x + y
 
-example (x : Nat') (y : Nat) : Nat' := x + y
+example : (1 : N) + (⟦(0, 1)⟧ : Z) = (0 : N)
+:= Quotient.sound rfl
 /-
 
 
@@ -59,12 +54,41 @@ A concrete example is given by the even natural numbers.
 -/
 abbrev EvenNat := {n : ℕ // ∃ m, n = 2 * m}
 
-example : EvenNat := ⟨4, by use 2⟩
+example : EvenNat := ⟨4, ⟨2, rfl⟩⟩
 /-
 
 Subtypes come with coercion.
 -/
 example (x : ℕ) (y : EvenNat) : ℕ := x + y
+/-
+
+
+## Equality of subtype expressions
+
+Due to proof irrelevance, two expressions inhabiting a subtype are equal if the associated expressions inhabiting the parent type are equal.
+-/
+open Subtype in
+example (α : Sort u) (P : α → Prop) (a₁ a₂ : α)
+  (h₁ : P a₁) (h₂ : P a₂) (h : a₁ = a₂)
+  : mk a₁ h₁ = mk a₂ h₂
+:=
+  Eq.subst
+    (motive := λ v ↦ ∀ (h : P v), mk a₁ h₁ = mk v h)
+    h
+    (λ _ ↦ Eq.refl (mk a₁ h₁))
+    h₂
+/-
+
+Similarly to {ref "sec-constructor-inj"}[constructor injectivity] theorems, Lean generates constructor equality theorems. The above example can be proven using such theorem for `Subtype.mk`.
+-/
+#print Subtype.mk.injEq
+
+open Subtype in
+example (α : Sort u) (P : α → Prop) (a₁ a₂ : α)
+  (h₁ : P a₁) (h₂ : P a₂) (h : a₁ = a₂)
+  : mk a₁ h₁ = mk a₂ h₂
+:=
+  (mk.injEq a₁ h₁ a₂ h₂).mpr h
 /-
 
 
@@ -115,12 +139,43 @@ Even natural numbers form a subsemigroup, hence a semigroup.
 -/
 def EvenNatSg : Subsemigroup ℕ where
   carrier := {n | ∃ m, n = 2 * m}
-  mul_mem' := by
-    rintro x y ⟨mx, rfl⟩ ⟨my, rfl⟩
-    use 2 * mx * my
-    grind
+  mul_mem' :=
+    λ {x y} hx hy ↦
+    let ⟨mx, hmx⟩ := hx
+    let ⟨my, hmy⟩ := hy
+    have : x * y = 2 * (2 * mx * my) := by grind
+    ⟨2 * mx * my, this⟩
 
-example : Semigroup EvenNatSg := by infer_instance
+example : Semigroup EvenNatSg := inferInstance
+/-
+
+
+## Equality of subsemigroups
+
+Due to proof irrelevance, two subsemigoups with the same carrier are equal. We give two proofs.
+-/
+def mul_mem {M : Type u} [Mul M] (s : Set M) :=
+  ∀ {a b : M}, a ∈ s → b ∈ s → a * b ∈ s
+
+open Subsemigroup in
+example
+  {M : Type u} [Mul M] {s₁ s₂ : Set M}
+  (h₁ : mul_mem s₁) (h₂ : mul_mem s₂) (h : s₁ = s₂)
+  : mk s₁ h₁ = mk s₂ h₂
+:=
+  (mk.injEq s₁ h₁ s₂ h₂).mpr h
+
+open Subsemigroup in
+lemma mk_pf_irrel
+  {M : Type u} [Mul M] {s₁ s₂ : Set M}
+  (h₁ : mul_mem s₁) (h₂ : mul_mem s₂) (h : s₁ = s₂)
+  : mk s₁ h₁ = mk s₂ h₂
+:=
+  Eq.subst
+    (motive := λ s ↦ ∀ (h : mul_mem s), mk s₁ h₁ = mk s h)
+    h
+    (λ _ ↦ Eq.refl (mk s₁ h₁))
+    h₂
 /-
 
 
@@ -139,7 +194,7 @@ example : EvenNatSg = {n : ℕ // n ∈ EvenNatSg} := rfl
 The coercion from `EvenNatSg` to `Nat` works via this coercion to a subtype that we study next. Already `n ∈ EvenNatSg` deserves an explanation: `EvenNatSg` is not a set, but its type `Subsemigroup ℕ` carries a `SetLike` instance, which is what licenses the membership notation.
 -/
 example (G : Type u) [Semigroup G] :
-  SetLike (Subsemigroup G) G := by infer_instance
+  SetLike (Subsemigroup G) G := inferInstance
 /-
 
 The type class `SetLike` has two fields: a function `coe` and a proof that the function is injective.
@@ -158,9 +213,11 @@ example (G : Type u) [Semigroup G] :
 open Function Subsemigroup in
 lemma carrier_inj (G : Type u) [Semigroup G]
   : Injective (carrier : Subsemigroup G → Set G)
-:= by
-  rintro ⟨s₁, pf₁⟩ ⟨s₂, pf₂⟩ rfl
-  rfl
+:=
+  λ p₁ p₂ h ↦
+  let ⟨s₁, h₁⟩ := p₁
+  let ⟨s₂, h₂⟩ := p₂
+  mk_pf_irrel h₁ h₂ h
 
 open Subsemigroup in
 example (G : Type u) [Semigroup G] :
@@ -194,7 +251,7 @@ example (G : Type u) [Semigroup G] (S : Subsemigroup G) :
 Coercion to subtypes uses the general mechanism of coercion to sorts.
 -/
 example (α : Type u) (β : Type v) [SetLike α β] :
-  CoeSort α (Type v) := by infer_instance
+  CoeSort α (Type v) := inferInstance
 /-
 
 The type class `CoeSort` has a single field called `coe`.

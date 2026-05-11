@@ -275,6 +275,9 @@ example (n : ℕ) : 0 ≠ n + 1 := nofun
 
 
 # Constructor injectivity
+%%%
+tag := "sec-constructor-inj"
+%%%
 
 Applications of a constructor at distinct arguments are not equal. Equivalently, _constructor injectivity_ holds: if two constructor applications are equal, then the arguments are equal as well. This can be proven using deconstruction together with congruence and transitivity.
 -/
