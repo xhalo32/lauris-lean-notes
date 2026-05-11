@@ -30,3 +30,11 @@ Alternatively one can use [direnv](https://github.com/nix-community/nix-direnv) 
 nix-build nix -A notes
 python -m http.server -d result/
 ```
+
+## Generating HW
+
+The `hw` attribute generates the homework files from `Examples`.
+
+```
+nix-build nix -A hw
+```

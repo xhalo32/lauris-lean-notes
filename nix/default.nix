@@ -119,5 +119,34 @@ rec {
       ];
     };
 
-  # TODO homework/exercises
+  hw =
+    let
+      header = builtins.toFile "header.lean" ''
+        /-
+        Exercises
+        ---------
+
+        Fill in the parts labeled with __TODO__.
+
+        -/
+      '';
+    in
+    pkgs.stdenv.mkDerivation {
+      pname = "hw";
+      version = "0.1.0";
+
+      src = ../Examples;
+
+      buildPhase = ''
+        mkdir -p $out
+        for file in *.lean; do
+            echo "Processing $file"
+
+            cat ${header} > $out/$file
+            awk -f ${../scripts/hw-process.awk} <$file \
+            | awk -f ${../scripts/hw-process-blank.awk} \
+            >>$out/$file
+        done
+      '';
+    };
 }
