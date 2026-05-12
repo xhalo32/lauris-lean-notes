@@ -45,3 +45,11 @@ The Verso translation is generated in `_out/`. This can be overridden by setting
   "editor.rulers": [60],
 ```
 in `.vscode/settings.json`.
+
+## Continuous Integration
+
+A GitHub action is used to deploy the notes to GitHub pages.
+To deploy manually, open [Actions](https://github.com/l-oksanen/lean-notes/actions/workflows/static.yml) and press `Run workflow`.
+
+The continuous integration uses [Nix](./nix) to build the notes and homework.
+As mathlib is really big, it takes a lot of space in the cache, which may cause issues in the long run (like having to rebuild mathlib.)
