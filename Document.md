@@ -10,7 +10,7 @@ authorshipNote := "lauri.oksanen@helsinki.fi"
 
 # Foundations
 
-We will consider Lean's type theory as a language for writing [formal proofs][formal-proof]. This language is highly expressive while consisting of only a few kinds of expressions.{margin}[We omit below expressions related to [quotient types][quotient-types], and effectively consider a [sublanguage][sublanguage].] Every type is either a universe in the universe hierarchy, a function type, or arises from the type constructor of an inductive type. The remaining expressions can be organized along two axes: 
+We will consider Lean's type theory as a language for writing [formal proofs][formal-proof]. This language is highly expressive while consisting of only a few kinds of expressions.{margin}[For the moment, we omit expressions related to {ref "sec-quotient-types"}[quotient types], and effectively consider a [sublanguage][sublanguage].] Every type is either a universe in the universe hierarchy, a function type, or arises from the type constructor of an inductive type. The remaining expressions can be organized along two axes: 
 
 ```
 <!--HTML-->
@@ -28,7 +28,6 @@ We will consider Lean's type theory as a language for writing [formal proofs][fo
 We begin with an introduction to types and universes. Since our primary goal is to study formal proofs using Lean, the universe of propositions at the bottom of the universe hierarchy plays a central role. The remainder of the chapter then proceeds through functions and inductive types. 
 
 [formal-proof]: https://en.wikipedia.org/wiki/Formal_proof
-[quotient-types]: https://lean-lang.org/doc/reference/latest/The-Type-System/Quotients/#quotients
 [sublanguage]: https://en.wikipedia.org/wiki/Sublanguage
 
 {include 2 Document.Expressions}
