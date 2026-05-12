@@ -549,17 +549,23 @@ The following example is invalid.
 example : plus1 = plus1' := rfl
 ```
 
-The principle of [functional extensionality][extensionality-principles] holds in Lean. It can be used to show that `plus1` and `plus1'` are indeed equal.{margin}[[Theorem Proving in Lean][TPIL] is the canonical reference for writing proofs like this in Lean.]
+The principle of [functional extensionality][extensionality-principles] holds in Lean.
+-/
+example (α : Sort u) (β : Sort v) (f g : α → β)
+  (h : ∀ (x : α), f x = g x)
+  : f = g
+:= funext h
+/-
+The principle can be used to show that `plus1` and `plus1'` are indeed equal.{margin}[We omit showing elementary algebraic facts from the first principles and use the [grind][grind] tactic instead.]
 
-[TPIL]: https://lean-lang.org/theorem_proving_in_lean4/Axioms-and-Computation/#function-extensionality
 [extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
+[grind]: https://lean-lang.org/doc/reference/latest/The--grind--tactic/
 
 -/
 example : plus1 = plus1'
-:= by
-  funext n
-  simp only [plus1, plus1', add]
-  grind
+:=
+  have (n : ℕ) : n + 1 = 1 + n := by grind
+  funext this
 /-
 
 

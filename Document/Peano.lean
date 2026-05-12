@@ -171,41 +171,56 @@ The expressive power of `Nat.rec` extends well beyond primitive recursive functi
 [computable-function]: https://en.wikipedia.org/wiki/Computable_function
 
 -/
-def ackermann : Nat → Nat → Nat := Nat.rec
+def ack' : Nat → Nat → Nat := Nat.rec
   (λ n ↦ n + 1)
   (λ _ hi1 ↦ Nat.rec
     (hi1 1)
     (λ _ hi2 ↦ hi1 hi2)
   )
 /-
-
 It can be defined in a natural way using pattern matching.
 -/
-def ackermann' (m n : ℕ) :=
+def ack'' (m n : ℕ) :=
   match m, n with
   | 0, n => n + 1
-  | m + 1, 0 => ackermann' m 1
-  | m + 1, n + 1 => ackermann' m (ackermann' (m + 1) n)
+  | m + 1, 0 => ack'' m 1
+  | m + 1, n + 1 => ack'' m (ack'' (m + 1) n)
 /-
-However, this version is not translated to a nested use of `Nat.rec` as above. Instead, it uses [well-founded recursion][well-founded-recursion]. Mathlib's {lean}`ack` is defined in the same way as `ackermann'`. Both our versions coincide with {lean}`ack`.
+However, this version is not translated to a nested use of `Nat.rec` as above. Instead, it uses [well-founded recursion][well-founded-recursion]. Mathlib's {lean}`ack` is defined in the same way as `ack''`. Both our versions coincide with {lean}`ack`.{margin}[We use the [simp][simp] tactic to show that the Mathlib's `ack` satisfies the defining propertiers of the Ackermann function. Our version satisfies these properties by `rfl`. The proof uses function extensionality in a non-trivial manner in the sense that the induction hypothesis `him` asserts equality of the partially applied functions `ack' m` and ` ack m`.]
 
 [well-founded-recursion]: https://lean-lang.org/doc/reference/latest/Definitions/Recursive-Definitions/#well-founded-recursion
-
+[simp]: https://lean-lang.org/doc/reference/latest/The-Simplifier/
 -/
-example : ack = ackermann := by
-  funext m
-  simp only [ackermann]
-  induction m with
-  | zero =>
-      funext _
-      simp
-  | succ _ ih =>
-      funext n
-      induction n with
-      | zero =>
-          simp [ih]
-      | succ _ ihn =>
-          simp [ih, ihn]
+example (m : ℕ) : ack' m = ack m
+:= Nat.rec
+  (
+    have (n : ℕ) := calc
+      ack' 0 n
+      _ = n + 1 := rfl
+      _ = ack 0 n := by simp
+    funext this
+  )
+  (λ m him ↦
+    have (n : ℕ) : ack' (m + 1) n = ack (m + 1) n := Nat.rec
+      (calc
+        ack' (m + 1) 0
+        _ = ack' m 1 := rfl
+        _ = ack m 1 := congrFun him 1
+        _ = ack (m + 1) 0 := by simp
+      )
+      (λ n hin ↦ calc
+        ack' (m + 1) (n + 1)
+        _ = ack' m (ack' (m + 1) n) := rfl
+        _ = ack m (ack' (m + 1) n)
+          := congrFun him (ack' (m + 1) n)
+        _ = ack m (ack (m + 1) n)
+          := congrArg (ack m) hin
+        _ = ack (m + 1) (n + 1) := by simp
+      )
+      n
+    funext this
+  )
+  m
 /-
 
 
@@ -356,20 +371,37 @@ example
 
 Our two versions of the Ackermann function coincide.
 -/
-example : ackermann' = ackermann := by
-  funext m
-  simp only [ackermann]
-  induction m with
-  | zero =>
-      funext n
-      simp [ackermann']
-  | succ m ih =>
-      funext n
-      induction n with
-      | zero =>
-          simp [ackermann', ih]
-      | succ n ihn =>
-          simp [ackermann', ih, ihn]
+example (m : ℕ) : ack' m = ack'' m
+:= Nat.rec
+  (
+    have (n : ℕ) := calc
+      ack' 0 n
+      _ = n + 1 := rfl
+      _ = ack'' 0 n := by simp [ack'']
+    funext this
+  )
+  (λ m him ↦
+    have (n : ℕ) : ack' (m + 1) n = ack'' (m + 1) n
+      := Nat.rec
+        (calc
+          ack' (m + 1) 0
+          _ = ack' m 1 := rfl
+          _ = ack'' m 1 := congrFun him 1
+          _ = ack'' (m + 1) 0 := by simp [ack'']
+        )
+        (λ n hin ↦ calc
+          ack' (m + 1) (n + 1)
+          _ = ack' m (ack' (m + 1) n) := rfl
+          _ = ack'' m (ack' (m + 1) n)
+            := congrFun him (ack' (m + 1) n)
+          _ = ack'' m (ack'' (m + 1) n)
+            := congrArg (ack'' m) hin
+          _ = ack'' (m + 1) (n + 1) := by simp [ack'']
+        )
+        n
+    funext this
+  )
+  m
 /-
 
 Here is a variant of `proxy` with the first two arguments implicit.
