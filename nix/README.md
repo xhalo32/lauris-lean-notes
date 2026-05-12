@@ -38,3 +38,11 @@ The `hw` attribute generates the homework files from `Examples`.
 ```
 nix-build nix -A hw
 ```
+
+## Bundling HW with the document
+
+The `notes-with-hw` attribute joins `notes` and `hw` together such that the generated homework files are found under the `/hw` subdirectory.
+
+```
+nix-build nix -A notes-with-hw
+```

@@ -108,7 +108,7 @@ rec {
 
       installPhase = ''
         runHook preInstall
-        mkdir -p $out
+        mkdir $out
         cp -r _out/html-multi/. $out/
         runHook postInstall
       '';
@@ -138,15 +138,21 @@ rec {
       src = ../Examples;
 
       buildPhase = ''
-        mkdir -p $out
+        mkdir $out
         for file in *.lean; do
-            echo "Processing $file"
+          echo "Processing $file"
 
-            cat ${header} > $out/$file
-            awk -f ${../scripts/hw-process.awk} <$file \
-            | awk -f ${../scripts/hw-process-blank.awk} \
-            >>$out/$file
+          cat ${header} > $out/$file
+          awk -f ${../scripts/hw-process.awk} <$file \
+          | awk -f ${../scripts/hw-process-blank.awk} \
+          >>$out/$file
         done
       '';
     };
+
+  notes-with-hw = pkgs.runCommand "notes-with-hw" { nativeBuildInputs = [ pkgs.lndir ]; } ''
+    mkdir -p $out/hw
+    lndir ${notes}/ $out/
+    cp -r ${hw}/. $out/hw/
+  '';
 }
