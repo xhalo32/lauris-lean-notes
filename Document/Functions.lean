@@ -4,7 +4,8 @@ Functions
 tag := "sec-functions"
 %%%
 -/
-import Mathlib.Data.Nat.Init
+--import Mathlib.Data.Nat.Init
+import Mathlib
 /-
 -/
 -- -show
@@ -57,10 +58,15 @@ def plus1₂ (n : ℕ) := n + 1
 
 Yet another way is to introduce a variable {index}[variable] in the surrounding context.
 -/
-variable (n : ℕ)
+variable (n : ℕ) in
 def plus1₃ := n + 1
 /-
-The functions `plus1₁`, `plus1₂`, and `plus1₃` coincide with `plus1`.
+The argument of a function can also be written as `·`. {index}[`·`]
+-/
+def plus1₄ := (· + 1)
+/-
+
+The functions `plus1₁`, …, `plus1₄` coincide with `plus1`.
 
 
 ## Several arguments
@@ -73,11 +79,10 @@ We refer to a function like this simply as a _function taking two arguments_. Sy
 -/
 def add₁ : ℕ → ℕ → ℕ := λ n m ↦ n + m
 /-
-When viewing `add₁` as a function taking two arguments, we refer to the final `ℕ` in `ℕ → ℕ → ℕ` as the codomain. The arguments may be introduced using parentheses, and we can also make use of the variable `n` that we defined above.
+When viewing `add₁` as a function taking two arguments, we refer to the final `ℕ` in `ℕ → ℕ → ℕ` as the codomain. The arguments may be introduced using parentheses.
 -/
 def add₂ (n : ℕ) (m : ℕ) : ℕ := n + m
 def add₃ (n m : ℕ) : ℕ := n + m
-def add₄ (m : ℕ) : ℕ := n + m
 /-
 All this is syntactic sugar. The functions `add₁`, …, `add₄` coincide with `add`.
 
@@ -140,15 +145,27 @@ if two expressions are definitionally equal, then their equality can be proven u
 Implicit arguments {index}[`{… : …}`] are written using curly braces `{…}`. Lean infers their values from context.
 -/
 example : {α : Sort u} → {a : α} → a = a := rfl
-example {α : Sort u} {a : α} : a = a := rfl
 /-
 
 Inference of implicit arguments can be disabled using `@`. {index}[`@`]
 -/
 example : (α : Sort u) → (a : α) → a = a := @rfl
+
 example (α : Sort u) (a : α) : a = a := @rfl α a
 /-
 Like {lean}`Prod`, {lean}`@rfl` is a function taking two arguments: first a type `α`, and then an expression `a` of that type. Its codomain `a = a` depends on the arguments.
+
+The following variant of `rfl` takes one implicit and one explicit argument.
+-/
+def refl := λ {α} a ↦ @rfl α a
+
+example : {α : Sort u} → (a : α) → a = a := refl
+/-
+
+Here is an identity function with implicit argument.
+-/
+example (α : Type) : {_ : α} → α := λ {a} ↦ a
+/-
 
 
 # Pi-types
@@ -156,15 +173,14 @@ Like {lean}`Prod`, {lean}`@rfl` is a function taking two arguments: first a type
 tag := "sec-pi-types"
 %%%
 
-To simplify the notation, we define the following function taking two arguments, the first of which is introduced as an implicit variable in the surrounding context.
+To simplify the notation, we define the following function taking two arguments, the first of which is implicit.
 -/
-variable {I : Type}
-def X (i : I) := i = i
+def X {I : Type} (i : I) := i = i
 /-
 
 Consider the following partial application of {lean}`@rfl`.
 -/
-example : (i : I) → X i := @rfl I
+example (I : Type) : (i : I) → X i := @rfl I
 /-
 We refer to `(i : I) → X i` as a [$`\Pi`-type][pi-type] and `i : I` as the _index_ of the $`\Pi`-type.{margin}[$`\Pi`-types are also called dependent function types.]  Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
 $$`
@@ -450,7 +466,7 @@ def pq₄ (x : ℕ) : ℕ :=
 There are cases where `let` is applicable but `have` is not.
 
 -/
-def plus1₄ :=
+def plus1₅ :=
   let t := ℕ
   λ x : t ↦ x + 1
 /-
@@ -466,12 +482,12 @@ def plus1₄ :=
 $`\beta`-reduction corresponds to applying a function to an argument by substitution.
 
 -/
-variable (α : Sort u) (β : Sort v) (f : α → β) (a : α)
+example (α : Sort u) (β : Sort v) (f : α → β) (a : α) :
+  (λ x ↦ f x) a = f a
+:= rfl
 
-example : (λ x ↦ f x) a = f a := rfl
-
+variable (α : Sort u) (β : Sort v) (f : α → β) (a : α) in
 #reduce (λ x ↦ f x) a
-#reduce f a
 /-
 
 
@@ -523,8 +539,8 @@ example : (λ x ↦ f x) = f := rfl
 /-
 The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, their normal forms differ.
 -/
+variable (α : Sort u) (β : Sort v) (f : α → β) in
 #reduce λ x ↦ f x
-#reduce f
 /-
 
 Reduction and $`\eta`-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
@@ -726,6 +742,7 @@ example : plus1 = plus1₁ := rfl
 example : plus1 = plus1₂ := rfl
 example : plus1 = plus1₃ := rfl
 example : plus1 = plus1₄ := rfl
+example : plus1 = plus1₅ := rfl
 
 example : (ℕ → (ℕ → ℕ)) = (ℕ → ℕ → ℕ) := rfl
 example
@@ -737,7 +754,6 @@ example : add = (λ n m ↦ n + m) := rfl
 example : add = add₁ := rfl
 example : add = add₂ := rfl
 example : add = add₃ := rfl
-example : add = add₄ := rfl
 
 example : Prod = Prod₁ := rfl
 example : Prod = Prod₂ := rfl
