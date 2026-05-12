@@ -290,6 +290,9 @@ def Z.neg := Quotient.lift
 
 
 # Quotient reduction
+%%%
+tag := "sec-quotient-reduction"
+%%%
 
 Analogously to {ref "sec-iota-reduction"}[$`\iota`-reduction] that governs the composition of elimination and introduction of expressions of an inductive type, quotient reduction causes `Quotient.lift` to reduce when composed with `Quotient.mk`.
 -/
