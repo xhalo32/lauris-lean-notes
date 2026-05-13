@@ -177,9 +177,12 @@ example
   | rfl => h2
 /-
 
+
+# Named arguments
+
 Substitution principle is available as a theorem, with the predicate as an implicit parameter called `motive`, in line with `Eq.rec`.
 -/
-example
+lemma subst
   (α : Sort u) (P : α → Prop) (a b : α)
   (h1 : a = b) (h2 : P a)
   : P b
@@ -193,6 +196,12 @@ example
   (h1 : a = b) (h2 : P a)
   : P b
 := Eq.subst (motive := P) h1 h2
+/-
+
+Setting the option `pp.explicit` to `true` makes `#print` to show all implicit arguments.
+-/
+set_option pp.explicit true in
+#print subst
 /-
 
 
