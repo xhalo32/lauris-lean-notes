@@ -67,6 +67,18 @@ Lean provides several mechanisms for relating types to one another:
 {include 2 Document.Coercions}
 
 
+# Axioms
+
+Axioms are propositions postulated without proof. There are seven [standard][standard-axioms] axioms, three of which have mathematical content.{margin}[Three of the remaining axioms concern performance optimizations whose soundness rests on the compiler beyond the kernel. The final one is used by [sorry][sorry].] These three are the quotient axiom, propositional extensionality, and the [axiom of choice][axiom-of-choice]. The first two are similar in that they postulate equality assuming equivalence.
+
+[standard-axioms]: https://lean-lang.org/doc/reference/4.28.0-rc1/Axioms/#standard-axioms
+[sorry]: https://lean-lang.org/doc/reference/4.28.0-rc1/Tactic-Proofs/Tactic-Reference/#sorry
+[axiom-of-choice]: https://en.wikipedia.org/wiki/Axiom_of_choice
+
+{include 2 Document.Axioms_eq}
+{include 2 Document.Axiom_choice}
+
+
 # Index
 
 {theIndex}
