@@ -186,7 +186,7 @@ example (n k : N)
 
 ## Quotient exactness
 
-The implication converse to `Quotient.sound` is called `Quotient.exact`. Contrary to `Quotient.sound`, it is a regular theorem, not an axiom.
+The implication converse to `Quotient.sound` is called `Quotient.exact`. Contrary to `Quotient.sound`, it is a regular theorem, not an axiom.{margin}[We give a proof of `Quotient.exact` {ref "sec-quotient-exactness-proof"}[later].]
 -/
 example  (α : Sort u) (s : Setoid α) (x y : α)
   (h : (⟦x⟧ : Quotient s) = ⟦y⟧)

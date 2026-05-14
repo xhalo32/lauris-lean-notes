@@ -565,7 +565,7 @@ The following example is invalid.
 example : plus1 = plus1' := rfl
 ```
 
-The principle of [functional extensionality][extensionality-principles] holds in Lean.
+The principle of [functional extensionality][extensionality-principles] holds in Lean.{margin}[We give a proof of `funext` {ref "sec-function-extensionality-proof"}[later].]
 -/
 example (α : Sort u) (β : Sort v) (f g : α → β)
   (h : ∀ (x : α), f x = g x)
