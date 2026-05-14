@@ -88,22 +88,6 @@ example (α : Sort u) (β : α → Sort v) (f g : (x : α) → β x)
     _ = g := rfl
 /-
 
-Here is a version using `Quot` rather than `Quotient`
--/
-example (α : Sort u) (β : α → Sort v) (f g : (x : α) → β x)
-  (h : ∀ x, f x = g x)
-  : f = g
-:=
-  let eqv (φ₁ φ₂ : (x : α) → β x) := ∀ x, φ₁ x = φ₂ x
-  let lift_app (φ : Quot eqv) (x : α) :=
-    Quot.lift (λ ψ ↦ ψ x) (λ _ _ h ↦ h x) φ
-  have : Quot.mk eqv f = Quot.mk eqv g := Quot.sound h
-  calc
-    f = lift_app (Quot.mk eqv f) := rfl
-    _ = lift_app (Quot.mk eqv g) := congrArg lift_app this
-    _ = g := rfl
-/-
-
 
 # Quotient exactness
 %%%
