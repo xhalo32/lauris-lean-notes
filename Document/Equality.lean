@@ -178,8 +178,6 @@ example
 /-
 
 
-# Named arguments
-
 Substitution principle is available as a theorem, with the predicate as an implicit parameter called `motive`, in line with `Eq.rec`.
 -/
 lemma subst
@@ -188,8 +186,7 @@ lemma subst
   : P b
 := Eq.subst h1 h2
 /-
-
-Named arguments allow specifying implicit parameters explicitly. {index}[`(… := …)`]
+Occasionally, it might be necessary to provide explicit `motive`. This can be done using a named argument.
 -/
 example
   (α : Sort u) (P : α → Prop) (a b : α)
@@ -269,6 +266,9 @@ example
 
 
 # Constructor distinctness
+%%%
+tag := "sec-constructor-distinct"
+%%%
 
 Expressions given by distinct constructors of an inductive type are not equal. This _constructor distinctness_ can be proven using the substitution principle. As an illustration, we show that `0 = n + 1` leads to a contradiction by applying the substitution principle to the predicate
 -/
