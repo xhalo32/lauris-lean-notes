@@ -27,10 +27,13 @@ In the case of Lean, a further category is useful:
 
 These organizational categories are applied here to functions. We later apply them to inductive types and quotient types.
 
-We call the formation rule for function types the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule]. To understand the rule, we must first consider the universes and the relations between them. We introduce also proof irrelevance, since it lies behind an exceptional case of the rule.
-
 
 # Preliminaries
+
+To understand the formation rule for function types, we must first consider the universes and the relations between them. We introduce also proof irrelevance, since it lies behind an exceptional case of the rule.
+
+
+## Proof irrelevance
 
 If `a` has type `α`, we say that `a` inhabits `α` and that `α` is inhabited. Recall that `Prop` is the universe of propositions. Each expression inhabiting `Prop` is a type encoding a proposition, and proving a proposition amounts to giving an expression inhabiting the proposition. We call an expression inhabiting a proposition a proof.
 
@@ -88,69 +91,19 @@ An elementary function type is formed as follows.
 -/
 example (α β : Type) : Type := α → β
 /-
-Here the types `α` and `β` specify the [domain][domain] and [codomain][codomain], respectively.
+Here the types `α` and `β` specify the [domain][domain] and [codomain][codomain], respectively. The operator `→` is [right-associative][right-associative], that is,
 
 [domain]: https://en.wikipedia.org/wiki/Domain_of_a_function
 [codomain]: https://en.wikipedia.org/wiki/Codomain
-
-The function type
--/
-example (α β γ : Type) : Type := α → β → γ
-/-
-is often viewed as encoding the type of functions taking two arguments, the first in `α` and the second in `β`, and yielding an expression in `γ`. For this reason, we occasionally refer to `γ` as the final codomain. Observe that the domain is `α` and the codomain is `β → γ`. The final codomain `γ` is the codomain of the codomain.
+[right-associative]: https://en.wikipedia.org/wiki/Operator_associativity
 -/
 example (α β γ : Type) : (α → β → γ) = (α → (β → γ)) := rfl
 /-
+This is often viewed as encoding functions taking two arguments, the first in `α` and the second in `β`, and yielding an expression in `γ`. For this reason, we occasionally refer to `γ` as the final codomain.
 
-
-## Universe polymorphism
-
-{ref "sec-primitives"}[Recall] that {lean}`Prod` encodes the Cartesian product. It is a function taking two types as arguments.
+{ref "sec-intro-logic"}[Recall] that the codomain of a function may depend on its argument. Consider the following abstract example.
 -/
-example : Type → Type → Type := Prod
-/-
-In fact, {lean}`Prod` is a more general [universe-polymorphic][univ-polymorphic] function.
-
-[univ-polymorphic]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#--tech-term-universe-polymorphism
-
--/
-example : Type u → Type v → Type (max u v) := Prod
-/-
-We will {ref "sec-well-formedness"}[return] shortly to the maximum appearing in the final codomain. The difference between the above two examples is that in the first, `Prod` is instantiated with a fixed level of the universe hierarchy. It is a special case of the second.
-
-
-## Implicit arguments
-
-We have used extensively `rfl`. It is a function taking two implicit arguments.
--/
-#check rfl
-/-
-Implicit arguments {index}[`{… : …}`] are written using curly braces `{…}`. They are translated into explicit arguments during elaboration.
--/
-example : {α : Sort u} → {a : α} → a = a := rfl
-/-
-
-Inference of implicit arguments can be disabled using `@`. {index}[`@`]
--/
-example : (α : Sort u) → (a : α) → a = a := @rfl
-
-example (α : Sort u) (a : α) : a = a := @rfl α a
-/-
-Like {lean}`Prod`, {lean}`@rfl` is a function taking two arguments: first a type `α`, and then an expression `a` of that type. Its final codomain `a = a` depends on the arguments.
-
-
-## Pi-types
-%%%
-tag := "sec-pi-types"
-%%%
-
-To simplify the notation, we define the following function taking two arguments, the first of which is implicit.
--/
-def X {I : Sort u} (i : I) : Prop := i = i
-/-
-Consider the following partial application of {lean}`@rfl`.
--/
-example (I : Sort u) : (i : I) → X i := @rfl I
+example (I : Type) (X : I → Type) : Type := (i : I) → X i
 /-
 We refer to `(i : I) → X i` as a [$`\Pi`-type][pi-type] and `i : I` as the _index_ of the $`\Pi`-type.{margin}[$`\Pi`-types are also called dependent function types.]  Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
 $$`
@@ -242,6 +195,45 @@ example : Prop = Sort (imax _ 0) := rfl
 /-
 
 
+## Implicit arguments
+
+We have used extensively `rfl`. It is a function taking two implicit arguments. Implicit arguments  are written using curly braces. {index}[`{… : …}`]
+-/
+example : {α : Sort u} → {a : α} → a = a := rfl
+/-
+The first argument is a type `α`, and the second is an expression `a` of that type. The final codomain `a = a` depends on the arguments. The implicit arguments can be inferred from it due to this dependence. In gerenal, implicit arguments are translated into their explicit counterparts during elaboration.
+
+Prefixing a function with `@` makes all its implicit arguments explicit. {index}[`@`]
+-/
+example : (α : Sort u) → (a : α) → a = a := @rfl
+
+example (α : Sort u) (a : α) : a = a := @rfl α a
+/-
+
+
+## Universe polymorphism
+
+The function `rfl` is [universe-polymorphic][univ-polymorphic]: it depends on a universe level, denoted by `u` in the following example.
+
+[univ-polymorphic]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#--tech-term-universe-polymorphism
+
+-/
+example : (α : Sort u) → (a : α) → a = a := @rfl
+/-
+
+A universe-polymorphic function can be instantiated at fixed universe levels.
+-/
+example : (α : Type) → (a : α) → a = a := @rfl
+
+example : (α : Prop) → (a : α) → a = a := @rfl
+/-
+
+If a name depends on universe levels, diagnostic output shows them in curly braces after the name, with a dot in between.
+-/
+#check rfl
+/-
+
+
 ## Girard's paradox
 %%%
 tag := "sec-girard"
@@ -270,7 +262,7 @@ example
   : 1 = 0
 := False.elim (Counterexample.girard π Λ app β)
 /-
-The paradox assumes a formation rule `π`, incompatible with the special case `pi` of the impredicative maximum rule. The codomain of `π` is one level below the universe of `pi`.
+The paradox assumes a formation rule `π`, incompatible with the above special case `pi` of the impredicative maximum rule. The codomain of `π` is one level below the universe of `pi`.
 
 In the paradox, `Λ`, `app`, and `β` model $`\lambda`-abstraction, function application, and $`\beta`-reduction, respectively. These concepts are described below. The flawed formation rule `π`, together with `Λ`, `app`, and `β`, leads to the contradiction `1 = 0`.
 
@@ -278,72 +270,63 @@ The special case of `imax`
 -/
 example : Sort (imax _ 0) = Prop := rfl
 /-
-is related to proof irrelevance. Heuristically speaking, since proofs carry no information beyond the fact that a proposition holds, they do not enable the kind of self-referential constructions that lead to paradoxes.{margin}[Restricted elimination, considered {ref "sec-restricted-elimination"}[later], is also necessary for consistency. It is closely related to proof irrelevance.]
+is related to proof irrelevance. Heuristically speaking, since proofs carry no information beyond the fact that a proposition holds, they do not enable the kind of self-referential constructions that lead to paradoxes.
 
 
 # Introduction
 
-Functions are introduced by $`\lambda`-abstraction. For instance, the type `α → α` is inhabited for any type `α`.
+Functions are introduced by $`\lambda`-abstraction. As an illustration, we consider the [identity function][identity-function].
+
+[identity-function]: https://en.wikipedia.org/wiki/Identity_function
+
 -/
 def I₁ {α : Sort u} : α → α := λ x ↦ x
 /-
-Here the $`\lambda`-abstraction `λ x ↦ x` gives the identity function. Here is a variant of the identity function taking an implicit argument.
+Here are some syntactic variations of the same function. {index}[`·`]
 -/
-def I₁' {α : Sort u} : {_ : α} → α := λ {x} ↦ x
-/-
-Here are some syntactic variations. {index}[`·`]
--/
-def I₂ {α : Sort u} (x : α) := x
+def I₂ {α : Sort u} := λ x : α ↦ x
 
-def I₂' {α : Sort u} {x : α} := x
+def I₃ {α : Sort u} := λ (x : α) ↦ x
 
-def I₃ {α : Sort u} := λ x : α ↦ x
+def I₄ {α : Sort u} (x : α) := x
 
 variable {α : Sort u} in
-def I₄ (x : α) := x
+def I₅ (x : α) := x
 
-def I₅ {α : Sort u} : α → α := (·)
+def I₆ {α : Sort u} : α → α := (·)
 /-
 Observe that the codomain is not specified explicitly in these examples. Lean can infer it based on the domain.
-
-The functions `I₁`, `I₂`, and `I₃` coincide by `rfl`, but the following example is too ambiguous.
-```lean +error
-example {α : Sort u} : I₁ = I₂ := rfl
-```
-To prove the equality, we must provide more information or disable inference of implicit arguments.
--/
-example {α : Sort u} : (I₁ : α → α) = I₂ := rfl
-
-example : @I₁ = @I₂ := rfl
-/-
-Named arguments allow specifying implicit parameters explicitly. {index}[`(… := …)`]
--/
-example {α : Sort u} : I₁ (α := α) = I₂ := rfl
-/-
-The implicit variant is even more ambiguous.
-```lean +error
-example {α : Sort u} : I₁' (α := α) = I₂' := rfl
-```
-Nonetheless, the functions `I₁'` and `I₂'` coincide.
--/
-example : @I₁' = @I₂' := rfl
-/-
-Moreover,
--/
-example : @I₁ = @I₁' := rfl
-/-
-
-The notation `id` is provided for the identity function.
--/
-example {α : Sort u} : I₁ (α := α) = id := rfl
-/-
 
 The following function taking two arguments ignores the second one.{margin}[In the context of combinatory logic, this function is called the [combinator K][combinator-K].]
 
 [combinator-K]: https://en.wikipedia.org/wiki/Combinatory_logic#Examples_of_combinators
 
 -/
-def K {α β: Type} : α → β → α := λ x _ ↦ x
+def K₁ {α β: Type} : α → (β → α) := λ x ↦ (λ _ ↦ x)
+/-
+Here are some syntactic variations of the same function.
+-/
+def K₂ {α β: Type} : α → β → α := λ x _ ↦ x
+
+def K₃ {α β : Type} := λ (x : α) (_ : β) ↦ x
+
+def K₄ {α β: Type} (x : α) (_ : β) := x
+
+def K₅ {α β: Type} (x : α) (y : β) := x
+/-
+
+
+## Implicit arguments
+
+Let us consider a variant of the identity function taking only implicit arguments.
+-/
+def I₁' {α : Sort u} : {_ : α} → α := λ {x} ↦ x
+/-
+Here are two syntactic variations of the same function.
+-/
+def I₂' {α : Sort u} := λ {x : α} ↦ x
+
+def I₃' {α : Sort u} {x : α} := x
 /-
 
 
@@ -375,11 +358,86 @@ example (α β γ: Type) (f : α → β → γ) (a : α) (b : β) :
 /-
 
 
-## Local definitions
+# Reduction
+
+{ref "sec-definitional-equality-naive"}[Recall] that having the same normal form is a sufficient condition for two expressions to be definitionally equal. Computing normal forms involves several kinds of reduction. Importantly, an introduction followed immediately by the associated elimination can be reduced. In the case of functions, this is called $`\beta`-reduction.
+-/
+example (α : Sort u) (β : Sort v) (f : α → β) (a : α) :
+  (λ x ↦ f x) a = f a
+:= rfl
+
+variable (α : Sort u) (β : Sort v) (f : α → β) (a : α) in
+#reduce (λ x ↦ f x) a
+/-
+
+Although it is not strictly related to functions, we also consider another form of reduction.
+
+
+## delta-reduction
+
+$`\delta`-reduction replaces a defined name by its defining expression.{margin}[Names are referred to as constants in the Lean Language Reference, see [Definitions][definitions].]
+
+[definitions]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#The-Lean-Language-Reference--Definitions--Definitions
+
+-/
+def ℕ2 := ℕ × ℕ
+
+example : ℕ2 = (ℕ × ℕ) := rfl
+/-
+
+By default, `#reduce` does not reduce inside types for performance reasons.
+-/
+#reduce ℕ2
+/-
+We can force reduction inside types as follows.
+-/
+#reduce (types := true) ℕ2
+/-
+
+The following example combines $`\beta`- and $`\delta`-reduction.
+-/
+example : I₁ 0 = 0 := rfl
+
+#reduce I₁ 0
+/-
+
+
+# Equality
+%%%
+tag := "sec-function-eta-equivalence"
+%%%
+
+In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called $`\eta`-equivalence. For functions, $`\eta`-equivalence says that a function is definitionally equal to the $`\lambda`-abstraction obtained by applying the function to an argument.
+-/
+example (α : Sort u) (β : Sort v) (f : α → β)
+  : (λ x ↦ f x) = f
+:= rfl
+/-
+The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, the left-hand side does not reduce.
+-/
+variable (α : Sort u) (β : Sort v) (f : α → β) in
+#reduce λ x ↦ f x
+/-
+
+Reduction and $`\eta`-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
+
+[intensional-extensional]: https://en.wikipedia.org/wiki/Extensional_and_intensional_definitions
+
+The principle of [functional extensionality][extensionality-principles] holds in Lean, but not by `rfl`.{margin}[We give a proof of `funext` {ref "sec-function-extensionality-proof"}[later].]
+-/
+example (α : Sort u) (β : Sort v) (f g : α → β)
+  (h : ∀ (x : α), f x = g x)
+  : f = g
+:= funext h
+/-
+[extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
+
+
+# Local definitions
 
 Consider the following function.
 -/
-def pq (x : ℕ) : ℕ :=
+def pq₁ (x : ℕ) : ℕ :=
   (x + 1)^2 + 3*(x + 1) + 1
 /-
 
@@ -387,12 +445,12 @@ We can avoid repeating the expression `x + 1` by composing two functions.
 -/
 def q (x : ℕ) : ℕ := x + 1
 def p (y : ℕ) : ℕ := y^2 + 3*y + 1
-def pq₁ (x : ℕ) := p (q x)
+def pq₂ (x : ℕ) := p (q x)
 /-
 
 This introduces two names `p` and `q`. Such auxiliary definitions can be avoided as follows. {index}[have]
 -/
-def pq₂ (x : ℕ) :=
+def pq₃ (x : ℕ) :=
   have y := x + 1
   y^2 + 3*y + 1
 /-
@@ -413,7 +471,7 @@ example (α : Sort u) (β : Sort v) (a : α) (b : β) :
 
 In particular, the following coincides with `pq₂`.
 -/
-def pq₃ (x : ℕ) :=
+def pq₄ (x : ℕ) :=
   (λ y ↦ y^2 + 3*y + 1) (x + 1)
 /-
 
@@ -475,63 +533,19 @@ A more general [abbreviation][local-def] is given by `let`. {index}[let]
 [local-def]: https://lean-lang.org/theorem_proving_in_lean4/dependent_type_theory.html#local-definitions
 
 -/
-def pq₄ (x : ℕ) : ℕ :=
+def pq₅ (x : ℕ) : ℕ :=
   let y := x + 1
   y^2 + 3*y + 1
 /-
 
 There are cases where `let` is applicable but `have` is not.
 -/
-def I₆ {α : Sort u} :=
+def I₇ {α : Sort u} :=
   let t := α
   λ x : t ↦ x
 /-
 
-
-# Reduction
-
-{ref "sec-definitional-equality-naive"}[Recall] that having the same normal form is a sufficient condition for two expressions to be definitionally equal. Computing normal forms involves several kinds of reduction, three of which are related to the concepts introduced in this section.
-
-
-## beta-reduction
-
-$`\beta`-reduction corresponds to applying a function to an argument by substitution.
-
--/
-example (α : Sort u) (β : Sort v) (f : α → β) (a : α) :
-  (λ x ↦ f x) a = f a
-:= rfl
-
-variable (α : Sort u) (β : Sort v) (f : α → β) (a : α) in
-#reduce (λ x ↦ f x) a
-/-
-
-
-## delta-reduction
-
-$`\delta`-reduction replaces a defined name by its defining expression.{margin}[Names are referred to as constants in the Lean Language Reference, see [Definitions][definitions].]
-
-[definitions]: https://lean-lang.org/doc/reference/latest/Definitions/Definitions/#The-Lean-Language-Reference--Definitions--Definitions
-
--/
-def ℕ2 := ℕ × ℕ
-
-example : ℕ2 = (ℕ × ℕ) := rfl
-/-
-
-By default, `#reduce` does not reduce inside types.
--/
-#reduce ℕ2
-/-
-We can force reduction inside types as follows.
--/
-#reduce (types := true) ℕ2
-/-
-
-
-## zeta-reduction
-
-$`\zeta`-reduction expands a `let`-abbreviation.
+Syntactic abbreviation is unfolded by $`\zeta`-reduction.
 
 {index}[`;`]
 -/
@@ -541,36 +555,59 @@ example : (let t := ℕ; t × t) = (ℕ × ℕ) := rfl
 /-
 The semicolon is a syntactic device that allows multiple expressions to be written on a single line. Replacing it by a line break leaves the expression intact.
 
-
-# Equality
-%%%
-tag := "sec-function-eta-equivalence"
-%%%
-
-In addition to reduction, definitional equality identifies certain expressions that differ only by trivial abstraction. This identification is called $`\eta`-equivalence. For functions, $`\eta`-equivalence says that a function is definitionally equal to the $`\lambda`-abstraction obtained by applying the function to an argument.
+The following example combines $`\beta`-, $`\delta`-, and $`\zeta`-reduction.
 -/
-example (α : Sort u) (β : Sort v) (f : α → β)
-  : (λ x ↦ f x) = f
-:= rfl
-/-
-The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, the left-hand side does not reduce.
--/
-variable (α : Sort u) (β : Sort v) (f : α → β) in
-#reduce λ x ↦ f x
+example : I₇ 0 = 0 := rfl
+
+#reduce I₇ 0
 /-
 
-Reduction and $`\eta`-equivalence differ in a fundamental way: the former has an [intensional][intensional-extensional] nature while the latter is a limited kind of extensionality.
 
-[intensional-extensional]: https://en.wikipedia.org/wiki/Extensional_and_intensional_definitions
+# On inference of implicit arguments
 
-The principle of [functional extensionality][extensionality-principles] holds in Lean, but not by `rfl`.{margin}[We give a proof of `funext` {ref "sec-function-extensionality-proof"}[later].]
+Implicit arguments let us omit information that Lean can usually infer from the surrounding context. As an illustration, we return to the two syntactic variants `I₁` and `I₂` of the identity function. They both take an implicit argument, denoted by `α` in the following examples.
 -/
-example (α : Sort u) (β : Sort v) (f g : α → β)
-  (h : ∀ (x : α), f x = g x)
-  : f = g
-:= funext h
+example : {α : Sort u} → α → α := I₁
+
+example : {α : Sort u} → α → α := I₂
 /-
-[extensionality-principles]: https://en.wikipedia.org/wiki/Extensionality#Extensionality_principles
+In the next example, the implicit argument is inferred to be `ℕ`.
+-/
+example : I₁ 0 = I₂ 0 := rfl
+/-
+
+The inference can stall if the surrounding context is not informative enough. While `α` appears on the left-hand side of `:` in the following example, nothing fixes it on the right-hand side, that is, in `I₁ = I₂`.
+```lean +error
+example (α : Sort u) : I₁ = I₂ := rfl
+```
+To prove the equality of `I₁` and `I₂`, we must provide more information or use the explicit versions.
+-/
+example (α : Sort u) : (I₁ : α → α) = I₂ := rfl
+
+example : @I₁ = @I₂ := rfl
+/-
+Perhaps the cleanest way to specify implicit arguments is to use named arguments. {index}[`(… := …)`]
+-/
+example (α : Sort u) : I₁ (α := α) = I₂ := rfl
+
+example (β : Sort u) : I₁ (α := β) = I₂ := rfl
+/-
+The left-hand side of `:=` in `(α := α)` refers to the argument `α` in the definition of `I₁` and the right-hand side to the argument of the anonymous function defined by the example. The second example renames the latter argument to make the distinction visible.
+
+The variant of the identity function taking only implicit arguments is harder to disambiguate: fixing `α` alone is not enough.
+```lean +error
+example (α : Sort u) : I₁' (α := α) = I₂' := rfl
+```
+Nonetheless, the explicit versions of `I₁'` and `I₂'` coincide.
+-/
+example : @I₁' = @I₂' := rfl
+/-
+Unlike `I₁'`, whose second argument is anonymous, the second arguments of `I₂'` and `I₃'` are both named `x` and can be referred to as follows.
+-/
+example (α : Sort u) (x : α)
+  : I₂' (x := x)  = I₃' (x := x) := rfl
+/-
+Here `α` can be inferred since it is the type of `x`.
 
 
 # Rules of the type theory
@@ -704,8 +741,18 @@ example : @I₁ = @I₃ := rfl
 example : @I₁ = @I₄ := rfl
 example : @I₁ = @I₅ := rfl
 example : @I₁ = @I₆ := rfl
+example : @I₁ = @I₇ := rfl
+example : @I₁ = @I₁' := rfl
 
-example : pq = pq₁ := rfl
-example : pq = pq₂ := rfl
-example : pq = pq₃ := rfl
-example : pq = pq₄ := rfl
+example : @K₁ = @K₂ := rfl
+example : @K₁ = @K₃ := rfl
+example : @K₁ = @K₄ := rfl
+example : @K₁ = @K₅ := rfl
+
+example : @I₁' = @I₂' := rfl
+example : @I₁' = @I₃' := rfl
+
+example : pq₁ = pq₂ := rfl
+example : pq₁ = pq₃ := rfl
+example : pq₁ = pq₄ := rfl
+example : pq₁ = pq₅ := rfl
