@@ -11,7 +11,7 @@ import Mathlib.Data.Nat.Init
 namespace Document.Primitives
 /-
 
-When used as a proof assistant, the central form of interaction with Lean is declaring a definition.{margin}[Besides `def`, its variant `example`, and `inductive`, the other commands we will encounter are the `#`-prefixed diagnostics and `set_option`, which configures them. Later we will use further variants of `def`: `abbrev`, `lemma`, and `theorem`.] The following definition gives the name `z` to `0`, and states that `z` is a natural number.{margin}[The natural numbers `0, 1,…` are denoted by `ℕ`. Hovering over `ℕ` in [VS Code][vscode] shows that it can be entered using `\N`.] {index}[def] {index}[`:`] {index}[`:=`]
+When used as a proof assistant, the central form of interaction with Lean is declaring a definition.{margin}[In fact, the Lean code in these notes consists of almost exclusively on commands declaring a definition, namely `def` together with its variants `example`, `abbrev`, `lemma`, and `theorem`. The remaining commands we encounter are diagnostics, such as `#check`, and `set_option`, which configures diagnostic output. Diagnostic commands are prefixed with `#`.] The following definition gives the name `z` to `0`, and states that `z` is a natural number.{margin}[The natural numbers `0, 1,…` are denoted by `ℕ`. Hovering over `ℕ` in [VS Code][vscode] shows that it can be entered using `\N`.] {index}[def] {index}[`:`] {index}[`:=`]
 
 [vscode]: https://lean-lang.org/install/
 
@@ -79,14 +79,14 @@ example : 0 = 0 := rfl
 tag := "sec-definitional-equality-naive"
 %%%
 
-In addition to enforcing the rules of the type theory, the kernel implements [definitional equality][def-eq]. If two expressions are definitionally equal, then `rfl` proves their equality, modulo elaboration-time transparency settings.{margin}[Definitions annotated as irreducible are not unfolded under default transparency. This annotation is typically used for performance reasons. The proof `by with_unfolding_all rfl` uses `rfl` under full transparency.] A sufficient condition for definitional equality is that the expressions have the same normal form.{margin}[Definitional equality has aspects beyond reduction to normal form, summarized {ref "sec-definitional-equality"}[later].] The `#reduce` command computes this normal form.{margin}[The normal form is passed through Lean's pretty-printer, a non-injective function.]
+In addition to enforcing the rules of the type theory, the kernel implements [definitional equality][def-eq]. If two expressions are definitionally equal, then `rfl` proves their equality.{margin}[More precisely, `rfl` proves equality of definitionally equal expressions modulo elaboration-time transparency settings: definitions annotated as irreducible are not unfolded under default transparency, a restriction typically imposed for performance reasons. Full transparency can be enforced using [with_unfolding_all][with_unfolding_all].] A sufficient condition for definitional equality is that the expressions have the same normal form.{margin}[Definitional equality has aspects beyond reduction to normal form, summarized {ref "sec-definitional-equality"}[later].] The `#reduce` command computes this normal form.
 
 [def-eq]: https://lean-lang.org/doc/reference/latest/The-Type-System/#--tech-term-definitional-equality
-
+[with_unfolding_all]: https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#with_unfolding_all-next
 -/
 #reduce 1 + 1
 /-
-As normal form of `1 + 1` is `2`, we can use `rfl` to prove `1 + 1 = 2`.
+Since the normal form of `1 + 1` is `2`, we can use `rfl` to prove `1 + 1 = 2`.
 -/
 example : 1 + 1 = 2 := rfl
 /-
@@ -139,6 +139,10 @@ The functions `add₁` and `add₂` coincide with `add`.
 
 
 ## Implication and universal quantification
+%%%
+tag := "sec-intro-logic"
+%%%
+
 
 In Lean, [logical implication][implication] and [universal quantification][universal-quantification] are not separate primitives but arise as function types.{margin}[Other logical connectives and existential quantification are encoded as inductive types, as seen {ref "sec-logic"}[later].]
 
@@ -168,31 +172,32 @@ example : ∀ n : ℕ, n + 1 ≠ 0 := nofun
 
 # Inductive types
 
-Lean provides a substantial amount of [syntactic sugar][sugar]. Occasionally it can be useful to remove the syntactic sugar. [Pretty-printing][pretty-printing] can be adjusted using `set_option` command. {index}[`set_option`] For example, `ℕ` is syntactic sugar for {lean}`Nat`.
+Inductive types are a general mechanism for defining new types by specifying constructors. For instance, `ℕ` is an inductive type with two constructors. Its constructors can be inspected by `#print` command. However, `#print` does not interact well with syntactic sugar, and `ℕ` is in fact syntactic sugar for `Nat`. We can strip this sugar by adjusting [pretty-printing][pretty-printing] via `set_option`. {index}[`set_option`]
 
 [pretty-printing]: https://en.wikipedia.org/wiki/Pretty-printing
 
 -/
 set_option pp.notation false in
 #check ℕ
-/-
 
-The `#print` command queries information about definitions.{margin}[It does not work well with syntactic sugar.] {index}[#print]
--/
+set_option pp.notation false in
 #print Nat
 /-
 
-Let us construct our first definition `z` from scratch (without syntactic sugar).
+Let us reproduce the definition of `Nat` under a fresh name `Nat'`.
 -/
 inductive Nat' : Type where
   | zero : Nat'
   | succ (n : Nat') : Nat'
+/-
 
+Now we can reconstruct our first definition `z` from scratch.
+-/
 def z' : Nat' := Nat'.zero
 /-
 
 Expressions of type `Nat'` are put together using the
-constructors `zero` and `succ`.{margin}[The constructors use the same syntax as the left-hand side of `:=` in `def`. The constructor `succ` encodes the [successor function][succ].] They are taken apart by using pattern matching. Here is the predecessor function.
+constructors `zero` and `succ`.{margin}[The constructors use the same syntax as the left-hand side of `:=` in `def`.] They are taken apart by using pattern matching. Here is the predecessor function.
 
 [succ]: https://en.wikipedia.org/wiki/Successor_function
 
@@ -203,7 +208,7 @@ def Nat'.pred (n : Nat') :=
   | succ m => m
 /-
 
-Here is a proof by reflection that predecessor is the left inverse of successor.
+The constructor `succ` encodes the [successor function][succ], and `pred` is its left inverse.
 -/
 open Nat' in
 example (n : Nat') : pred (succ n) = n := rfl
@@ -211,6 +216,9 @@ example (n : Nat') : pred (succ n) = n := rfl
 
 Let us construct our second definition `p` from scratch.
 -/
+set_option pp.notation false in
+#check ℕ × ℕ
+
 #print Prod
 
 inductive Prod' (α β : Type) : Type where

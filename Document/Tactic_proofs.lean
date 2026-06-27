@@ -10,9 +10,10 @@ import Mathlib
 -- -show
 namespace Document.Tactic_proofs
 /-
-Due to the kernel being small, we were able to give a brief summary of the most important kernel-level concepts
-{ref "sec-primitives"}[earlier]. In contrast, tactics implement heterogeneous automations. They cannot be summarized briefly, and learning them is more challenging than understanding the kernel-level concepts. We now illustrate two tactics, `grind` and `rw`.
+Due to the kernel being small, we were able to give a brief {ref "sec-primitives"}[summary] of the most important kernel-level concepts. In contrast, tactics implement heterogeneous automations. They cannot be summarized briefly, and learning them is more challenging than understanding the kernel-level concepts. We now illustrate two tactics, [grind][grind] and [simp][simp].
 
+[grind]: https://lean-lang.org/doc/reference/latest/The--grind--tactic/#grind-tactic
+[simp]: https://lean-lang.org/doc/reference/latest/The-Simplifier/#the-simplifier
 
 # Automation with grind
 
@@ -40,7 +41,7 @@ The proof refers to several functions and is already long even without expanding
 [SMT]: https://en.wikipedia.org/wiki/Satisfiability_modulo_theories
 
 
-# Rewriting with rw
+# Rewriting with simp
 
 [Semigroup][semigroup] is a set with an associative binary operation. In Lean, semigroups are defined as a type class.{margin}[Type classes are inductive types with special elaboration-level features. We return to them {ref "sec-type-classes"}[later].]
 
@@ -54,10 +55,10 @@ example (G : Type) [Semigroup G] (a b c : G)
 := by
   calc
     (a * b) * c
-    _ = (b * a) * c := by rw [h a b]
+    _ = (b * a) * c := by simp [h]
     _ = b * (a * c) := by grind
-    _ = b * (c * a) := by rw [h a c]
+    _ = b * (c * a) := by simp [h]
     _ = (b * c) * a := by grind
 /-
-We use the `grind` and `rw` tactics to prove the steps in the `calc` block.{margin}[The `calc` block chains equalities, and other transitive relations.] The `rw` tactic uses the commutativity hypothesis `h` as a rewrite rule. For instance, `rw [h a b]` replaces `a * b` with `b * a`.
+We use the `grind` and `simp` tactics to prove the steps in the `calc` block.{margin}[The `calc` block chains equalities and other transitive relations.] The `simp` tactic uses the commutativity hypothesis `h` as a rewrite rule.
 -/

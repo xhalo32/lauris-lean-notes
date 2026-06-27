@@ -10,6 +10,14 @@ import Document.Peano
 
 Like structures, type classes are a feature of the elaboration stage. Both are implemented as inductive types with a single constructor together with projections for their fields. Expressions inhabiting a type class are called instances. The difference between type classes and structures shows up when they appear as the domain of a function: an instance of a type class can be supplied by a search procedure distinct from the unification used for ordinary implicit arguments.
 
+
+# Preliminaries
+
+Transparency settings.
+
+
+# Formation
+
 One of the simplest type classes is `Add`.
 -/
 #print Add
@@ -43,6 +51,9 @@ example :
   Prod' α β /- codomain -/
 := @Prod'.mk
 /-
+
+
+# Introduction
 
 Returning to our version of natural numbers `Nat'`, we define an instance `Add' Nat'`.{margin}[We have imported our earlier definitions. In the next example, `Nat'` is a link that takes to its definition.] The syntax of instance declarations resembles record-style definitions, as the side-by-side examples below illustrate. {index}[`instance … where`]
 -/
