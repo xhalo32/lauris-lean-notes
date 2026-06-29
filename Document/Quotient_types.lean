@@ -12,7 +12,7 @@ Quotient types encode [equivalence classes][equivalence-class]. As an example, w
 
 [equivalence-class]: https://en.wikipedia.org/wiki/Equivalence_class
 
-We will implement integers as the quotient type by the followin relation.{margin}[We have imported our earlier definitions.]
+We will implement integers as the quotient type by the following relation.{margin}[We have imported our earlier definitions.]
 -/
 def N2.r (p₁ p₂ : N × N) : Prop :=
   let ⟨n₁, k₁⟩ := p₁
@@ -22,7 +22,7 @@ def N2.r (p₁ p₂ : N × N) : Prop :=
 We begin by showing that `r` is an equivalence relation.
 
 
-# Equivalence relations
+# Preliminaries
 
 An [equivalence relation][equivalence-relation] is a binary relation that is reflexive, symmetric, and transitive. We show that `r` has these three properties. Reflexivity and symmetry are inherited from equality.
 
@@ -67,7 +67,7 @@ lemma N2.r_trans {p₁ p₂ p₃ : N × N}
 /-
 
 
-# Formation of quotient types
+# Formation
 
 A quotient type is formed from a [setoid][setoid], a set equipped with an equivalence relation, encoded as the type class `Setoid`.
 
@@ -107,7 +107,7 @@ abbrev Z : Type := Quotient N2.instSetoid
 /-
 
 
-# Introduction of quotient expressions
+# Introduction
 
 Expressions of a quotient type are introduced using `Quot.mk`. Like `Quot`, it has a function type but is built into the kernel.
 -/
@@ -117,14 +117,6 @@ example (α : Sort u) :
   (r : α → α → Prop) → α → Quot r := Quot.mk
 /-
 The variant `Quotient.mk` is parameterized by a setoid.
--/
-example (α : Sort u) :
-  (s : Setoid α) → α → Quotient s := Quotient.mk
-
-example (α : Sort u) (s : Setoid α) :
-  Quotient.mk s = Quot.mk s.r
-:= rfl
-/-
 
 The following syntactic sugar is provided.
 -/
@@ -139,13 +131,98 @@ def Z.zero : Z := ⟦(0, 0)⟧
 /-
 
 
-# Equality of quotient expressions
+# Elimination
+
+The elimination principle for quotients is `Quot.lift`, with the setoid variant `Quotient.lift`. If a function on the underlying type respects the equivalence relation, as stated in the compatibility condition `h` below, then `Quot.lift` turns it into a function on the quotient. Like the introduction principle, the elimination principle has a function type but is built into the kernel.
+-/
+#print Quot.lift
+
+example (α : Sort u) (r : α → α → Prop) (β : Sort v)
+  (f : α → β) (q : Quot r)
+  (h : ∀ (x y : α), r x y → f x = f y) :
+  β := Quot.lift f h q
+/-
+
+In order to define negation on `Z`, we first define negation on `N × N` and show that it respects `N2.r`.
+-/
+def N2.neg (p : N × N) :=
+  let ⟨n, k⟩ := p
+  (k, n)
+
+open Nat' in
+lemma N2.neg_resp_r {p q : N × N}
+  (h : p ≈ q)
+  : neg p ≈ neg q
+:=
+  let ⟨n, k⟩ := p
+  let ⟨m, l⟩ := q
+  calc
+    k + m
+    _ = m + k := add_comm
+    _ = n + l := h.symm
+    _ = l + n := add_comm
+/-
+
+The codomain of the lifted negation should be `Z`. For this reason, we need to turn `N2.neg` into a function from `N × N` to `Z` satisfying the below compatibility condition `h`.
+-/
+example (f : N × N → Z) (ec : Z)
+  (h : ∀ (x y : N × N), x ≈ y → f x = f y) :
+  Z := Quotient.lift f h ec
+/-
+A suitable function is obtained via introduction.
+-/
+example : N × N → Z := λ p ↦ ⟦N2.neg p⟧
+/-
+The compatibility condition follows from `N2.neg_resp_r` and `Quotient.sound`. We define negation on `Z` by
+-/
+def Z.neg := Quotient.lift
+  (λ p ↦ ⟦N2.neg p⟧)
+  (λ _ _ h ↦ Quotient.sound (N2.neg_resp_r h))
+/-
+
+
+# Reduction
+%%%
+tag := "sec-quotient-reduction"
+%%%
+
+Analogously to {ref "sec-iota-reduction"}[$`\iota`-reduction] that governs the composition of elimination and introduction of expressions of an inductive type, quotient reduction causes `Quotient.lift` to reduce when composed with `Quotient.mk`.
+-/
+example (α : Sort u) (β : Sort v) (s : Setoid α)
+  (f : α → β) (x : α)
+  (h : ∀ (x y : α), x ≈ y → f x = f y)
+  : Quotient.lift f h ⟦x⟧ = f x
+:= rfl
+
+variable (α : Sort u) (β : Sort v) (s : Setoid α)
+  (f : α → β) (x : α)
+  (h : ∀ (x y : α), x ≈ y → f x = f y)
+in
+#reduce Quotient.lift f h ⟦x⟧
+/-
+
+Quotient reduction enables the following.
+-/
+open Z in
+example : neg zero = zero := rfl
+
+example (n k : N) :
+  Z.neg ⟦(n, k)⟧ = ⟦(k, n)⟧
+:= rfl
+
+example (n k : N) :
+  Z.neg (Z.neg ⟦(n, k)⟧) = ⟦(n, k)⟧
+:= rfl
+/-
+
+
+# Equality
 
 The quotient axiom and its converse say that two equivalence classes `⟦x⟧` and `⟦y⟧` are equal if and only if `x` and `y` are related by the underlying equivalence.
 
 ## Quotient axiom
 
-Axioms are propositions postulated without proof. `Quot.sound` is one of the small number of axioms postulated by the kernel.
+Axioms are propositions postulated without proof. `Quot.sound` is one of the small number of axioms postulated by the kernel. We {ref "sec-axioms"}[return] to axioms in general.
 -/
 #print Quot.sound
 
@@ -155,17 +232,6 @@ example (α : Sort u) (r : α → α → Prop) (x y : α)
 := Quot.sound h
 /-
 The variant `Quotient.sound` is parametrized by a setoid.
--/
-example (α : Sort u) (s : Setoid α) (x y : α)
-  (h : x ≈ y)
-  : (⟦x⟧ : Quotient s) = ⟦y⟧
-:= Quotient.sound h
-
-example (α : Sort u) (s : Setoid α) (x y : α)
-  (h : x ≈ y)
-  : Quotient.sound h = Quot.sound h
-:= rfl
-/-
 
 An integer `⟦(n, k)⟧` is zero if and only if `n = k`. We show now the _if_ direction. The _only if_ direction is shown later.
 -/
@@ -226,107 +292,9 @@ example (n m : N)
 /-
 
 
-# Elimination of quotient expressions
+# Induction
 
-The elimination principle for quotients is `Quot.lift`. If a function on the underlying type respects the equivalence relation, as stated in the compatibility condition `h` below, then `Quot.lift` turns it into a function on the quotient. Like the introduction principle, the elimination principle has a function type but is built into the kernel.
--/
-#print Quot.lift
-
-example (α : Sort u) (r : α → α → Prop) (β : Sort v)
-  (f : α → β) (q : Quot r)
-  (h : ∀ (x y : α), r x y → f x = f y) :
-  β := Quot.lift f h q
-/-
-The variant `Quotient.lift` is parametrized by a setoid.
--/
-example (α : Sort u) (β : Sort v) (s : Setoid α)
-  (f : α → β) (ec : Quotient s)
-  (h : ∀ (x y : α), x ≈ y → f x = f y) :
-  β := Quotient.lift f h ec
-
-example (α : Sort u) (β : Sort v) (s : Setoid α)
-  (f : α → β)
-  (h : ∀ (x y : α), x ≈ y → f x = f y)
-  : Quotient.lift f h = Quot.lift f h
-:= rfl
-/-
-
-In order to define negation on `Z`, we first define negation on `N × N` and show that it respects `N2.r`.
--/
-def N2.neg (p : N × N) :=
-  let ⟨n, k⟩ := p
-  (k, n)
-
-open Nat' in
-lemma N2.neg_resp_r {p q : N × N}
-  (h : p ≈ q)
-  : neg p ≈ neg q
-:=
-  let ⟨n, k⟩ := p
-  let ⟨m, l⟩ := q
-  calc
-    k + m
-    _ = m + k := add_comm
-    _ = n + l := h.symm
-    _ = l + n := add_comm
-/-
-
-The codomain of the lifted negation should be `Z`. For this reason, we need to turn `N2.neg` into a function from `N × N` to `Z` satisfying the below compatibility condition `h`.
--/
-example (f : N × N → Z) (ec : Z)
-  (h : ∀ (x y : N × N), x ≈ y → f x = f y) :
-  Z := Quotient.lift f h ec
-/-
-A suitable function is obtained via introduction.
--/
-example : N × N → Z := λ p ↦ ⟦N2.neg p⟧
-/-
-The compatibility condition follows from `N2.neg_resp_r` and `Quotient.sound`. We define negation on `Z` by
--/
-def Z.neg := Quotient.lift
-  (λ p ↦ ⟦N2.neg p⟧)
-  (λ _ _ h ↦ Quotient.sound (N2.neg_resp_r h))
-/-
-
-
-# Quotient reduction
-%%%
-tag := "sec-quotient-reduction"
-%%%
-
-Analogously to {ref "sec-iota-reduction"}[$`\iota`-reduction] that governs the composition of elimination and introduction of expressions of an inductive type, quotient reduction causes `Quotient.lift` to reduce when composed with `Quotient.mk`.
--/
-example (α : Sort u) (β : Sort v) (s : Setoid α)
-  (f : α → β) (x : α)
-  (h : ∀ (x y : α), x ≈ y → f x = f y)
-  : Quotient.lift f h ⟦x⟧ = f x
-:= rfl
-
-variable (α : Sort u) (β : Sort v) (s : Setoid α)
-  (f : α → β) (x : α)
-  (h : ∀ (x y : α), x ≈ y → f x = f y)
-in
-#reduce Quotient.lift f h ⟦x⟧
-/-
-
-Quotient reduction enables the following.
--/
-open Z in
-example : neg zero = zero := rfl
-
-example (n k : N) :
-  Z.neg ⟦(n, k)⟧ = ⟦(k, n)⟧
-:= rfl
-
-example (n k : N) :
-  Z.neg (Z.neg ⟦(n, k)⟧) = ⟦(n, k)⟧
-:= rfl
-/-
-
-
-# Induction principle for quotients
-
-The induction principle for quotients follows the structure of recursors for inductive types: in order to prove that a predicate holds for all equivalence classes, it suffices to prove that it holds for each `⟦a⟧` with `a` inhabiting the underlying type. The induction principle is `Quot.ind`. Like the elimination principle `Quot.lift`, it has a function type but is built into the kernel.
+The induction principle for quotients follows the structure of recursors for inductive types: in order to prove that a predicate holds for all equivalence classes, it suffices to prove that it holds for each `⟦a⟧` with `a` inhabiting the underlying type. The induction principle is `Quot.ind` with the setoid variant `Quotient.ind`. Like the elimination principle `Quot.lift`, it has a function type but is built into the kernel.
 -/
 #print Quot.ind
 
@@ -335,16 +303,6 @@ example (α : Sort u) (r : α → α → Prop)
   (h : (∀ (a : α), motive (Quot.mk r a)))
   : motive q
 := Quot.ind h q
-/-
-The variant `Quotient.ind` is parametrized by a setoid.
--/
-#print Quotient.ind
-
-example (α : Sort u) (s : Setoid α)
-  (motive : Quotient s → Prop) (ec : Quotient s)
-  (h : (∀ (a : α), motive ⟦a⟧))
-  : motive ec
-:= Quotient.ind h ec
 /-
 
 Elimination of double negation.
@@ -440,6 +398,53 @@ We can now show that `1 - 1 = 0`.
 example : (⟦(1, 0)⟧ : Z) + (⟦(0, 1)⟧ : Z) = ⟦(0, 0)⟧
 := Quotient.sound rfl
 /-
+The underlying relation holds by `rfl`, and `Quotient.sound` lifts it to equality of equivalence classes.
 
 The standard integers `Int` are not defined as a quotient, but as an inductive type with separate constructors for non-negative and negative cases. Consequently, computing with them does not require the quotient axiom, as we have {ref "sec-definitional-equality-naive"}[seen].
+
+
+# Further proofs
 -/
+
+example (α : Sort u) :
+  (s : Setoid α) → α → Quotient s := Quotient.mk
+
+example (α : Sort u) (s : Setoid α) :
+  Quotient.mk s = Quot.mk s.r
+:= rfl
+
+
+example (α : Sort u) (β : Sort v) (s : Setoid α)
+  (f : α → β) (ec : Quotient s)
+  (h : ∀ (x y : α), x ≈ y → f x = f y) :
+  β := Quotient.lift f h ec
+
+example (α : Sort u) (β : Sort v) (s : Setoid α)
+  (f : α → β)
+  (h : ∀ (x y : α), x ≈ y → f x = f y)
+  : Quotient.lift f h = Quot.lift f h
+:= rfl
+
+
+example (α : Sort u) (s : Setoid α) (x y : α)
+  (h : x ≈ y)
+  : (⟦x⟧ : Quotient s) = ⟦y⟧
+:= Quotient.sound h
+
+example (α : Sort u) (s : Setoid α) (x y : α)
+  (h : x ≈ y)
+  : Quotient.sound h = Quot.sound h
+:= rfl
+
+
+example (α : Sort u) (s : Setoid α)
+  (motive : Quotient s → Prop) (ec : Quotient s)
+  (h : (∀ (a : α), motive ⟦a⟧))
+  : motive ec
+:= Quotient.ind h ec
+
+example (α : Sort u) (s : Setoid α)
+  (motive : Quotient s → Prop) (ec : Quotient s)
+  (h : (∀ (a : α), motive ⟦a⟧))
+  : Quotient.ind h ec = Quot.ind h ec
+:= rfl
