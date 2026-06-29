@@ -1,5 +1,5 @@
 /-
-First-order logic
+Logic
 %%%
 tag := "sec-logic"
 %%%
@@ -11,15 +11,13 @@ Proving a proposition in Lean amounts to constructing an expression whose type i
 
 * well-formed [formula][formula]: an expression `p` of type {lean}`Prop`
 * proof: an expression of type `p`
-* formula is true: there is an expression of type `p`
-* formula is false: there is no expression of type `p`
 * truth `⊤`: an inductive type with a single constant constructor
 * falsehood `⊥`: an inductive type with no constructors
 * [implication][implication] `→`: function type
 * [conjunction][conjunction] `∧`: like {lean}`Prod` but in the universe `Prop`
 * [disjunction][disjunction] `∨`: like {lean}`Sum` but in the universe `Prop`
 * [universal quantification][universal-quantification]: $`\Pi`-type
-* [existential quantification][existential-quantification]: an inductive type with a predicate as a parameter
+* [existential quantification][existential-quantification]: "an inductive type with a predicate as a parameter
 
 [Curry-Howard]: https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence
 [1st-order-logic]: https://en.wikipedia.org/wiki/First-order_logic
@@ -31,7 +29,7 @@ Proving a proposition in Lean amounts to constructing an expression whose type i
 [existential-quantification]: https://en.wikipedia.org/wiki/Existential_quantification
 
 
-# Truth, falsehood and negation
+# Formation
 
 Proposition {lean}`True` is defined as an inductive type with a single constructor that takes no arguments.
 -/
@@ -43,59 +41,131 @@ inductive True' : Prop where
   | intro : True'
 /-
 
-The proposition `True'` can be proven by the constructor.{margin}[{ref "sec-anon-const-syntax"}[Recall] the anonymous constructor syntax.]
--/
-example : True' := True'.intro
-example : True' := ⟨⟩
-/-
-
-The following syntactic sugar is available for the standard version.
--/
-example : ⊤ = True := rfl
-example : trivial = True.intro := rfl
-/-
-allowing
--/
-example : ⊤ := trivial
-/-
-
-
 Proposition {lean}`False` is defined as an inductive type without constructors.
 -/
 #print False
 
 inductive False' : Prop
 /-
-As there are no constructors, there are no expressions of type `False'`. It becomes meaningful via negation.
+
+Compound propositions in [propositional calculus][propositional-calculus] are formed by using the logical connectives: conjunction, disjunction, implication,  biconditional, and negation. {ref "sec-intro-logic"}[Recall] that implication is encoded as a function type. Negation is a function
+
+[propositional-calculus]: https://en.wikipedia.org/wiki/Propositional_calculus
+
 -/
 #print Not
 
 def Not' (p : Prop) := p → False'
 /-
-It follows from the above two definitions that
+The remaining connectives are encoded as inductive types.
+-/
+#print And
+#print Or
+#print Iff
+
+inductive And' (p q : Prop) : Prop where
+  | intro (left : p) (right : q) : And' p q
+
+inductive Or' (p q : Prop) : Prop where
+  | inl (h : p) : Or' p q
+  | inr (h : q) : Or' p q
+
+inductive Iff' (p q : Prop) : Prop where
+  | intro (mp : p → q) (mpr : q → p) : Iff' p q
+/-
+
+Moreover, existential quantification is encoded as an inductive type.{margin}[This is an example of a [dependent sum type][dependent-sum-type].]
+
+[dependent-sum-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A3_type
+-/
+#print Exists
+
+inductive Exists' {α : Sort u} (P : α → Prop) : Prop where
+  | intro (a : α) (h : P a) : Exists' P
+/-
+
+The following syntactic sugar is available for the standard versions.
+-/
+example : ⊤ = True := rfl
+
+example : ⊥ = False := rfl
+
+example (p : Prop) : (¬p) = Not p := rfl
+
+example (p q : Prop) : (p ∧ q) = And p q := rfl
+
+example (p q : Prop) : (p ∨ q) = Or p q := rfl
+
+example (p q : Prop) : (p ↔ q) = Iff p q := rfl
+
+example (α : Sort u) (P : α → Prop) :
+  (∃ a : α, P a) = Exists P := rfl
+/-
+
+
+# Introduction
+
+The proposition `True'` can be proven by the constructor.{margin}[{ref "sec-anon-const-syntax"}[Recall] the anonymous constructor syntax.]
+-/
+example : True' := True'.intro
+example : True' := ⟨⟩
+/-
+The following notation is provided for the standard version.
+-/
+example : trivial = True.intro := rfl
+/-
+
+Since `False'` has no constructors, there are no expressions of type `False'`. It becomes meaningful via negation.
 -/
 example : (Not' False') = (False' → False') := rfl
 /-
-
-The identity function maps from a type to itself.
+The function type `α → α` is inhabited for any type `α` by the identity function `id`. In particular, `id` proves `Not' False'`.
 -/
-example (α : Sort u) : id = λ x : α ↦ x := rfl
-
 example : Not' False' := id
+
+example (α : Sort u) : id = λ x : α ↦ x := rfl
 /-
 
-The following syntactic sugar is provided.
+The constructors of `And'`, `Or'`, and `Iff'` encode [conjunction][conjunction-intro], [disjunction][disjunction-intro], and [biconditional introductions][biconditional-intro].
+
+[disjunction-intro]: https://en.wikipedia.org/wiki/Disjunction_introduction
+[conjunction-intro]: https://en.wikipedia.org/wiki/Conjunction_introduction
+[biconditional-intro]: https://en.wikipedia.org/wiki/Biconditional_introduction
+
 -/
-example : ⊥ = False := rfl
-example : (λ p ↦ ¬p) = Not := rfl
+example (p q : Prop) (hl : p) (hr : q) : And' p q
+  := ⟨hl, hr⟩
+
+example (p q : Prop) (h : p) : Or' p q := Or'.inl h
+example (p q : Prop) (h : q) : Or' p q := Or'.inr h
+
+example (p q : Prop) (hl : p → q) (hr : q → p) : Iff' p q
+  := ⟨hl, hr⟩
 /-
-allowing
+
+Moreover, the constructor of `Exists'` encodes [existential generalization][existential-generalization]. We give two formulations.
+
+[existential-generalization]: https://en.wikipedia.org/wiki/Existential_generalization
+
 -/
-example : ¬False := id
+example (α : Sort u) (P : α → Prop) (a : α)
+  (h : P a) : Exists' P
+:= Exists'.intro a h
+
+example (α : Sort u) (P : α → Prop) (a : α)
+  (h : P a) : Exists' P
+:= ⟨a, h⟩
 /-
 
 
-# Principle of explosion
+# Elimination
+
+Propositions are subject to [restricted elimination][restricted-elimination]: they can be eliminated only into expressions of type `Prop` unless they have at most one constructor, whose arguments have type `Prop` or are shared with the type constructor.{margin}[For our immediate purposes, the only relevant shared arguments are parameters. The third argument of the type constructor of {lean}`Acc` illustrates the general case. This argument is shared with the only type constructor but it cannot be promoted to a parameter due to not satisfying the {ref "sec-well-formedness"}[uniformity requirement].] In contrast, constructorless inductive types, including `False'`, can be eliminated into anything.
+
+[restricted-elimination]: https://lean-lang.org/doc/reference/latest/The-Type-System/Propositions/?terms=restricted%20elimination#propositions
+
+
+## Principle of explosion
 
 Both `False` and `False'` are uninhabited, that is,
 there are no expressions of either type. Uninhabited propositions encode contradictions. From a contradiction, any proposition can be derived by the [principle of explosion][explosion]. The recursor `False.rec` encodes the principle of explosion.
@@ -143,70 +213,6 @@ example : False' → False := nofun
 /-
 
 
-# Lemmas and theorems
-
-We can give a name to a proven proposition in several ways.
-{index}[lemma] {index}[theorem]
--/
-def explosion : False → False' := nofun
-def explosion₁ (h : False) : False' := nomatch h
-lemma explosion₂ (h : False) : False' := nomatch h
-theorem explosion₃ (h : False) : False' := nomatch h
-/-
-Despite the syntactic differences, all these define the same function. The following indentation suggest reading `h : False'` as a hypothesis and `False` as the conclusion.{margin}[{ref "sec-proof-steps"}[Recall] that `:` before the conclusion `False` can be read as "Then" and `:=` as "Proof:".]
--/
-lemma explosion₄
-  (h : False)
-  : False'
-:=
-  nomatch h
-/-
-
-Lemmas can be used in subsequent proofs.
--/
-example : Not' False := explosion
-/-
-
-
-# Propositional calculus
-
-Compound propositions in [propositional calculus][propositional-calculus] are formed by using the logical connectives: conjunction, disjunction, implication, and negation. We know already how negation and implication are encoded. Conjunction and disjunction are inductive types.
-
-[propositional-calculus]: https://en.wikipedia.org/wiki/Propositional_calculus
-
--/
-#print And
-#print Or
-
-inductive And' (p q : Prop) : Prop where
-  | intro (hl : p) (hr : q) : And' p q
-
-inductive Or' (p q : Prop) : Prop where
-  | inl (h : p) : Or' p q
-  | inr (h : q) : Or' p q
-/-
-
-These definitions encode [conjunction][conjunction-intro] and [disjunction introductions][disjunction-intro].{margin}[We use again the anonymous constructor syntax.]
-
-[disjunction-intro]: https://en.wikipedia.org/wiki/Disjunction_introduction
-[conjunction-intro]: https://en.wikipedia.org/wiki/Conjunction_introduction
-
--/
-variable (p q : Prop)
-
-example (hl : p) (hr : q) : And' p q := ⟨hl, hr⟩
-
-example (h : p) : Or' p q := Or'.inl h
-example (h : q) : Or' p q := Or'.inr h
-/-
-
-The following syntactic sugar is available for the standard versions.
--/
-example : (p ∧ q) = And p q := rfl
-example : (p ∨ q) = Or p q := rfl
-/-
-
-
 ## Conjunction elimination
 
 Deconstruction via pattern matching enables proofs of statements involving compound hypotheses. We illustrate [conjunction elimination][conjunction-elim].
@@ -214,19 +220,19 @@ Deconstruction via pattern matching enables proofs of statements involving compo
 [conjunction-elim]: https://en.wikipedia.org/wiki/Conjunction_elimination
 
 -/
-example (h : And' p q) : p
+example (p q : Prop) (h : And' p q) : p
 :=
   match h with
   | And'.intro hp _ => hp
 /-
-This is just the projection function associated to the first field of `And'`.{margin}[{ref "sec-structures"}[Recall] that projection functions are generated for structures in this manner. While we could have defined `And'` as a structure, its definition as an inductive type illustrates the fact that structures are merely a convenience.] Here are two alternative proofs using the shorthand related to the {ref "sec-anon-const-syntax"}[anonymous constructor syntax].
+This is just the projection associated to the first field of `And'`.{margin}[{ref "sec-pattern-matching"}[Recall] that we considered the analogous projection for `Prod'` earlier.] Here are two alternative proofs.
 -/
-example (h : And' p q) : p
+example (p q : Prop) (h : And' p q) : p
 :=
   let ⟨hp, _⟩ := h
   hp
 
-example (h : And' p q) : p
+example (p q : Prop) (h : And' p q) : p
 :=
   let ⟨_, _⟩ := h
   ‹p›
@@ -377,14 +383,12 @@ example (p q : Prop) (h : Or' p q) :
 /-
 
 
-# Restricted elimination
+## Restricted elimination
 %%%
 tag := "sec-restricted-elimination"
 %%%
 
-Inspecting the type of `Or.rec`, we see that `Or.rec` differs from all other recursors we have seen so far in that its motive's codomain is not an arbitrary universe `Sort u` but `Prop`. This is a manifestation of [restricted elimination][restricted-elimination]: propositions can be eliminated only into expressions of type `Prop` unless they have at most one constructor, whose arguments have type `Prop` or are shared with the type constructor.{margin}[For our immediate purposes, the only relevant shared arguments are parameters. The third argument of the type constructor of {lean}`Acc` illustrates the general case. This argument is shared with the only type constructor but it cannot be promoted to a parameter due to not satisfying the {ref "sec-params"}[uniformity requirement].]
-
-[restricted-elimination]: https://lean-lang.org/doc/reference/latest/The-Type-System/Propositions/?terms=restricted%20elimination#propositions
+Inspecting the type of `Or.rec`, we see that `Or.rec` differs from all other recursors we have seen so far in that its motive's codomain is not an arbitrary universe `Sort u` but `Prop`. This is a manifestation of [restricted elimination][restricted-elimination].
 
 Restricted elimination can be understood as the flipside of {ref "sec-impredicative-lub-rule"}[proof irrelevance]. Indeed, without such restriction, proof irrelevance would lead to inconsistency via
 -/
@@ -412,48 +416,26 @@ def bad (h : True ∨ True) := match h with
 If it were allowed, then taking `bad` as `f` in the above example would lead to `0 = 1`.
 
 
-# Existential quantification
-
-Existential quantification is encoded as an inductive type.
--/
-#print Exists
-
-inductive Exists' {α : Sort u} (P : α → Prop) : Prop where
-  | intro (a : α) (h : P a) : Exists' P
-/-
-
-The definition is based on [existential generalization][existential-generalization]. We give two formulations.
-
-[existential-generalization]: https://en.wikipedia.org/wiki/Existential_generalization
-
--/
-example (α : Sort u) (P : α → Prop) (a : α)
-  (h : P a) : Exists' P
-:= Exists'.intro a h
-
-example (α : Sort u) (P : α → Prop) (a : α)
-  (h : P a) : Exists' P
-:= ⟨a, h⟩
-/-
+## Existential instantiation
 
 Deconstruction enables [existential instantiation][existential-instantiation]. We give three formulations.
 
 [existential-instantiation]: https://en.wikipedia.org/wiki/Existential_instantiation
 
 -/
-example (α : Sort u) (P : α → Prop)
+example (q : Prop) (α : Sort u) (P : α → Prop)
   (h1 : Exists' P) (h2 : ∀ a : α, P a → q) : q
 :=
   let ⟨a, h⟩ := h1
   h2 a h
 
-example (α : Sort u) (P : α → Prop)
+example (q : Prop) (α : Sort u) (P : α → Prop)
   (h1 : Exists' P) (h2 : ∀ a : α, P a → q) : q
 :=
   match h1 with
   | Exists'.intro a h => h2 a h
 
-example (α : Sort u) (P : α → Prop)
+example (q : Prop) (α : Sort u) (P : α → Prop)
   (h1 : Exists' P) (h2 : ∀ a : α, P a → q) : q
 :=
   Exists'.rec (λ a h ↦ h2 a h) h1
@@ -465,24 +447,17 @@ Propositions of form `Exists' p` can be eliminated only into expressions of type
 /-
 The field `a : α` of `Exists'.intro` does not have type `Prop` and is not shared with the type constructor.
 
-Syntactic sugar is provided for the standard version.
+
+# Equality
+
+Two propositions are equal if and only if they are equivalent. The implication from equality to equivalence can be proven using the substitution principle for equality. We {ref "sec-substitution-principle"}[return] to this principle.
 -/
-example (α : Sort u) (P : α → Prop) :
-  (∃ a : α, P a) = Exists P := rfl
+example (p q : Prop) (h : p = q) : p ↔ q :=
+  have : p ↔ p := ⟨id, id⟩
+  Eq.subst h this
 /-
-
-
-# Further proofs and remarks
-
+The opposite implication is an axiom. Axioms are propositions postulated without proof. The kernel postulates a small number of axioms including `propext`. We {ref "sec-axioms"}[return] to axioms in general.
 -/
-example : explosion = explosion₁ := rfl
-example : explosion = explosion₂ := rfl
-example : explosion = explosion₃ := rfl
-example : explosion = explosion₄ := rfl
+#print propext
 
-example (h : And' p q) : q
-:=
-  match h with
-  | ⟨_, hq⟩ => hq
-
-example (h : p ∧ q) : q := h.right
+example (p q : Prop) (h : p ↔ q) : p = q := propext h
