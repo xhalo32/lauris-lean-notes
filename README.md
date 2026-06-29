@@ -1,6 +1,6 @@
 # Notes on Lean
 
-Source files for [Notes on Lean](https://www.mv.helsinki.fi/home/lsoksane/lean/). Lean files in [`Document/`](./Document/) are translated into [Verso](https://github.com/leanprover/verso) documents, and [`Document.md`](./Document.md) gathers them into a single document.
+Source files for [Notes on Lean](https://l-oksanen.github.io/lean-notes/). Lean files in [`Document/`](./Document/) are translated into [Verso](https://github.com/leanprover/verso) documents, and [`Document.md`](./Document.md) gathers them into a single document.
 
 The Lean files must 
 
@@ -31,11 +31,10 @@ are hidden in the document.
 
 To inspect the generated site locally, run e.g.
 ```
-python -m http.server 8000
+python -m http.server 8000 -d _out/_out/html-multi
 ```
-in `_out/_out/html-multi`, and open [localhost:8000](http://localhost:8000/).
+in the root of the repository, and open [localhost:8000](http://localhost:8000/).
 
-> Alternatively, pass `-d _out/_out/html-multi` to the Python command and run it from the root of the repository.
 
 ## Configuration
 
