@@ -10,11 +10,11 @@ authorshipNote := "lauri.oksanen@helsinki.fi"
 
 # Introduction
 
-We will consider [Lean][lean]'s type theory as a language for writing [formal proofs][formal-proof]. The part of Lean that enforces the rules of the type theory is called the kernel. The type theory is designed to be simple, enabling the kernel to remain small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel.
+We will consider [Lean][lean]'s type theory as a language for writing [formal proofs][formal-proof]. The part of Lean that enforces the rules of the type theory is called the kernel. The type theory is built from few primitives, enabling the kernel to remain small. From a foundational perspective, trusting Lean means trusting the correctness of this small kernel.
 
 Expressed directly in kernel primitives, even simple proofs can be very verbose. The user-facing surface syntax is more implicit and compressed. Elaboration translates surface syntax into primitives, filling in the implicit pieces. Tactics are an especially powerful form of this compression, and it is typical to write proofs as tactic blocks. 
 
-We begin by outlining the most important kernel primitives, namely the type and proposition universes, functions, and inductive types, as well as the kernel-level notion of definitional equality. We then take a brief look at tactics.
+We begin by outlining the most important kernel primitives related to universes, functions, and inductive types. We then take a brief look at tactics.
 
 [lean]: https://lean-lang.org/
 [formal-proof]: https://en.wikipedia.org/wiki/Formal_proof
@@ -25,7 +25,8 @@ We begin by outlining the most important kernel primitives, namely the type and 
 
 # Foundations
 
-Lean is highly expressive language while consisting of only a few kinds of expressions.{margin}[For the moment, we omit expressions related to {ref "sec-quotient-types"}[quotient types], and effectively consider a [sublanguage][sublanguage].] Every type is either a universe in the universe hierarchy, a function type, or arises from the type constructor of an inductive type. The remaining expressions can be organized along two axes: 
+
+Lean is highly expressive despite having only a few kinds of expression.{margin}[For the moment, we omit expressions related to {ref "sec-quotient-types"}[quotient types], and effectively consider a [sublanguage][sublanguage].] Every type is either a universe in the universe hierarchy, a function type, or arises from the type constructor of an inductive type. The remaining expressions can be organized along two axes: 
 
 ```
 <!--HTML-->
@@ -40,7 +41,7 @@ Lean is highly expressive language while consisting of only a few kinds of expre
 </table>
 ```
 
-We present the formation, introduction, elimination, and reduction rules for functions and inductive types. The notion of equality of functions and expressions of an inductive type is also discussed. 
+We present the formation, introduction, elimination, and reduction rules for functions and inductive types. We also discuss when two functions, and two expressions of an inductive type, are equal.
 
 [sublanguage]: https://en.wikipedia.org/wiki/Sublanguage
 

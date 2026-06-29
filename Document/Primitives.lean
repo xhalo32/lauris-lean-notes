@@ -11,7 +11,7 @@ import Mathlib.Data.Nat.Init
 namespace Document.Primitives
 /-
 
-When used as a proof assistant, the central form of interaction with Lean is declaring a definition.{margin}[In fact, the Lean code in these notes consists of almost exclusively on commands declaring a definition, namely `def` together with its variants `example`, `abbrev`, `lemma`, and `theorem`. The remaining commands we encounter are diagnostics, such as `#check`, and `set_option`, which configures diagnostic output. Diagnostic commands are prefixed with `#`.] The following definition gives the name `z` to `0`, and states that `z` is a natural number.{margin}[The natural numbers `0, 1,…` are denoted by `ℕ`. Hovering over `ℕ` in [VS Code][vscode] shows that it can be entered using `\N`.] {index}[def] {index}[`:`] {index}[`:=`]
+When used as a proof assistant, the central form of interaction with Lean is declaring a definition.{margin}[In fact, the Lean code in these notes consists almost exclusively of commands declaring a definition, namely `def` together with its variants `example`, `abbrev`, `lemma`, and `theorem`, as well as `inductive`, which declares an inductive type. The remaining commands we encounter are related to namespaces and diagnostics. These include `#check` and `set_option`, which configures diagnostic output. Commands producing diagnostic output are prefixed with `#`.] The following definition gives the name `z` to `0`, and states that `z` is a natural number.{margin}[The natural numbers `0, 1,…` are denoted by `ℕ`. Hovering over `ℕ` in [VS Code][vscode] shows that it can be entered using `\N`.] {index}[def] {index}[`:`] {index}[`:=`]
 
 [vscode]: https://lean-lang.org/install/
 
@@ -63,7 +63,7 @@ Propositions are expressions of type `Prop`, the universe of propositions.
 example : Prop := 0 = 0
 example : Prop := 1 = 0
 /-
-The first proposition is provable, while the second is not.{margin}[We {ref "sec-peano"}[later] prove the negation of `1 = 0` as a consequence of the Peano axioms.] Interestingly, the proposition `0 = 0` is itself a type,{margin}[The expression `0 = 0` is syntactic sugar for `Eq 0 0`. We will {ref "sec-equality"}[return] to this later.] and an expression of type `0 = 0` encodes a proof of `0 = 0`. In general, an expression `p` of type `Prop` is itself a type. To prove `p` is to give an expression of type `p`.
+The first proposition is provable, while the second is not.{margin}[We {ref "sec-peano"}[later] prove the negation of `1 = 0` as a consequence of the Peano axioms.] Interestingly, the proposition `0 = 0` is itself a type,{margin}[We will {ref "sec-equality"}[return] to equality later.] and an expression of type `0 = 0` encodes a proof of `0 = 0`. In general, an expression `p` of type `Prop` is itself a type. To prove `p` is to give an expression of type `p`.
 
 The proposition `0 = 0` has a canonical proof by [reflexivity][reflexivity] of equality.{margin}[We will explain the precise meaning of `rfl` {ref "sec-equality"}[later].]
 
@@ -104,10 +104,7 @@ Functions are given by $`\lambda`-abstractions. {index}[`λ … ↦`] {index}[`�
 -/
 def plus1 : ℕ → ℕ := λ n ↦ n + 1
 /-
-This is [syntactic sugar][sugar] for {index}[fun]
-
-[sugar]: https://en.wikipedia.org/wiki/Syntactic_sugar
-
+An alternative notation is {index}[fun]
 -/
 def plus1₁ : ℕ → ℕ := fun n => n + 1
 /-
@@ -121,7 +118,10 @@ Lean is a proof assistant and a functional programming language. One may think o
 example : plus1 0 = 1 := rfl
 /-
 
-Syntactic sugar allows for introducing the argument using parentheses. {index}[`(… : …)`]
+[Syntactic sugar][sugar] allows for introducing the argument using parentheses. {index}[`(… : …)`]
+
+[sugar]: https://en.wikipedia.org/wiki/Syntactic_sugar
+
 -/
 def plus1₂ (n : ℕ) : ℕ := n + 1
 /-
@@ -142,7 +142,6 @@ The functions `add₁` and `add₂` coincide with `add`.
 %%%
 tag := "sec-intro-logic"
 %%%
-
 
 In Lean, [logical implication][implication] and [universal quantification][universal-quantification] are not separate primitives but arise as function types.{margin}[Other logical connectives and existential quantification are encoded as inductive types, as seen {ref "sec-logic"}[later].]
 
@@ -171,6 +170,9 @@ example : ∀ n : ℕ, n + 1 ≠ 0 := nofun
 
 
 # Inductive types
+%%%
+tag := "sec-intro-inductive-types"
+%%%
 
 Inductive types are a general mechanism for defining new types by specifying constructors. For instance, `ℕ` is an inductive type with two constructors. Its constructors can be inspected by `#print` command. However, `#print` does not interact well with syntactic sugar, and `ℕ` is in fact syntactic sugar for `Nat`. We can strip this sugar by adjusting [pretty-printing][pretty-printing] via `set_option`. {index}[`set_option`]
 

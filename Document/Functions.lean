@@ -12,7 +12,7 @@ import Counterexamples.Girard
 -- -show
 namespace Document.Functions
 /-
-We consider a sublanguage which is a [pure type system][pure-type-system]. A pure type system is defined by its universes, the relations between the universes, and a number of rules. The rules govern
+We consider a sublanguage that is a [pure type system][pure-type-system]. A pure type system is defined by its universes, the relations between the universes, and a number of rules. The rules govern
 
 [pure-type-system]: https://en.wikipedia.org/wiki/Pure_type_system
 
@@ -86,6 +86,9 @@ More generally, each type `α` inhabits `Sort u` for exactly one `u`. We say tha
 
 
 # Formation
+%%%
+tag := "sec-functions-formation"
+%%%
 
 An elementary function type is formed as follows.
 -/
@@ -99,13 +102,13 @@ Here the types `α` and `β` specify the [domain][domain] and [codomain][codomai
 -/
 example (α β γ : Type) : (α → β → γ) = (α → (β → γ)) := rfl
 /-
-This is often viewed as encoding functions taking two arguments, the first in `α` and the second in `β`, and yielding an expression in `γ`. For this reason, we occasionally refer to `γ` as the final codomain.
+This is often viewed as encoding functions that take two arguments, the first in `α` and the second in `β`, and yield a result in `γ`. We refer to `γ` as the _final codomain_. Moreover, we say that the final codomain of a type `δ` is `δ` itself whenever `δ` is not a function type.{margin}[This unified terminology across all types is used for instance when discussing {ref "sec-inductive-type-formation"}[type constructors] and {ref "sec-well-formedness"}[well-formedness requirements] of inductive types.]
 
 {ref "sec-intro-logic"}[Recall] that the codomain of a function may depend on its argument. Consider the following abstract example.
 -/
 example (I : Type) (X : I → Type) : Type := (i : I) → X i
 /-
-We refer to `(i : I) → X i` as a [$`\Pi`-type][pi-type] and `i : I` as the _index_ of the $`\Pi`-type.{margin}[$`\Pi`-types are also called dependent function types.]  Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
+We refer to `(i : I) → X i` as a [$`\Pi`-type][pi-type].{margin}[$`\Pi`-types are also called dependent function types.]  Such a type can be thought of as encoding an [indexed product][indexed-product] of sets,
 $$`
 \prod_{i \in I} X_i
 =
@@ -116,13 +119,13 @@ $$`
 [pi-type]: https://en.wikipedia.org/wiki/Dependent_type#%CE%A0_type
 [indexed-product]: https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
 
-All function types are $`\Pi`-types.
+In fact, all function types are $`\Pi`-types. In the elementary case discussed above, the codomain simply does not depend on the argument.
 -/
 example
   (α : Sort u) (β : Sort v) : (α → β) = ((a : α) → β)
 := rfl
 /-
-As the codomain `β` does not depend on the argument `a`, we can rewrite this function type leaving `a` as a hole. {index}[`_`]
+Since `a` does not appear in the codomain, we can rewrite the type leaving it as a hole. {index}[`_`]
 -/
 example
   (α : Sort u) (β : Sort v) : (α → β) = ((_ : α) → β)
@@ -135,7 +138,7 @@ example
 tag := "sec-impredicative-lub-rule"
 %%%
 
-The formation of a $`\Pi`-type type is governed by the following _impredicative maximum rule_.{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity]. The [level expression][level-expression] `imax u v` is called the impredicative maximum (or least upper bound) of `u` and `v`. We have named the rule accordingly.]
+The formation of a $`\Pi`-type is governed by the following _impredicative maximum rule_.{margin}[This name is not used in the Lean Language Reference; the rule itself is described in [Predicativity][predicativity]. The [level expression][level-expression] `imax u v` is called the impredicative maximum (or least upper bound) of `u` and `v`. We have named the rule accordingly.]
 
 [predicativity]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/#The-Lean-Language-Reference--The-Type-System--Universes--Predicativity
 [level-expression]: https://lean-lang.org/doc/reference/latest/The-Type-System/Universes/?terms=imax#level-expressions
@@ -177,7 +180,7 @@ The type of predicates on `α` satisfies
 -/
 example (α : Sort u) : Sort (max u 1) := α → Prop
 /-
-Here `Sort (max u 1)` arises from impredicative maximum rule. Indeed, since
+Here `Sort (max u 1)` arises from the impredicative maximum rule. Indeed, since
 -/
 example : Sort 1 := Prop
 /-
@@ -201,7 +204,7 @@ We have used extensively `rfl`. It is a function taking two implicit arguments. 
 -/
 example : {α : Sort u} → {a : α} → a = a := rfl
 /-
-The first argument is a type `α`, and the second is an expression `a` of that type. The final codomain `a = a` depends on the arguments. The implicit arguments can be inferred from it due to this dependence. In gerenal, implicit arguments are translated into their explicit counterparts during elaboration.
+The first argument is a type `α`, and the second is an expression `a` of that type. The final codomain `a = a` depends on the arguments. The implicit arguments can be inferred from it due to this dependence. In general, implicit arguments are translated into their explicit counterparts during elaboration.
 
 Prefixing a function with `@` makes all its implicit arguments explicit. {index}[`@`]
 -/
@@ -243,7 +246,7 @@ The impredicative maximum rule relies on the infinite sequence of universes as s
 -/
 def pi : Type (w + 1) := Type w → Type w
 /-
-Having an infinite number of universes is not a feature introduced by choice, rather it is the price of consistency. [Certain historical][system-U] pure type systems that lack such stratification are inconsistent.
+Having an infinite number of universes is not a feature introduced by choice, rather it is the price of consistency. [Certain historical][system-U] pure type systems that lack sufficient stratification are inconsistent.
 
 [system-U]: https://en.wikipedia.org/wiki/System_U
 
@@ -274,6 +277,9 @@ is related to proof irrelevance. Heuristically speaking, since proofs carry no i
 
 
 # Introduction
+%%%
+tag := "sec-fun-introduction"
+%%%
 
 Functions are introduced by $`\lambda`-abstraction. As an illustration, we consider the [identity function][identity-function].
 
