@@ -25,7 +25,6 @@ We begin by outlining the most important kernel primitives related to universes,
 
 # Foundations
 
-
 Lean is highly expressive despite having only a few kinds of expression.{margin}[For the moment, we omit expressions related to {ref "sec-quotient-types"}[quotient types], and effectively consider a [sublanguage][sublanguage].] Every type is either a universe in the universe hierarchy, a function type, or arises from the type constructor of an inductive type. The remaining expressions can be organized along two axes: 
 
 ```
@@ -51,9 +50,9 @@ We present the formation, introduction, elimination, and reduction rules for fun
 
 # Constructions
 
-We have now seen all the primitive notions in Lean's type theory. To reiterate, they are universes, function types, and inductive types,{margin}[We view formation of function and inductive types as primitive notions. This does not include concrete function types or inductive types.] together with introduction and elimination of expressions of the latter two types. In addition, we have considered the concrete inductive types `Eq` and `Nat`, as well as the [product][product-type] and [sum][sum-type] types `Prod` and `Sum`.
+We have now seen the most important primitive notions in Lean's type theory. To reiterate, they are universes, function types, and inductive types,{margin}[We view formation of function and inductive types as primitive notions. This does not include concrete function types or inductive types.] together with introduction and elimination of expressions of the latter two types. In addition, we have considered the concrete inductive types `Eq` and `Nat`, as well as the [product][product-type] and [sum][sum-type] types `Prod` and `Sum`.
 
-We begin with an encoding of first-order logic using inductive types. This involves product and sum types similar to `Prod` and `Sum`, a [dependent sum type][dep-sum-type], a [unit type][unit-type], and an [empty type][empty-type].{margin}[These types are called `And`, `Or`, `Exists`, `True`, and `False`.] The remainder of the chapter then takes a deeper look at `Eq` and `Nat`.
+We begin with an encoding of connectives and quantifiers in first-order logic using inductive types. This involves product and sum types similar to `Prod` and `Sum`, a [dependent sum type][dep-sum-type], a [unit type][unit-type], and an [empty type][empty-type].{margin}[These types are called `And`, `Or`, `Exists`, `True`, and `False`.] The remainder of the chapter then takes a deeper look at `Eq` and `Nat`.
 
 [product-type]: https://en.wikipedia.org/wiki/Product_type
 [sum-type]: https://en.wikipedia.org/wiki/Sum_type
@@ -76,7 +75,7 @@ This chapter collects three tools for working with types:
 
 * _Coercions_ encode embeddings between types, and more generally, let expressions of one type be used implicitly where another is expected.
 
-Type classes underpin the other two: quotient types are formed from instances of the `Setoid` type class, and coercions are implemented as type class instances at the elaboration stage. Type classes are inductive types with special elaboration-level features, so they require no new kernel-level primitives. Quotient types, by contrast, come with a number of primitives for their formation, the introduction and elimination of quotient expressions, and reasoning about them.
+Type classes underpin the other two: quotient types are formed from instances of the `Setoid` type class, and coercions are implemented as type class instances at the elaboration stage. Type classes are inductive types with special elaboration-level features, so they require no new kernel-level primitives. Quotient types, by contrast, come with a number of primitives for their formation, the introduction and elimination of quotient expressions, and reasoning about them. 
 
 {include 2 Document.Type_classes}
 {include 2 Document.Quotient_types}
@@ -84,6 +83,9 @@ Type classes underpin the other two: quotient types are formed from instances of
 
 
 # Axioms
+%%%
+tag := "sec-axioms"
+%%%
 
 Axioms are propositions postulated without proof. There are seven [standard][standard-axioms] axioms, three of which have mathematical content.{margin}[Three of the remaining axioms concern performance optimizations whose soundness rests on the compiler beyond the kernel. The final one is used by [sorry][sorry].] These three are the quotient axiom, propositional extensionality, and the [axiom of choice][axiom-of-choice]. The first two are similar in that they postulate equality assuming equivalence.
 

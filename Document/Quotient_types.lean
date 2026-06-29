@@ -222,7 +222,7 @@ The quotient axiom and its converse say that two equivalence classes `⟦x⟧` a
 
 ## Quotient axiom
 
-Axioms are propositions postulated without proof. `Quot.sound` is one of the small number of axioms postulated by the kernel. We {ref "sec-axioms"}[return] to axioms in general.
+`Quot.sound` is one of the small number of axioms postulated by the kernel. We {ref "sec-axioms"}[return] to axioms in general.
 -/
 #print Quot.sound
 

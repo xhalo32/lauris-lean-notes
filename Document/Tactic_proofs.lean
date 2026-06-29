@@ -44,6 +44,7 @@ lemma diff_sq₂ (x y : ℝ) : x^2 - y^2 = (x + y) * (x - y)
 theorem diff_sq₃ (x y : ℝ) : x^2 - y^2 = (x + y) * (x - y)
 := diff_sq₁ x y
 /-
+Despite the syntactic differences, all these define the same function.
 
 The expression produced by `grind` can be inspected using `#print`. The actual proof has an auto-generated name.
 -/

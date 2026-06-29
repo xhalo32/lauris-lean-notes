@@ -630,7 +630,7 @@ We introduced the [namespace][namespace] `Demo` to avoid a clash with the existi
 
 [namespace]: https://lean-lang.org/doc/reference/latest/Namespaces-and-Sections/#namespaces
 
-The constructor is named `mk`,{margin}[Name `mk` is used unless a name is provided with `::` {index}[`::`] [syntax][constructor-name].] and it has the fields `fst : α` and `snd : β`. Therefore, the above structure declaration yields the same constructor as our earlier definition of `Prod'`.
+The constructor is named `mk`,{margin}[Name `mk` is used unless a name is provided with `::` [syntax][constructor-name].] {index}[`::`] and it has the fields `fst : α` and `snd : β`. Therefore, the above structure declaration yields the same constructor as our earlier definition of `Prod'`.
 
 [constructor-name]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#structure-constructors
 
