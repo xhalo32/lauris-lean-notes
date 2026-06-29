@@ -4,108 +4,56 @@ Inductive types
 tag := "sec-inductive-types"
 %%%
 -/
-import Mathlib.Data.Nat.Init
-import Mathlib.Util.CompileInductive
+import Mathlib
 /-
 -/
 -- -show
 namespace Document.Inductive_types
 /-
-The type encoding natural numbers, {lean}`Nat`, is an example of an [inductive type][inductive-types].
+While a pure type system can encode types of data using [Church encoding][Church_encoding], working with such encoding could feel cumbersome. [Inductive types][inductive-types] extend Lean's pure type system and provide the primary means of encoding types of data, including the natural numbers.
 
-[inductive-types]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/
+[inductive-types]: https://en.wikipedia.org/wiki/Inductive_type
+[Church_encoding]: https://en.wikipedia.org/wiki/Church_encoding
 
+Let us {ref "sec-intro-inductive-types"}[return] to the definition of natural numbers, reproduced here.
 -/
-#print Nat
+inductive Nat' : Type where
+  | zero : Nat'
+  | succ (n : Nat') : Nat'
 /-
-The output shows the _type constructor_ and _constructors_ together with their types: the former is {lean}`Nat` inhabiting {lean}`Type`, while the latter are
+The `inductive` command causes the kernel to synthesize formation, introduction, elimination, and reduction rules for a fresh inductive type. The above command defines, in particular, the two constructors `Nat'.zero` and `Nat'.succ` that determine how expressions of type `Nat'` can be introduced.
 
-* {lean}`Nat.zero` inhabiting `ℕ`, and{margin}[Recall that `ℕ` is syntactic sugar for {lean}`Nat`.]
-* {lean}`Nat.succ` inhabiting `ℕ → ℕ`.
-
-The constructors define how the expressions of type {lean}`Nat` arise, while the type constructor specifies that
+The following expressions correspond to `1` and `2`.
 -/
-example : Type := Nat
+def one := Nat'.succ Nat'.zero
+def two := Nat'.succ (Nat'.succ Nat'.zero)
 /-
-
-{lean}`Nat.succ` encodes the [successor function][succ]. The numerals `0`, `1`, `2`, … are syntactic sugar for expressions composed from the constructors of {lean}`Nat`. The only way to obtain an expression of type {lean}`Nat` is by using {lean}`Nat.succ` and {lean}`Nat.zero`.
-
-[succ]: https://en.wikipedia.org/wiki/Successor_function
+In fact, the numerals `0`, `1`, `2`, … are syntactic sugar for expressions composed from the constructors of `Nat` in the same manner.
 -/
 example : 0 = Nat.zero := rfl
 example : 1 = Nat.succ Nat.zero := rfl
 example : 2 = Nat.succ (Nat.succ Nat.zero) := rfl
 /-
 
-We can define an inductive type in the same way as {lean}`Nat`. {index}[inductive … where]
--/
-inductive Nat' : Type where
-  | zero : Nat'
-  | succ : Nat' → Nat'
 
-#print Nat'
-/-
+# Preliminaries
 
-The following expressions correspond to 1 and 2.
--/
-def one := Nat'.succ Nat'.zero
-def two := Nat'.succ (Nat'.succ Nat'.zero)
-/-
-Moreover,
+As expected, `two` is the [successor][succ] of `one`.
+
+[succ]: https://en.wikipedia.org/wiki/Successor_function
+
 -/
 example : two = Nat'.succ one := rfl
 /-
-Here the left and right-hand sides of the equality have the same normal form:
+Here the left and right-hand sides of the equality have the same normal form.
 -/
 #reduce two
 #reduce Nat'.succ one
 /-
-We will explain {ref "sec-hierarchical-names"}[below] the hierarchical name appearing in the normal form.
+We will next explain the hierarchical name appearing in the normal form.
 
 
-# Universes
-%%%
-tag := "sec-universe-placement"
-%%%
-
-The universe of an inductive type is specifed by its type constructor.
--/
-inductive NextLevelNat : Sort 2 where
-  | zero : NextLevelNat
-  | succ : NextLevelNat → NextLevelNat
-/-
-From the mathematical point of view, `NextLevelNat` is [isomorphic][isomorphism] to {lean}`Nat`. They both satisfy the second-order formulation of [Peano axioms][peano], as shown {ref "sec-peano"}[later]. In contrast, the following is not isomorphic to {lean}`Nat`.
-
-[isomorphism]: https://en.wikipedia.org/wiki/Isomorphism
-[peano]: https://en.wikipedia.org/wiki/Peano_axioms
-
--/
-inductive NotNat : Sort 0 where
-  | zero : NotNat
-  | succ : NotNat → NotNat
-/-
-Indeed, `NotNat` inhabits `Sort u`, the universe of propositions, and
--/
-example : NotNat.zero = NotNat.succ NotNat.zero := rfl
-/-
-due to proof irrelevance.
-
-If the universe of an inductive type is not specified explicitly, Lean infers the smallest universe level compatible with the constructors.{margin}[Lean also attempts to infer the type of a constructor if it is omitted.]
--/
-namespace Demo
-
-inductive Nat where
-  | zero
-  | succ : Nat → Nat
-
-end Demo
-/-
-We introduced the [namespace][namespace] `Demo` to avoid a clash with the existing name {lean}`Nat`.
-
-[namespace]: https://lean-lang.org/doc/reference/latest/Namespaces-and-Sections/#namespaces
-
-
-# Hierarchical names
+## Hierarchical names
 %%%
 tag := "sec-hierarchical-names"
 %%%
@@ -123,12 +71,14 @@ In the first case, all but the final component of a hierarchical name constitute
 example : Nat := Nat.zero
 example : Nat → Nat := Nat.succ
 /-
-where the namespace is `Nat`, and the names are `zero` and `succ`, respectively; as well as:
+where the namespace is `Nat`, and the names are `zero` and `succ`, respectively. Likewise, it includes the following example from [Mathlib][mathlib] stating that any prime number is nonzero.
+
+[mathlib]: https://mathlib.org/
+
 -/
-example : Nat' := Nat'.zero
-example : Demo.Nat := Demo.Nat.zero
+example (n : ℕ) : Nat.Prime n → n ≠ 0 := Nat.Prime.ne_zero
 /-
-where the name is `zero`, and the namespaces are `Nat'` and `Demo.Nat`, respectively.
+Here the name is `ne_zero`, and the namespace is `Nat.Prime`.
 
 An example of the second case is given by
 -/
@@ -141,36 +91,126 @@ We will return to the third case {ref "sec-structures"}[below].
 
 We can open {index}[open] the namespace of `Nat'`, and then write `zero` and `succ` instead of `Nat'.zero` and `Nat'.succ`.
 -/
-open Nat'
-
+open Nat' in
 def three := succ (succ (succ zero))
 
+open Nat' in
 example : three = zero.succ.succ.succ := rfl
 /-
 
 
-# Parameters and fields
+# Formation
 %%%
-tag := "sec-params"
+tag := "sec-inductive-type-formation"
 %%%
 
-Recall that `Prod` encodes Cartesian product. It is an inductive type with parameters. We can define our version as follows.
+In addition to constructors, the `inductive` command specifies a type constructor for the fresh inductive type, governing its formation. Every type constructor must have a universe as its final codomain.{margin}[{ref "sec-functions-formation"}[Recall] that the final codomain was discussed in the context of function types.] For the natural numbers and Cartesian product, this is `Type` and `Type (max u v)`, respectively.
+-/
+example : Type := Nat
+
+example : Type u → Type v → Type (max u v) := Prod
+/-
+
+We now focus on type constructors, and consider constructorless inductive types as examples. Here is an inductive type whose type constructor shares the type with `Prod`.
+-/
+inductive EmptyProd
+  (α : Type u) (β : Type v) : Type (max u v)
+
+example : Type u → Type v → Type (max u v) := EmptyProd
+/-
+
+The following example is invalid since `Nat` is not a universe.
+```lean +error
+inductive InvalidCodomain
+  (α : Type u) (β : Type v) : Nat
+```
+
+
+## Parameters and indices
+%%%
+tag := "sec-params-and-ixs"
+%%%
+
+{ref "sec-fun-introduction"}[Recall] that the following two syntactic variations define the same identity function.
+-/
+def I₁ {α : Sort u} : α → α := λ x ↦ x
+
+def I₂ {α : Sort u} (x : α) : α := x
+/-
+Whether an argument is written to the left or the right of `:` is merely cosmetic for a function, but for a type constructor the two sides play distinct role. Arguments on the left-hand side are _parameters_ and those on the right-hand side are _indices_. Constructors inherit the parameters as implicit arguments, but not the indices. We will {ref "sec-inductive-types-intro"}[return] to this.
+
+`EmptyProd` has two parameters.
+-/
+#print EmptyProd
+/-
+Indices appear in `Eq` that encodes equality. Its type constructor takes three arguments, the being first implicit.
+-/
+example : {α : Sort u} → α → α → Prop := Eq
+/-
+Only the first two arguments are parameters, the third is an index. Their difference becomes clear when we consider the {ref "sec-inductive-types-intro"}[constructor] and {ref "sec-arguments-of-recursors"}[recursor] of `Eq`.
+-/
+#print Eq
+/-
+Here is a constructorless inductive type whose type constructor has the same type as `Eq`.{margin}[We disable [auto-promotion of indices][auto-promote-indices], a translation at the elaboration stage that promotes indices to parameters whenever possible.]
+
+[auto-promote-indices]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#inductive___autoPromoteIndices
+
+-/
+set_option inductive.autoPromoteIndices false in
+inductive EmptyEq {α : Sort u} (a : α) : α → Prop
+
+#print EmptyEq
+/-
+
+
+## Universes
+%%%
+tag := "sec-universe-placement"
+%%%
+
+We can encode natural numbers in the universe right above `Type`.{margin}[We show {ref "sec-peano"}[later] that both `Nat` and `NextLevelNat` satisfy the [Peano axioms][peano].]
+
+[peano]: https://en.wikipedia.org/wiki/Peano_axioms
+
+-/
+inductive NextLevelNat : Sort 2 where
+  | zero : NextLevelNat
+  | succ (n : NextLevelNat) : NextLevelNat
+/-
+In contrast, the following inductive type does not encode natural numbers.
+-/
+inductive NotNat : Sort 0 where
+  | zero : NotNat
+  | succ (n : NotNat) : NotNat
+/-
+Indeed, `NotNat` inhabits `Prop`, the universe of propositions, and
+-/
+example : NotNat.zero = NotNat.succ NotNat.zero := rfl
+/-
+due to proof irrelevance.
+
+
+# Introduction
+%%%
+tag := "sec-inductive-types-intro"
+%%%
+
+Expressions of an inductive type are introduced using its constructors. The Cartesian product has a single constructor called `Prod.mk`.
+-/
+example :
+  {α : Type u} → {β : Type v} → α → β → Prod α β := Prod.mk
+/-
+We define our version.
 -/
 inductive Prod' (α : Type u) (β : Type v) : Type (max u v)
   where
-  | mk : (fst : α) → (snd : β) → Prod' α β
-/-
-The type constructor `Prod'` is a function taking two arguments.
--/
-example : Type u → Type v → Type (max u v) := Prod'
-/-
-The only constructor `Prod'.mk` has the type
--/
+  | mk (fst : α) (snd : β) : Prod' α β
+
 example :
-  (α : Type u) → (β : Type v) →
-  (fst : α) → (snd : β) → Prod' α β := @Prod'.mk
+  {α : Type u} → {β : Type v} →
+  α → β → Prod' α β := Prod'.mk
 /-
-The arguments `α` and `β` are called _parameters_. They are shared by the type constructor `Prod'` and the constructor `Prod'.mk`. The latter takes them as implicit arguments. Its remaining arguments, `fst` and `snd`, are called _fields_.
+The parameters `α` and `β` are shared by the type constructor `Prod'` and the constructor `Prod'.mk`. The latter takes them as implicit arguments. Its remaining arguments, `fst` and `snd`, are called _fields_.
 
 Earlier we considered the product of `ℕ` with itself and used the notation `(0, 1)`, which is syntactic sugar for `Prod.mk 0 1`.
 -/
@@ -184,154 +224,249 @@ The inductive type `Sum` encodes [disjoint union][disjoint-union]. It can be def
 -/
 inductive Sum' (α : Type u) (β : Type v) : Type (max u v)
   where
-  | inl (x : α) : Sum' α β
-  | inr (x : β) : Sum' α β
+  | inl (a : α) : Sum' α β
+  | inr (b : β) : Sum' α β
 /-
-Both the constructors `inl` and `inr` take the parameters `α` and `β` as implicit arguments.
+Both the constructors `Sum'.inl` and `Sum'.inr` take the parameters `α` and `β` as implicit arguments and have one field.
 -/
 example :
-  (α : Type u) → (β : Type v) →
-  (x : α) → Sum' α β := @Sum'.inl
+  {α : Type u} → {β : Type v} →
+  α → Sum' α β := Sum'.inl
 
 example :
-  (α : Type u) → (β : Type v) →
-  (x : β) → Sum' α β := @Sum'.inr
+  {α : Type u} → {β : Type v} →
+  β → Sum' α β := Sum'.inr
 /-
 
-The parameters `(a1 : α1), …, (an: αn)` of the type constructor `T` of an inductive type are subject to the following _uniformity requirement_: for any application `T b1 … bm` of `T` in the definition of the type, `bj` must be definitionally equal to `aj` for `j = 1, …, n`.
-
-The following definition is invalid.
-```lean +error
-inductive BadSum (α : Type u) (β : Type v) : Type (max u v)
-  where
-  | inl (x : α) : BadSum α β
-  | inr (x : β) : BadSum β α
-```
-
-We can define a version of `Prod` in a convoluted way, making use of the fact that `(λ t ↦ t) α` is definitionally equal to `α`.
--/
-inductive Pro'' (α : Type u) (β : Type v) : Type (max u v)
-  where
-  | mk : (fst : α) → (snd : β) → Pro'' ((λ t ↦ t) α) β
-
-#print Prod'
-#print Pro''
-/-
-
-The following user-facing surface syntax is also supported. This syntax is relevant because `Eq` makes use of it, as we will see shortly.
--/
-inductive Pr''' :
-  (α : Type u) → (β : Type v) → Type (max u v)
-  where
-  | mk : {α : Type u} → {β : Type v} →
-    (fst : α) → (snd : β) → Pr''' α β
-
-#print Prod'
-#print Pr'''
-/-
-This syntax relies on [auto-promotion of indices][auto-promote-indices], a translation at the elaboration stage. The convoluted definition does not work with auto-promotion of indices.
-
-[auto-promote-indices]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#inductive___autoPromoteIndices
-
-```lean +error
-inductive BadProd :
-  (α : Type u) → (β : Type v) → Type (max u v)
-  where
-  | mk : {α : Type u} → {β : Type v} →
-    (fst : α) → (snd : β) → BadProd ((λ t ↦ t) α) β
-```
-
-
-# Indices
-%%%
-tag := "sec-indexed-families"
-%%%
-
-The type constructor of an inductive types can take arguments that are not shared with the constructors of the type. Such arguments are called _indices_. Indices can be seen as defining a family of types: each choice of indices selects a particular member of the family. An example is given by {lean}`Eq` that encodes equality. We define our version as follows.{margin}[Our `Eq'` is not quite the same as the standard `Eq`. The constructor of the latter takes the second parameter explicitly rather than implicitly. We take the view that `Eq` abuses auto-promotion of indices and that `Eq'` is a more natural way to define equality. Counterarguments to this view are [welcome][refute].]
+The inductive type `Eq` can be defined as follows.{margin}[Our `Eq'` is not quite the same as the standard `Eq`. The constructor of the latter takes the second parameter explicitly rather than implicitly. We take the view that `Eq` abuses auto-promotion of indices and that `Eq'` is a more natural way to define equality. Counterarguments to this view are [welcome][refute].]
 
 [refute]: https://leanprover.zulipchat.com/#narrow/channel/113489-new-members/topic/Why.20the.20constructor.20of.20Eq.20doesn't.20take.20implicit.20parameters.3F/with/577656843
 
 -/
-#print Eq
-
 inductive Eq' {α : Sort u} (a : α) : α → Prop where
   | refl : Eq' a a
-
-#print Eq'
 /-
-
-The type constructor `@Eq'` is a function taking three arguments.
+The constructor `Eq'.refl` takes the parameters `α` and `a` as implicit arguments and has no fields.
 -/
-example : (α : Sort u) → (a : α) → α → Prop := @Eq'
+example : {α : Sort u} → {a : α} → Eq' a a := Eq'.refl
 /-
-The first two arguments are parameters, while the third argument is an index. The constructor `@Eq'.refl` has no fields.
--/
-example : (α : Sort u) → (a : α) → Eq' a a := @Eq'.refl
-/-
-
 Applying the constructor `Eq'.refl` to an expression `a` gives `Eq' a a`, where the parameter and index of type `α` take the same value `a`. As a result, we can construct an expression of type `Eq' a a` for any `a`, but we cannot construct expressions of type `Eq' a b` when `a` and `b` are distinct (modulo definitional equality). In this way, `Eq'` encodes the equality between expressions.
 
 
-# Recursors
+## Anonymous constructor syntax
+%%%
+tag := "sec-anon-const-syntax"
+%%%
 
-Inductive types come with a disciplined way of elimination, reflecting their construction. This deconstruction is based on [pattern matching][pattern-matching] at the user-facing surface syntax level.{margin}[The use of both _application_ and _evaluation_ for function elimination is standard. Similarly, we employ both _elimination_ and _deconstruction_ in the context of inductive types.] Pattern matching is translated into applications of [recursors][recursor] at the elaboration stage. The recursor of an inductive type is completely determined by the type constructor and the constructors.
+If an inductive type has a single constructor, then this constructor is eligible for the [anonymous constructor syntax][anon-const-syntax]: instead of writing the constructor's name applied to its arguments, the arguments can be enclosed in angle brackets and separated with commas. {index}[`⟨…⟩`]
 
-[pattern-matching]: https://lean-lang.org/doc/reference/latest/Terms/Pattern-Matching/
-[recursor]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#recursors
-
-For instance, the [predecessor][predecessor] function is defined as follows. {index}[match … with]
-
-[predecessor]: https://en.wikipedia.org/wiki/Primitive_recursive_function#Predecessor
+[anon-const-syntax]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#anonymous-constructor-syntax
 
 -/
-def pred (n : Nat') : Nat' :=
-  match n with
-  | zero   => zero
-  | succ m => m
+example
+  (α : Type u) (β : Type v) (a : α) (b : β)
+  : Prod'.mk a b = ⟨a, b⟩
+:= rfl
 /-
-The predecessor function maps `n` constructed as `zero` to `zero`, and `n` constructed as `succ m` to `m`.
 
 
-## Translation of pattern matching
+## Well-formedness requirements
 %%%
-tag := "sec-pattern-matching"
+tag := "sec-well-formedness"
 %%%
+
+Constructors of the inductive type are subject to a number of [well-formedness requirements][well-formedness-req]. Consider an inductive type and write `T`, `a1, …, an`, and `c1, …, cm` for its type constructor, parameters, and constructors. {ref "sec-inductive-type-formation"}[Recall] that `T` has a universe as its final codomain. Write `Sort u` for this universe. For each `i = 1, …, m`:
+
+[well-formedness-req]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#well-formed-inductives
+
+* The constructor `ci` must have a saturated application of `T` as its final codomain.
+
+* The parameters must appear uniformly in `ci`. That is, for any application `T b1 … bk`, `bj` must be definitionally equal to `aj` for `j = 1, …, n`.
+
+* If `u > 0` then for each field `x` of `ci`, writing `α` for the type of `x`, the type `Sort v` of `α` must satisfy `v ≤ u`.{margin}[This universe level requirement is similar to the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule].]
+
+In addition, inductive types must satisfy a strict-positivity requirement related to elimination. We {ref "sec-strict-positivity"}[return] to this.
+
+The following definition is invalid since the constructor does not inhabit the type constructor.
+```lean +error
+inductive InvalidInhabitant : Type where
+  | mk : Nat
+```
+
+The following definition is invalid since the constructor inhabits an unsaturated application of the type constructor.
+```lean +error
+inductive UnsaturatedInhabitant (α : Type) : Type where
+  | mk : UnsaturatedInhabitant
+```
+
+The following definition is invalid since the application `NonuniformProd β α` has the parameters in a wrong order.
+```lean +error
+inductive NonuniformParams (α β : Type) : Type where
+  | mk : NonuniformParams β α
+```
+
+The following definition is invalid since its parameter `α` inhabits a universe with too large level.
+```lean +error
+inductive InvalidParamLevel (α : Type 1) : Type where
+  | mk (x : α) : InvalidParamLevel α
+```
+
+The following definition is invalid since its field `x` inhabits a universe with too large level.
+```lean +error
+inductive InvalidFieldLevel : Type where
+  | mk (x : Type) : InvalidFieldLevel
+```
+
+
+# Elimination
 -/
 -- -show
 compile_inductive% Nat'
 compile_inductive% Prod'
+compile_inductive% Sum'
 compile_inductive% Eq'
 /-
 
-The recursor of `Nat'` is `Nat'.rec`. Like all recursors, it has a function type.
+Inductive types come with a disciplined way of elimination, reflecting their construction. This deconstruction is based on [pattern matching][pattern-matching] at the user-facing surface syntax level.{margin}[The use of both _application_ and _evaluation_ for function elimination is standard. Similarly, we employ both _elimination_ and _deconstruction_ in the context of inductive types.] Pattern matching is translated into applications of [recursors][recursor] at the elaboration stage.
+
+The recursor of an inductive type is determined by the type constructor and the constructors. It has a function type and the name `rec` in the namespace of the inductive type. For example, the recursors of `Prod'` and `Nat'` are `Prod'.rec` and `Nat'.rec`.
 -/
+#print Prod'.rec
 #print Nat'.rec
 /-
 
-To get a glimpse of how `pred` is translated into an application of `Nat'.rec`, we consider a function `pred'` that is extensionally equal to `pred` and that uses `Nat'.rec` directly.{margin}[After asking the pretty-printer to be verbose by setting the option `pp.all` to `true`, it is possible to start from `#print pred` and trace how `pred` is actually translated to an evaluation of `Nat'.rec`. The translation generated by Lean results in a more complicated expression than the one in our example, and these two expressions are not definitionally equal. This is why the equality is not proven by `rfl` alone.]
--/
-def pred' := @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m)
+[pattern-matching]: https://lean-lang.org/doc/reference/latest/Terms/Pattern-Matching/
+[recursor]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#recursors
 
+
+## Pattern matching
+%%%
+tag := "sec-pattern-matching"
+%%%
+
+We will consider the surface level pattern matching via two examples, and study the kernel level recursors more systematically.
+
+As the first example, we define the projection of a pair to its component by using pattern matching. {index}[match … with]
+-/
+def Prod'.fst {α : Type u} {β : Type v}
+  (p : Prod' α β) : α :=
+  match p with
+  | mk a _ => a
+
+example : (Prod'.mk 0 1).fst = 0 := rfl
+/-
+In fact, such projections are generated automatically.
+-/
+example : (Prod'.mk 0 1).1 = 0 := rfl
+example : (Prod'.mk 0 1).2 = 1 := rfl
+/-
+The following shorthand is also available, reflecting the anonymous constructor syntax.
+-/
+example (α : Type u) (β : Type v) (pair : Prod α β) : α :=
+  let ⟨a, _⟩ := pair
+  a
+/-
+
+We can define the projection of a pair to its component by using the recursor of `Prod'` directly.
+-/
+def Prod'.fst' {α : Type u} {β : Type v}
+  := @Prod'.rec α β (λ _ ↦ α) (λ a _ ↦ a)
+/-
+Here `λ a _ ↦ a` corresponds to the pattern `mk a _ => a`. We will return to the other arguments.
+
+The earlier function `Prod'.fst` is translated to the same use of the recursor.
+-/
+example (α : Type u) (β : Type v) (p : Prod' α β) :
+  Prod'.fst p = Prod'.fst' p := rfl
+/-
+
+As the second example, let us define the [predecessor][predecessor] function using pattern matching.
+
+[predecessor]: https://en.wikipedia.org/wiki/Primitive_recursive_function#Predecessor
+
+-/
+def Nat'.pred (n : Nat') : Nat' :=
+  match n with
+  | zero => zero
+  | succ m => m
+/-
+The predecessor function maps `n` constructed as `zero` to `zero`, and `n` constructed as `succ m` to `m`. We can define the same function using the recursor of `Nat'` directly.
+-/
+def Nat'.pred' := @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m)
+/-
+Here `zero` corresponds to the pattern `zero => zero` and `λ m _ ↦ m` to `succ m => m`.
+
+The translation of `Nat'.pred` generated by Lean results in a more complicated expression than the one defining `Nat'.pred'`. We can show that these two functions are equal, but not by `rfl` alone.{margin}[After asking the pretty-printer to be verbose by setting the option `pp.all` to `true`, it is possible to start from `#print Nat'.pred` and trace how `Nat'.pred` is actually translated to an evaluation of `Nat'.rec`.]
+-/
+open Nat' in
 example (n : Nat') : pred n = pred' n
-:= Nat'.rec rfl (λ _ _ ↦ rfl) n
+:= rec rfl (λ _ _ ↦ rfl) n
 /-
-The first argument of `@Nat'.rec` is implicit. It is called the _motive_. The motive specifies the codomain of the resulting function. Since this codomain may depend on the argument of the function, the motive itself is a function. In the case of `pred'`, the codomain `Nat'` does not depend on the argument, and the argument of the motive is ignored.
-
-The second argument `zero` of `@Nat'.rec` prescribes how `zero` is mapped. It corresponds to `zero => zero` in the definition of `pred`. The third argument `λ m _ ↦ m` prescribes how `succ m` is mapped and corresponds to `succ m => m`.
-
-The constructor
--/
-example : Nat' → Nat' := Nat'.succ
-/-
-takes a _recursive argument_, that is, an argument of the same inductive type it constructs. The ignored argument in `λ m _ ↦ m` is the _induction hypothesis_ associated to this recursive argument. While ignored here, induction hypotheses will be useful {ref "sec-induction"}[later]: as their name indicates, recursors are not used only for pattern matching.
 
 
-## Arguments of recursors
+## Recursors
 %%%
 tag := "sec-arguments-of-recursors"
 %%%
 
-Consider the type of `@Nat'.rec`.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it. {index}[`/- … -/`] Here they are used to label parts of the type.]
+We will study the types of recursors of `Prod'`, `Sum'`, `Eq'`, and `Nat'`. Consider the type of `Prod'.rec`, labelled with comments.{margin}[In Lean, a line comment is written using `--`, {index}[`--`] while `/-` begins a block comment and `-/` ends it.] {index}[`/- … -/`]
+-/
+example :
+  {α : Type u} → {β : Type v} /- parameters -/ →
+  {motive : Prod' α β → Sort w} /- motive -/ →
+
+  -- minor premises:
+  ((a : α) → (b : β) → motive (Prod'.mk a b)) /- mk -/ →
+
+  (p : Prod' α β) /- major premise -/ →
+  motive p /- codomain -/
+:= Prod'.rec
+/-
+All recursors take a _motive_ as an implicit argument and a _major premise_ as an explicit argument. The motive specifies the codomain depending on the major premise. For example, the codomain `α` of `Prod'.fst'` does not depend on the major premise `p`.
+-/
+example : {α : Type u} → {β : Type v} →
+  (p : Prod' α β) → α := Prod'.fst'
+/-
+The motive `λ _ ↦ α` ignores its argument in the definition of `Prod'.fst'`.
+
+If an inductive type has parameters, its recursor takes them as implicit arguments preceding the motive. For each constructor, the recursor additionally takes an explicit argument following the motive, called a _minor premise_. A minor premise takes the constructor's fields as arguments, and its final codomain is determined by the motive. It specifies how an expression introduced by that constructor is eliminated. For example, the minor premise `λ a _ ↦ a` in the definition of `Prod'.fst'` eliminates an expression of the form `Prod'.mk a b` to `a`.
+
+The recursor of `Sum'` differs from that of `Prod'` only in minor premises: since `Sum'` has two constructors, there are two minor premises.
+-/
+example :
+  {α : Type u} → {β : Type v} /- parameters -/ →
+  {motive : Sum' α β → Sort w} /- motive -/ →
+
+  -- minor premises:
+  ((a : α) → motive (Sum'.inl a)) /- inl -/ →
+  ((b : β) → motive (Sum'.inr b)) /- inr -/ →
+
+  (p : Sum' α β) /- major premise -/ →
+  motive p /- codomain -/
+:= Sum'.rec
+/-
+
+The recursor of `Eq'` differs more from that of `Prod'` due to the presence of an index.
+-/
+example :
+  {α : Sort u} → {a : α} /- parameters -/ →
+  {motive : (x : α) → Eq' a x → Sort v} /- motive -/ →
+
+  -- minor premises:
+  motive a Eq'.refl /- refl -/ →
+
+  (b : α) /- indices -/ →
+  (h : Eq' a b) /- major premise -/ →
+  motive b h /- codomain -/
+:= Eq'.rec
+/-
+In general, if an inductive type has indices, its recursor takes them as explicit arguments preceding the major premise.
+
+For `Prod'` and `Sum'`, the domain of the motive coincides with the type of major premise. For `Eq'`, the domain of the motive is the $`\Pi`-type `(x : α) → Eq' a x` whose codomain `Eq' a x` differs from the type of major premise only in the index.
+
+The distinction between parameters and indices is apparent in recursors. Parameters are uniform in the sense that they precede all other arguments of the recursor. By contrast, indices precede only the major premise and occur as additional arguments of the motive.
+
+The recursor of `Nat'` does not have any parameters or indices.
 -/
 example :
   (motive : Nat' → Sort u) /- motive -/ →
@@ -344,139 +479,19 @@ example :
   motive n /- codomain -/
 := @Nat'.rec
 /-
-As above, the first argument of `@Nat'.rec` is the motive. The last argument is called the _major premise_. In the case of `@Nat'.rec`, the remaining arguments are called the _minor premises_.
-
-There is one minor premise for each constructor. The type or codomain of each minor premise is determined by the motive. A minor premise takes arguments of the same type as the constructor, excluding the parameters of the type. If the constructor takes recursive arguments, the minor premise additionally takes one induction hypothesis for each such argument. In the example above, the only induction hypothesis is the argument with type `motive m` in the minor premise associated to `Nat'.succ`.
-
-Next, consider the type of `@Prod'.rec`.
+The constructor
 -/
-example :
-  (α : Type u) → (β : Type v) /- parameters -/ →
-  (motive : Prod' α β → Sort w) /- motive -/ →
-
-  -- minor premises (mk):
-  ((fst : α) → (snd : β) → motive (Prod'.mk fst snd)) →
-
-  (pair : Prod' α β) /- major premise -/ →
-  motive pair /- codomain -/
-:= @Prod'.rec
+example : Nat' → Nat' := Nat'.succ
 /-
-`Prod'` is an inductive type with parameters. Its parameters precede the motive. As `Prod'` has a single constructor `Prod'.mk`, there is a single minor premise. Like `Nat'.succ`, `Prod'.mk` is a function, but unlike `Nat'.succ`, it is not recursive as it does not take an argument of type `Prod'`. Hence the minor premise does not take any induction hypotheses. Apart from the parameters `α : Type u` and `β : Type v`, the minor premise takes the same arguments as the constructor `@Prod'.mk`:
--/
-example :
-  (α : Type u) → (β : Type v) →
-  (fst : α) → (snd : β) → Prod' α β := @Prod'.mk
-/-
-
-Finally, consider the type of `@Eq'.rec`.
--/
-example :
-  (α : Sort u) → (a : α) /- parameters -/ →
-  (motive : (x : α) → Eq' a x → Sort v) /- motive -/ →
-
-  -- minor premises:
-  motive a Eq'.refl /- refl -/ →
-
-  (b : α) /- indices -/ →
-  (h : Eq' a b) /- major premise -/ →
-  motive b h /- codomain -/
-:= @Eq'.rec
-/-
-Like for `Prod'`, the parameters of `Eq'` precede the motive. As `Eq'` has a single constructor `Eq'.refl`, there is a single minor premise. Unlike `Nat'` and `Prod'`, `Eq'` is an indexed family of types. Its index precedes the major premise.
-
-For `Nat'` and `Prod'`, the domain of the motive coincides with the type of major premise. For `Eq'`, the domain of the motive is the Π-type `(x : α) → Eq' a x`. Its index `x : α` is of the same type as the index of `Eq'`, and its codomain `Eq' a x` differs from the type of major premise only in the index.
-
-The distinction between parameters and indices is apparent in recursors. Parameters are uniform in the sense that they precede all other arguments of the recursor. By contrast, indices precede only the major premise and occur as additional arguments of the motive.
+takes a _recursive argument_, that is, an argument of the same inductive type it constructs. The second argument in the associated minor premise is an _induction hypothesis_. In general, a minor premise takes an induction hypothesis for each recursive argument. We will return to induction {ref "sec-induction"}[later].
 
 
-# Reduction of iota kind
+## Strict positivity
 %%%
-tag := "sec-iota-reduction"
+tag := "sec-strict-positivity"
 %%%
 
-$`\iota`-reduction governs the interaction between recursors and constructors. It reduces applications of a recursor whose major premise is a constructor by selecting the corresponding minor premise.
-
--/
-example :
-  @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m) zero = zero
-:= rfl
-
-#reduce @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m) zero
-#reduce zero
-/-
-Here the major premise is `zero`, corresponding to the _first_ constructor of `Nat'`. Accordingly, $`\iota`-reduction selects the _first_ minor premise, namely `zero`.
-
--/
-variable (n : Nat')
-
-example :
-  @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m) (succ n) = n
-:= rfl
-
-#reduce @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m) (succ n)
-#reduce n
-/-
-Here the major premise is `succ n`, corresponding to the _second_ constructor of `Nat'`. Accordingly, $`\iota`-reduction selects the _second_ minor premise `λ m _ ↦ m`, which is then applied to the argument `n` of the major premise `succ n`.
-
-Together with $`\beta`- and $`\delta`-reductions, $`\iota`-reduction enables the following.
--/
-example : pred zero = zero := rfl
-example : pred (succ n) = n := rfl
-
-#reduce pred zero
-#reduce pred (succ n)
-/-
-
-
-# Well-formedness requirements
-%%%
-tag := "sec-well-formedness"
-%%%
-
-
-[well-formedness-req]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#well-formed-inductives
-
-Inductive type definitions are subject to a number of [well-formedness requirements][well-formedness-req]. The _basic shape requirements_ are:
-
-* The type or codomain of the type constructor is a universe.
-* The type or codomain of each constructor is a saturated application of the type constructor.
-
-The _universe level requirements_ are similar to the {ref "sec-impredicative-lub-rule"}[impredicative maximum rule]. Namely, if a type inhabits `Sort u` with `u > 0`, then it is required that:
-
-* For each parameter: if the parameter inhabits `Sort v`, then `v ≤ u`.
-* For each field of each constructor: if the field inhabits `Sort v`, then `v < u`.
-
-The following two definitions are invalid due to some of their parameters having a too large universe level.
-
-```lean +error
-inductive BadProd :
-  Type (u + 1) → Type v → Type (max u v)
-  where
-  | mk : {α : Type (u + 1)} → {β : Type v} →
-    (fst : α) → (snd : β) → BadProd α β
-```
-
-```lean +error
-inductive BadProd' :
-  Type u → Type (v + 1) → Type (max u v)
-  where
-  | mk : {α : Type u} → {β : Type (v + 1)} →
-    (fst : α) → (snd : β) → BadProd' α β
-```
-
-The following definition is invalid due to the only field of its only constructor having a too large universe level.
-
-```lean +error
-inductive BadWrap : Type u where
-  | mk (α : Type u) : BadWrap
-```
-Raising the universe level of the inductive type makes the definition valid.
--/
-inductive GoodWrap : Type (u + 1) where
-  | mk (α : Type u) : GoodWrap
-/-
-
-There are other requirements as well, the most important of which is [strict-positivity][strict-positivity]. For instance, the following definition is invalid since it violates this requirement.
+The [strict-positivity][strict-positivity] requirement rules out inductive types whose recursors would be inconsistent.{margin}[The kernel enforces this requirement by a syntactic check, rather than by detecting an inconsistency. The requirement also rules out some inductive types that would not in fact be problematic.] For instance, the following definition is invalid since it violates this requirement.
 
 [strict-positivity]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#strict-positivity
 
@@ -517,6 +532,80 @@ example (Bad : Sort u) (mk : (Bad → Bad) → Bad)
 /-
 
 
+# Reduction
+%%%
+tag := "sec-iota-reduction"
+%%%
+
+$`\iota`-reduction governs the interaction between recursors and constructors. It reduces applications of a recursor whose major premise is a constructor by selecting the corresponding minor premise.
+
+-/
+open Nat' in
+example : @rec (λ _ ↦ Nat') zero (λ m _ ↦ m) zero = zero
+:= rfl
+
+open Nat' in
+#reduce @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m) zero
+/-
+Here the major premise is `zero`, corresponding to the _first_ constructor of `Nat'`. Accordingly, $`\iota`-reduction selects the _first_ minor premise, namely `zero`.
+
+-/
+open Nat' in
+example (n : Nat')
+  : @rec (λ _ ↦ Nat') zero (λ m _ ↦ m) (succ n) = n
+:= rfl
+
+open Nat' in
+variable (n : Nat') in
+#reduce @Nat'.rec (λ _ ↦ Nat') zero (λ m _ ↦ m) (succ n)
+/-
+Here the major premise is `succ n`, corresponding to the _second_ constructor of `Nat'`. Accordingly, $`\iota`-reduction selects the _second_ minor premise `λ m _ ↦ m`, which is then applied to the argument `n` of the major premise `succ n`.
+
+Together with $`\beta`- and $`\delta`-reductions, $`\iota`-reduction enables the following.
+-/
+open Nat' in
+example : pred zero = zero := rfl
+
+open Nat' in
+example (n : Nat') : pred (succ n) = n := rfl
+
+open Nat' in
+#reduce pred zero
+
+open Nat' in
+variable (n : Nat') in
+#reduce pred (succ n)
+/-
+
+
+# Equality
+
+{ref "sec-function-eta-equivalence"}[Recall] that function $`\eta`-equivalence identifies a function with the $`\lambda`-abstraction obtained by applying it to an argument. There is an analogous $`\eta`-equivalence for inductive types with a single constructor and no indices.
+-/
+variable (x : Prod' ℕ ℕ)
+
+example : ⟨x.1, x.2⟩ = x := rfl
+/-
+Written without syntactic sugar, this is
+-/
+example : Prod'.mk x.1 x.2 = x := rfl
+/-
+The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, their normal forms differ.
+-/
+#reduce Prod'.mk x.1 x.2
+#reduce x
+/-
+
+An inductive type can be viewed as being freely generated by its constructors: two expressions inhabiting it are equal only if they are introduced using the same constructor taking equal arguments. In other words, expressions introduced using distinct constructors are distinct, and each constructor is injective.
+-/
+example (n : Nat') : Nat'.succ n ≠ Nat'.zero := nofun
+
+example (n m : Nat') (h : Nat'.succ n = Nat'.succ m) : n = m
+:= Nat'.succ.inj h
+/-
+Lean generates injectivity theorems such as `Nat'.succ.inj` automatically. Their proofs use recursors. We will {ref "sec-equality"}[return] to constructor distinctness and injectivity.
+
+
 # Structures
 %%%
 tag := "sec-structures"
@@ -537,8 +626,11 @@ structure Prod (α : Type u) (β : Type v) where
 
 end Demo
 /-
+We introduced the [namespace][namespace] `Demo` to avoid a clash with the existing name `Prod`.
 
-The constructor is named `mk`,{margin}[Name `mk` is used unless a name is provided with `::` {index}[`::`] [syntax][constructor-name].] and it has the fields `fst : α` and `snd : β`. Therefore, the above structure declaration yields the same constructor as our earlier definition of `Prod`.
+[namespace]: https://lean-lang.org/doc/reference/latest/Namespaces-and-Sections/#namespaces
+
+The constructor is named `mk`,{margin}[Name `mk` is used unless a name is provided with `::` {index}[`::`] [syntax][constructor-name].] and it has the fields `fst : α` and `snd : β`. Therefore, the above structure declaration yields the same constructor as our earlier definition of `Prod'`.
 
 [constructor-name]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#structure-constructors
 
@@ -548,7 +640,7 @@ example : (0, 1).fst = 0 := rfl
 example : (0, 1).snd = 1 := rfl
 /-
 
-Projections of a structure are just syntactic sugar for deconstruction via pattern matching.{margin}[We will refer to all such functions as projections, provided they are associated with an inductive type that could have been defined as a structure, regardless of whether the surface-syntax keyword `structure` was actually used in its definition.]
+Projections of a structure are just syntactic sugar for deconstruction via pattern matching.
 -/
 example
   (α : Type u) (β : Type v) (p : Prod α β)
@@ -556,70 +648,11 @@ example
 := rfl
 /-
 
-
-The fields of a structure can be accessed by indices.
--/
-example
-  (α : Type u) (β : Type v) (p : Prod α β)
-  : p.fst = p.1
-:= rfl
-/-
-
 Structures also support a record-style notation.
 -/
-def origin : ℕ × ℕ where
+example : ℕ × ℕ where
   fst := 0
   snd := 0
-/-
-
-
-## Anonymous constructor syntax
-%%%
-tag := "sec-anon-const-syntax"
-%%%
-
-If an inductive type has a single constructor, then this constructor is eligible for the [anonymous constructor syntax][anon-const-syntax] `⟨…⟩`. {index}[`⟨…⟩`] This syntax can be used, in particular, with structures.
-
-[anon-const-syntax]: https://lean-lang.org/doc/reference/latest/The-Type-System/Inductive-Types/#anonymous-constructor-syntax
-
--/
-example
-  (α : Type u) (β : Type v) (a : α) (b : β)
-  : Prod.mk a b = ⟨a, b⟩
-:= rfl
-/-
-
-The following shorthand is also available.
--/
-example (α : Type u) (β : Type v) (pair : Prod α β) : α :=
-  let ⟨a, _⟩ := pair
-  a
-/-
-
-
-# Structure eta-equivalence
-%%%
-tag := "sec-structure-eta-equivalence"
-%%%
-
-{ref "sec-function-eta-equivalence"}[Recall] that function $`\eta`-equivalence identifies a function with the $`\lambda`-abstraction obtained by applying it to an argument. There is an analogous $`\eta`-equivalence for structures. If the type of an expression `x` is a structure with two fields, then `x` is definitionally equal to the expression obtained by reconstructing it from its projections, namely `⟨x.1, x.2⟩`.
-
-More generally, structure $`\eta`-equivalence applies to structures with any number of fields. It also applies to any inductive type that could be defined as a structure, regardless of whether the surface-syntax keyword `structure` was used in its definition.
-
--/
-variable (x : Prod' ℕ ℕ)
-
-example : ⟨x.1, x.2⟩ = x := rfl
-/-
-
-Written without syntactic sugar, this is
--/
-example : Prod'.mk x.1 x.2 = x := rfl
-/-
-The definitional equality of the left and right-hand sides is not based on them having the same normal form. In fact, their normal forms differ.
--/
-#reduce Prod'.mk x.1 x.2
-#reduce x
 /-
 
 
@@ -674,5 +707,39 @@ example
 Distinct inductive types are not definitionally equal. The following example is invalid.
 ```lean +error
 example : Nat = Nat' := rfl
+```
+
+
+## On auto-promotion of indices
+
+We can define a version of `Prod` in a convoluted way, making use of the fact that `(λ t ↦ t) α` is definitionally equal to `α`.
+-/
+inductive Pro'' (α : Type u) (β : Type v) : Type (max u v)
+  where
+  | mk (fst : α) (snd : β) : Pro'' ((λ t ↦ t) α) β
+
+#print Prod'
+#print Pro''
+/-
+
+The following user-facing surface syntax relies on auto-promotion of indices.
+-/
+inductive Pr''' :
+  (α : Type u) → (β : Type v) → Type (max u v)
+  where
+  | mk {α : Type u} {β : Type v}
+    (fst : α) (snd : β) : Pr''' α β
+
+#print Prod'
+#print Pr'''
+/-
+
+The convoluted definition does not work with auto-promotion of indices.
+```lean +error
+inductive BadProd :
+  (α : Type u) → (β : Type v) → Type (max u v)
+  where
+  | mk {α : Type u} {β : Type v}
+    (fst : α) (snd : β) : BadProd ((λ t ↦ t) α) β
 ```
 -/
